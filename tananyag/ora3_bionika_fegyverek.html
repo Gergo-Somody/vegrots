@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3. Lecke: Bionika & Mag-Arsenal // Vegrots</title>
+  <style>
+    :root {
+      --bg: #0b132b;
+      --card-bg: #1c2541;
+      --accent: #4ade80;
+      --gold: #facc15;
+      --cyan: #38bdf8;
+      --danger: #ef4444;
+      --text: #f8fafc;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; user-select: none; }
+    body { background: var(--bg); color: var(--text); padding: 16px; min-height: 100vh; }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 16px 24px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+    }
+    .title-box h1 { font-size: 1.6rem; color: var(--accent); }
+    .title-box span { font-size: 0.9rem; color: #94a3b8; }
+
+    .btn-nav {
+      padding: 10px 18px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #0f172a;
+      color: var(--cyan);
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn-nav:hover { border-color: var(--cyan); }
+
+    /* FEJEZET TABS */
+    .lesson-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      flex: 1;
+      min-width: 170px;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: bold;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card-bg);
+      color: #94a3b8;
+      cursor: pointer;
+      text-align: center;
+    }
+    .tab-btn.active {
+      background: var(--gold);
+      color: #713f12;
+      border-color: var(--gold);
+      box-shadow: 0 0 15px rgba(250, 204, 21, 0.3);
+    }
+
+    .lesson-section { display: none; }
+    .lesson-section.active { display: block; }
+
+    .card {
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    h2 { color: var(--gold); margin-bottom: 12px; font-size: 1.4rem; }
+    h3 { color: var(--cyan); margin: 16px 0 8px; font-size: 1.15rem; }
+
+    .analogy-box {
+      background: #0f172a;
+      border-left: 4px solid var(--accent);
+      padding: 14px 18px;
+      border-radius: 0 12px 12px 0;
+      margin: 16px 0;
+      font-size: 1.05rem;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 15px;
+    }
+    @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    /* LŐTÉR & SZIMULÁCIÓ */
+    .range-box {
+      background: #0f172a;
+      border-radius: 16px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+    .canvas-container {
+      width: 100%;
+      max-width: 850px;
+      height: 320px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid var(--border);
+      background: #1e293b;
+    }
+    canvas { width: 100%; height: 100%; }
+
+    .range-controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+    }
+    .btn-weapon {
+      padding: 12px 18px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      color: #fff;
+      cursor: pointer;
+    }
+    .btn-weapon.active {
+      background: var(--accent);
+      color: #064e3b;
+      border-color: var(--accent);
+    }
+    .btn-fire {
+      padding: 12px 28px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-radius: 10px;
+      border: none;
+      background: var(--gold);
+      color: #713f12;
+      cursor: pointer;
+    }
+    .btn-fire:active { transform: scale(0.96); }
+
+    /* BIONIKA TALÁLMÁNY KÁRTYÁK */
+    .bionic-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 15px;
+    }
+    .bionic-card {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .bionic-card .badge {
+      align-self: flex-start;
+      font-size: 0.75rem;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: #334155;
+      color: var(--gold);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="title-box">
+      <h1>3. LECKE // BIONIKA & TERMÉSZETES MAG-FEGYVERTÁR</h1>
+      <span>Biomechanika, Magterjedés és Űrtechnológia • Rábapatona</span>
+    </div>
+    <a href="../index.html" class="btn-nav">⬅ Vissza a Hub-ra</a>
+  </header>
+
+  <nav class="lesson-tabs">
+    <button class="tab-btn active" onclick="showSection('weapons')">1. A Természet Fegyvertára (Lőtér)</button>
+    <button class="tab-btn" onclick="showSection('bionics')">2. Magokból Lett Találmányok</button>
+    <button class="tab-btn" onclick="showSection('curse')">3. Miért Menekülnek az Anyanövénytől?</button>
+  </nav>
+
+  <!-- 1. FEJEZET: LŐTÉR SZIMULÁCIÓ -->
+  <main id="sec-weapons" class="lesson-section active">
+    <div class="card">
+      <h2>🎯 Mag-Ballisztikai Lőtér: Hogyan lőnek a növények?</h2>
+      <p>A növények nem tudnak szaladni, ezért mechanikai rugókat, hidraulikus szivattyúkat és aerodinamikus szárnyakat építenek a magjaik köré! Válassz ki egy mechanizmust az érintőtáblán és indítsd a kilövést!</p>
+
+      <div class="range-box">
+        <div class="canvas-container">
+          <canvas id="rangeCanvas"></canvas>
+        </div>
+        <div class="range-controls">
+          <button class="btn-weapon active" onclick="selectWeapon('cucumber')">💥 Magbavalló Uborka (Hidraulika)</button>
+          <button class="btn-weapon" onclick="selectWeapon('maple')">🚁 Juharmag (Helikopter-szárny)</button>
+          <button class="btn-weapon" onclick="selectWeapon('erodium')">🔩 Bürök Gémorr (Önfúró Spirál)</button>
+          <button class="btn-fire" onclick="fireSimulator()">🚀 KILÖVÉS INDÍTÁSA!</button>
+        </div>
+        <div id="weaponDesc" style="color:var(--cyan); font-weight:bold; min-height:24px;">Magbavalló Uborka: 25 bar belső nyomás lövi ki a magot!</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 2. FEJEZET: BIONIKAI TALÁLMÁNYOK -->
+  <main id="sec-bionics" class="lesson-section">
+    <div class="card">
+      <h2>🛠️ Bionika: Amikor az ember a magokat másolta le</h2>
+      <p>A <strong>bionika (biomimikri)</strong> az a tudományág, ahol a mérnökök a természet évmilliók alatt tesztelt zseniális megoldásait alakítják át emberi találmányokká.</p>
+
+      <div class="bionic-grid">
+        <div class="bionic-card">
+          <span class="badge">ŰRTECHNIKA & TEXTIL</span>
+          <h3>1. Bojtorján ➔ Tépőzár (Velcro)</h3>
+          <p><strong>A felfedezés:</strong> George de Mestral kutyájának szőrébe beleakadt bojtorjánfejeket mikroszkóp alá tette: apró rugalmas horgok százait látta.</p>
+          <p><strong>A találmány:</strong> A modern tépőzár, ami nélkül az űrhajósok cipője és űrruhája szétnyílna a Nemzetközi Űrállomáson!</p>
+        </div>
+
+        <div class="bionic-card">
+          <span class="badge">REPÜLŐGÉP-TERVEZÉS</span>
+          <h3>2. Jávai Uborka ➔ Siklórepülő</h3>
+          <p><strong>A minta:</strong> Az <em>Alsomitra</em> csepp alakú profilú, 15 cm-es vitorlázó magja motor nélkül siklik több száz métert.</p>
+          <p><strong>A találmány:</strong> Igo Etrich erről a magról másolta le a világ első stabil motoros siklórepülőjének, az <em>Etrich Taube</em>-nak a szárnyait.</p>
+        </div>
+
+        <div class="bionic-card">
+          <span class="badge">ROBOTIKA & DRÓNOK</span>
+          <h3>3. Bürök Gémorr ➔ Önvető Robotmag</h3>
+          <p><strong>A minta:</strong> A nedvességre dugóhúzóként csavarodó higroszkópos magfarok.</p>
+          <p><strong>A találmány:</strong> A Carnegie Mellon Egyetem olyan drónokból szétszórható nanocellulóz maghordozókat épített, amik emberi kéz nélkül, eső hatására becsavarják magukat a földbe erdőtüzek után!</p>
+        </div>
+
+        <div class="bionic-card">
+          <span class="badge">SZÉLENERGIA</span>
+          <h3>4. Juharmag ➔ Csendes Drón-Propellerek</h3>
+          <p><strong>A minta:</strong> Az ikerlependék forgása közben egy légörvény keletkezik a szárny élén, ami vákuumként lassítja a lebegést.</p>
+          <p><strong>A találmány:</strong> Ultra-csendes drónlégcsavarok és nagyobb hatásfokú szélturbinák lapátjai.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 3. FEJEZET: JANZEN-CONNELL HIPOTÉZIS -->
+  <main id="sec-curse" class="lesson-section">
+    <div class="card">
+      <h2>💀 A Fa alatti „Halálzóna” (Janzen–Connell Törvény)</h2>
+      <p>Gyakran kérdezik a gyerekek: <em>„Miért baj, ha a termés simán csak leesik a fa alá?”</em></p>
+
+      <div class="analogy-box" style="border-color:var(--danger);">
+        ⚠️ <strong>A Fa Töve egy Halálos Csapda a saját gyerekeinek:</strong><br>
+        1. <strong>A Kórokozó-Felhő:</strong> Az öreg juhar lombjában és kérgében évtizedek óta élnek a gombák és kártevők. A fa alá pottyanó gyenge kis csírát azonnal megtámadják.<br>
+        2. <strong>A Kíméletlen Árnyék:</strong> Az anyafa elnyeli a napfény 95%-át, a gyökere pedig kiszívja az összes vizet a kicsi elől.<br>
+        3. <strong>A Rágcsáló-Büfé:</strong> Az erdei egerek pontosan tudják, hol lakik a nagy fa: odamennek, és a földön lévő magvak 98%-át napok alatt felfalják!
+      </div>
+
+      <div class="analogy-box" style="border-color:var(--accent);">
+        🚁 <strong>A Megoldás: Az Ikerlependék Repülőjegye:</strong><br>
+        A juharfa szárnya lehetővé teszi, hogy a mag lassú helikopter-pörgéssel zuhanjon. Míg lassan lebeg, a szél 50–200 méterre fújja el: pont be egy távoli napfényes erdei tisztásra, ahol nincsenek ott az anyafa kártevői!
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function showSection(id) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.lesson-section').forEach(s => s.classList.remove('active'));
+      
+      event.target.classList.add('active');
+      document.getElementById('sec-' + id).classList.add('active');
+      if (id === 'weapons') drawRange();
+    }
+
+    // LŐTÉR CANVAS SZIMULÁTOR
+    const canvas = document.getElementById('rangeCanvas');
+    const ctx = canvas.getContext('2d');
+    let currentWeapon = 'cucumber';
+    let isFiring = false;
+    let animProgress = 0;
+    let animId = null;
+
+    function resizeCanvas() {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+    }
+    window.addEventListener('resize', () => { resizeCanvas(); drawRange(); });
+
+    const WEAPON_DATA = {
+      cucumber: {
+        title: "💥 Magbavalló Uborka",
+        desc: "25 baros belső nyomás! Érintésre leválik a kocsányról, és 100 km/h-val lövi ki a magokat!",
+        draw: (prog, w, h) => {
+          // Ágyúcső (uborka)
+          ctx.fillStyle = '#15803d';
+          ctx.beginPath();
+          ctx.ellipse(80, h - 80, 40, 22, -0.4, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Kocsány
+          ctx.strokeStyle = '#4ade80';
+          ctx.lineWidth = 6;
+          ctx.beginPath();
+          ctx.moveTo(45, h - 65);
+          ctx.lineTo(20, h - 50);
+          ctx.stroke();
+
+          // Kilőtt sugár és magvak
+          if (prog > 0) {
+            ctx.fillStyle = '#fde047';
+            for (let i = 0; i < 6; i++) {
+              let t = Math.max(0, prog - (i * 0.1));
+              let mx = 110 + (t * (w - 180));
+              let my = (h - 95) - Math.sin(t * Math.PI) * 110 + (i * 12);
+              ctx.beginPath();
+              ctx.arc(mx, my, 5, 0, Math.PI * 2);
+              ctx.fill();
+            }
+
+            // Fröccsenés effekt
+            ctx.strokeStyle = 'rgba(74, 222, 128, 0.6)';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(110, h - 95);
+            ctx.lineTo(110 + prog * 150, (h - 95) - prog * 60);
+            ctx.stroke();
+          }
+        }
+      },
+      maple: {
+        title: "🚁 Juharmag (Helikopter)",
+        desc: "Autorotáció: az aszimmetrikus szárny lebegtető örvényt kelt, a szél messzire sodorja!",
+        draw: (prog, w, h) => {
+          let startY = 40;
+          let currentY = startY + (prog * (h - 100));
+          let currentX = 100 + (prog * (w - 220));
+          let angle = prog * Math.PI * 16; // Pörgés!
+
+          ctx.save();
+          ctx.translate(currentX, currentY);
+          ctx.rotate(angle);
+
+          // Szárny
+          ctx.fillStyle = 'rgba(234, 179, 8, 0.7)';
+          ctx.beginPath();
+          ctx.ellipse(25, 0, 30, 8, 0.1, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#a16207';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+
+          // Magfej
+          ctx.fillStyle = '#713f12';
+          ctx.beginPath();
+          ctx.arc(0, 0, 7, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.restore();
+
+          // Lebegési vonal
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.3)';
+          ctx.setLineDash([4, 4]);
+          ctx.beginPath();
+          ctx.moveTo(100, 40);
+          ctx.lineTo(currentX, currentY);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+      },
+      erodium: {
+        title: "🔩 Bürök Gémorr",
+        desc: "Higroszkópos fúró: a spirális farok a nedvesség hatására forogva fúrja be magát!",
+        draw: (prog, w, h) => {
+          let cx = w / 2;
+          let groundY = h - 60;
+          let seedY = groundY - 20 + (prog * 35); // Befúródik a talajba!
+
+          // Mag
+          ctx.fillStyle = '#78350f';
+          ctx.beginPath();
+          ctx.moveTo(cx, seedY);
+          ctx.lineTo(cx - 6, seedY - 25);
+          ctx.lineTo(cx + 6, seedY - 25);
+          ctx.closePath();
+          ctx.fill();
+
+          // Spirál farok
+          ctx.strokeStyle = '#d97706';
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          let turns = 6 - (prog * 2); // Kitekeredik a spirál
+          for (let i = 0; i <= 30; i++) {
+            let t = i / 30;
+            let sy = (seedY - 25) - (t * 70);
+            let sx = cx + Math.sin(t * Math.PI * turns) * 12;
+            if (i === 0) ctx.moveTo(sx, sy);
+            else ctx.lineTo(sx, sy);
+          }
+          ctx.stroke();
+
+          if (prog > 0.5) {
+            ctx.fillStyle = '#4ade80';
+            ctx.font = 'bold 13px sans-serif';
+            ctx.fillText("🔩 Fúrás folyamatban...", cx + 30, seedY);
+          }
+        }
+      }
+    };
+
+    function selectWeapon(key) {
+      currentWeapon = key;
+      document.querySelectorAll('.btn-weapon').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById('weaponDesc').innerText = WEAPON_DATA[key].desc;
+      animProgress = 0;
+      isFiring = false;
+      drawRange();
+    }
+
+    function fireSimulator() {
+      if (isFiring) return;
+      isFiring = true;
+      animProgress = 0;
+
+      function step() {
+        animProgress += 0.015;
+        if (animProgress > 1) animProgress = 1;
+        drawRange();
+
+        if (animProgress < 1) {
+          animId = requestAnimationFrame(step);
+        } else {
+          isFiring = false;
+        }
+      }
+      step();
+    }
+
+    function drawRange() {
+      if (!canvas.width) resizeCanvas();
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Talaj
+      ctx.fillStyle = '#451a03';
+      ctx.fillRect(0, h - 50, w, 50);
+      ctx.strokeStyle = '#22c55e';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(0, h - 50);
+      ctx.lineTo(w, h - 50);
+      ctx.stroke();
+
+      // Aktuális fegyver renderelése
+      WEAPON_DATA[currentWeapon].draw(animProgress, w, h);
+    }
+
+    setTimeout(() => { drawRange(); }, 150);
+  </script>
+</body>
+</html>
