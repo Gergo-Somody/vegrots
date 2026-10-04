@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Magbomba Labor (3:1 Pindstrup) // Vegrots</title>
+  <style>
+    :root {
+      --bg: #0b132b;
+      --card-bg: #1c2541;
+      --accent: #4ade80;
+      --gold: #facc15;
+      --cyan: #38bdf8;
+      --danger: #ef4444;
+      --text: #f8fafc;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; user-select: none; }
+    body { background: var(--bg); color: var(--text); padding: 16px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+
+    header {
+      width: 100%;
+      max-width: 950px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 14px 20px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .title-box h1 { font-size: 1.5rem; color: var(--accent); }
+    .title-box span { font-size: 0.85rem; color: #94a3b8; }
+
+    .btn-nav {
+      padding: 10px 18px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #0f172a;
+      color: var(--cyan);
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn-nav:hover { border-color: var(--cyan); }
+
+    .main-grid {
+      width: 100%;
+      max-width: 950px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    h2 { color: var(--gold); font-size: 1.25rem; display: flex; align-items: center; gap: 8px; }
+    h3 { color: var(--cyan); font-size: 1.05rem; }
+
+    /* RECEPT CSÚSZKÁK & MÉRLEG */
+    .scale-box {
+      background: #0f172a;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .ingredient-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .ingredient-head {
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+    .slider {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .ratio-badge {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      border-radius: 10px;
+      background: #1c2541;
+      border: 1px solid var(--border);
+      font-weight: bold;
+    }
+
+    /* VIZUÁLIS BOMBA CANVAS */
+    .canvas-wrapper {
+      width: 100%;
+      height: 250px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid var(--border);
+      background: #1e293b;
+      position: relative;
+    }
+    canvas { width: 100%; height: 100%; }
+
+    .btn-touch {
+      padding: 12px;
+      font-size: 1.05rem;
+      font-weight: bold;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      text-align: center;
+      transition: transform 0.1s;
+    }
+    .btn-touch.green { background: var(--accent); color: #064e3b; }
+    .btn-touch.gold { background: var(--gold); color: #713f12; }
+    .btn-touch:active { transform: scale(0.97); }
+
+    /* PROTOKOLL LISTA */
+    .step-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 0.9rem;
+      color: #cbd5e1;
+    }
+    .step-list li {
+      background: #0f172a;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border-left: 3px solid var(--cyan);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .warning-box {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid var(--danger);
+      padding: 10px 14px;
+      border-radius: 10px;
+      color: #fca5a5;
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="title-box">
+      <h1>💣 MAGBOMBA KEVERŐ & GYÚRÓ LABOR</h1>
+      <span>1. Óra Gyakorlati Protokoll • 3:1 Pindstrup Technológia</span>
+    </div>
+    <a href="../index.html" class="btn-nav">⬅ Vissza a Hub-ra</a>
+  </header>
+
+  <main class="main-grid">
+    <!-- BAL OLDAL: ARÁNY MÉRLEG & KEVERŐPULT -->
+    <div class="card">
+      <h2>⚖️️ A 3:1 Keverési Arány Beállítása</h2>
+      <p style="font-size:0.9rem; color:#94a3b8;">Állítsd be a hozzávalók arányát a laboratóriumi digitális mérlegen egy 10 db-os csapat-tételhez!</p>
+
+      <div class="scale-box">
+        <div class="ingredient-row">
+          <div class="ingredient-head">
+            <span style="color:#a3e635;">🌱 Pindstrup Finomtőzeg (Rostos szubsztrátum)</span>
+            <span id="peatVal">300 g (3 rész)</span>
+          </div>
+          <input type="range" class="slider" id="peatRange" min="50" max="500" step="25" value="300" oninput="updateMix()">
+        </div>
+
+        <div class="ingredient-row">
+          <div class="ingredient-head">
+            <span style="color:#fb923c;">🧱 Porított Agyag / Bentonit (Kötőanyag)</span>
+            <span id="clayVal">100 g (1 rész)</span>
+          </div>
+          <input type="range" class="slider" id="clayRange" min="20" max="300" step="10" value="100" oninput="updateMix()">
+        </div>
+
+        <div class="ingredient-row">
+          <div class="ingredient-head">
+            <span style="color:#38bdf8;">💧 Víz (Permetezve)</span>
+            <span id="waterVal">80 ml (Optimális gyúrhatóság)</span>
+          </div>
+          <input type="range" class="slider" id="waterRange" min="20" max="250" step="10" value="80" oninput="updateMix()">
+        </div>
+
+        <div class="ratio-badge">
+          <span>Keverési állapot:</span>
+          <span id="mixStatus" style="color:var(--accent);">✅ TÖKÉLETES (3:1 Bionikus golyó)</span>
+        </div>
+      </div>
+
+      <div class="warning-box">
+        ⚠️ <strong>Agronómus szabály:</strong> NEM csinálunk égetett cserépgolyót! Ha túl sok az agyag, a golyó csontkemény kővé szárad a napon, és a csírázó borsó gyenge hajtása nem tudja szétrepeszteni! A tőzeg adja a lélegző szivacsos szerkezetet.
+      </div>
+    </div>
+
+    <!-- JOBB OLDAL: VIZUÁLIS BOMBA & PROTOKOLL -->
+    <div class="card">
+      <h2>🔮 Magbomba Belső Röntgen</h2>
+      <div class="canvas-wrapper">
+        <canvas id="bombCanvas"></canvas>
+      </div>
+
+      <button class="btn-touch green" onclick="simulateCrush()">🔨 PRÓBANYOMÁS (Morzsolódás teszt)</button>
+
+      <h3>📋 5 Lépéses Készítési Protokoll:</h3>
+      <ul class="step-list">
+        <li><strong>1. Száraz keverés:</strong> A 3 rész tőzeget és 1 rész agyagot szárazon alaposan homogenizáljátok tálban!</li>
+        <li><strong>2. Vízpermet:</strong> Apránként adagoljátok a vizet, amíg nedves virágföld állagú nem lesz (nem sáros pacsni!).</li>
+        <li><strong>3. Magbehelyezés:</strong> Formázzatok diónyi (2.5-3 cm) golyót, és a közepébe nyomjatok 2 szem borsót + 3 szem repcemagot!</li>
+        <li><strong>4. Becsomagolás:</strong> Görbítés simára, hogy ne látszódjon ki mag a madarak elől!</li>
+        <li><strong>5. Szárítás:</strong> Tálcán, szobahőmérsékleten 24-48 óra árnyékos szikkasztás a vetésig.</li>
+      </ul>
+    </div>
+  </main>
+
+  <script>
+    const canvas = document.getElementById('bombCanvas');
+    const ctx = canvas.getContext('2d');
+    let peat = 300;
+    let clay = 100;
+    let water = 80;
+    let crushAnim = 0;
+    let isCrushing = false;
+
+    function resizeCanvas() {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+    }
+    window.addEventListener('resize', () => { resizeCanvas(); drawBomb(); });
+
+    function updateMix() {
+      peat = parseInt(document.getElementById('peatRange').value);
+      clay = parseInt(document.getElementById('clayRange').value);
+      water = parseInt(document.getElementById('waterRange').value);
+
+      document.getElementById('peatVal').innerText = `${peat} g (${(peat/clay).toFixed(1)} rész)`;
+      document.getElementById('clayVal').innerText = `${clay} g (1 rész)`;
+      document.getElementById('waterVal').innerText = `${water} ml`;
+
+      const ratio = peat / clay;
+      const statusEl = document.getElementById('mixStatus');
+
+      if (water > 160) {
+        statusEl.innerText = "❌ TÚL SÁROS! Elrothad a mag!";
+        statusEl.style.color = "var(--danger)";
+      } else if (ratio < 2.0) {
+        statusEl.innerText = "❌ TÚL KEMÉNY AGYAG! Kővé válik!";
+        statusEl.style.color = "var(--danger)";
+      } else if (ratio > 4.5) {
+        statusEl.innerText = "❌ SZÉTOMIK! Kevés az agyag-kötődés!";
+        statusEl.style.color = "var(--gold)";
+      } else {
+        statusEl.innerText = "✅ TÖKÉLETES (3:1 Bionikus golyó)";
+        statusEl.style.color = "var(--accent)";
+      }
+
+      drawBomb();
+    }
+
+    function drawBomb() {
+      if (!canvas.width) resizeCanvas();
+      const w = canvas.width;
+      const h = canvas.height;
+      const cx = w / 2;
+      const cy = h / 2;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const ratio = peat / clay;
+      let shellColor = '#451a03'; // Alap tőzegbarna
+      if (ratio < 2.0) shellColor = '#78350f'; // Világos agyagos
+      if (water > 160) shellColor = '#1f2937'; // Fekete iszap
+
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      // KÜLSŐ MAGBOMBA TEST
+      ctx.fillStyle = shellColor;
+      ctx.beginPath();
+      const radius = 65 + (crushAnim * 15);
+      ctx.ellipse(0, 0, radius, radius * (1 - crushAnim * 0.4), 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      // Tőzeg rostok és textúra pöttyök
+      ctx.fillStyle = '#a3e635';
+      for (let i = 0; i < 18; i++) {
+        let ang = (i * 20) * (Math.PI / 180);
+        let dist = (i % 3 === 0 ? 30 : 50) + (crushAnim * 10);
+        ctx.beginPath();
+        ctx.arc(Math.cos(ang) * dist, Math.sin(ang) * dist * (1 - crushAnim * 0.4), 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // BELSŐ VÉDETT MAGVAK
+      if (crushAnim > 0) {
+        // Repedések a héjon próba esetén
+        ctx.strokeStyle = '#facc15';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(-30, -20); ctx.lineTo(-10, 5); ctx.lineTo(-40, 20);
+        ctx.moveTo(25, -15); ctx.lineTo(15, 10); ctx.lineTo(35, 30);
+        ctx.stroke();
+      }
+
+      // Borsószem a magbomba közepén
+      ctx.fillStyle = '#4ade80';
+      ctx.beginPath();
+      ctx.arc(-10, 0, 14, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#064e3b';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Kis repcemag mellette
+      ctx.fillStyle = '#facc15';
+      ctx.beginPath();
+      ctx.arc(16, -6, 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+
+      // Címke a magbomba alatt
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText("Védett Magkamra (Borsó + Repce tőzegágyban)", cx, h - 16);
+    }
+
+    function simulateCrush() {
+      if (isCrushing) return;
+      isCrushing = true;
+      crushAnim = 0;
+
+      let step = 0;
+      const timer = setInterval(() => {
+        step++;
+        crushAnim = Math.sin((step / 20) * Math.PI) * 0.4;
+        drawBomb();
+
+        if (step >= 20) {
+          clearInterval(timer);
+          isCrushing = false;
+          crushAnim = 0;
+          drawBomb();
+          alert("Próbanyomás kész: A szerves tőzegburok rugalmasan reped, a magvak épek maradtak a bunkerben!");
+        }
+      }, 30);
+    }
+
+    setTimeout(() => { resizeCanvas(); updateMix(); }, 150);
+  </script>
+</body>
+</html>

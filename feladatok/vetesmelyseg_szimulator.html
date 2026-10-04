@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vetésmélység Szimulátor // Vegrots Labor</title>
+  <style>
+    :root {
+      --bg: #0b132b;
+      --card-bg: #1c2541;
+      --accent: #4ade80;
+      --gold: #facc15;
+      --cyan: #38bdf8;
+      --danger: #ef4444;
+      --text: #f8fafc;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; user-select: none; }
+    body { background: var(--bg); color: var(--text); padding: 16px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+
+    header {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 14px 20px;
+      border-radius: 16px;
+      margin-bottom: 16px;
+    }
+    .title-box h1 { font-size: 1.5rem; color: var(--accent); }
+    .title-box span { font-size: 0.85rem; color: #94a3b8; }
+
+    .btn-nav {
+      padding: 10px 18px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #0f172a;
+      color: var(--cyan);
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn-nav:hover { border-color: var(--cyan); }
+
+    .sim-card {
+      width: 100%;
+      max-width: 900px;
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .canvas-box {
+      width: 100%;
+      height: 340px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 2px solid var(--border);
+      background: #1e293b;
+      position: relative;
+    }
+    canvas { width: 100%; height: 100%; }
+
+    /* VEZÉRLŐPULT */
+    .controls-panel {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .seed-selector {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .btn-seed {
+      flex: 1;
+      min-width: 140px;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-seed.active {
+      border-color: var(--cyan);
+      background: #0284c7;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+    }
+
+    .slider-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1c2541;
+      padding: 12px 18px;
+      border-radius: 10px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .slider-row label {
+      font-size: 1.05rem;
+      font-weight: bold;
+    }
+    .slider-row input[type="range"] {
+      flex: 1;
+      min-width: 200px;
+      height: 8px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .btn-launch {
+      padding: 14px;
+      font-size: 1.15rem;
+      font-weight: 900;
+      border-radius: 12px;
+      border: none;
+      background: var(--accent);
+      color: #064e3b;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(74, 222, 128, 0.3);
+      transition: transform 0.1s;
+    }
+    .btn-launch:active { transform: scale(0.98); }
+
+    .info-strip {
+      background: #0f172a;
+      border-left: 4px solid var(--gold);
+      padding: 10px 14px;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.9rem;
+      color: #cbd5e1;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="title-box">
+      <h1>🌱 BIO-FIZIKAI VETÉSMÉLYSÉG SZIMULÁTOR</h1>
+      <span>1. Óra Gyakorlat • Vegrots Iskolakert</span>
+    </div>
+    <a href="../index.html" class="btn-nav">⬅ Vissza a Hub-ra</a>
+  </header>
+
+  <main class="sim-card">
+    <div class="canvas-box">
+      <canvas id="soilCanvas"></canvas>
+    </div>
+
+    <div class="controls-panel">
+      <div class="seed-selector">
+        <button class="btn-seed active" onclick="setSeed('mustard')">
+          <span>🟡 Mustármag</span>
+          <small style="color:#cbd5e1;">1.5 mm • Epigeal</small>
+        </button>
+        <button class="btn-seed" onclick="setSeed('pea')">
+          <span>🟢 Zöldborsó</span>
+          <small style="color:#cbd5e1;">8.0 mm • Hypogeal</small>
+        </button>
+        <button class="btn-seed" onclick="setSeed('bean')">
+          <span>🟤 Veteménybab</span>
+          <small style="color:#cbd5e1;">12.0 mm • Epigeal</small>
+        </button>
+      </div>
+
+      <div class="slider-row">
+        <label>Vetésmélység: <span id="depthLabel" style="color:var(--gold); font-size:1.3rem;">2.0</span> cm (<span id="fingerLabel">1 ujjperc</span>)</label>
+        <input type="range" id="depthRange" min="0.2" max="7.0" step="0.2" value="2.0" oninput="changeDepth(this.value)">
+      </div>
+
+      <button class="btn-launch" onclick="launchGermination()">🚀 KELÉS INDÍTÁSA & ENERGIA-ELLENŐRZÉS</button>
+    </div>
+
+    <div class="info-strip" id="ruleTip">
+      💡 <strong>3×-os Aranyszabály:</strong> A magot a saját átmérőjének maximum 3-szoros mélységébe érdemes vetni, hogy a sziklevél belső akkumulátora kibírja a felszínig!
+    </div>
+  </main>
+
+  <script>
+    const canvas = document.getElementById('soilCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const SEED_DATA = {
+      mustard: { name: 'Mustár', size: 3, type: 'epigeal', minDepth: 0.4, maxDepth: 1.6, color: '#facc15', tip: "Mustár: 1-1.5 mm aprómag. Épp csak porhanyós földdel takarjuk be (fél ujjperc)!" },
+      pea: { name: 'Zöldborsó', size: 10, type: 'hypogeal', minDepth: 2.0, maxDepth: 5.5, color: '#4ade80', tip: "Borsó: 8 mm-es gömb, hypogeikus (a sziklevél lenn marad a bunkerben). 2 ujjperc mélyre mehet!" },
+      bean: { name: 'Veteménybab', size: 14, type: 'epigeal', minDepth: 2.0, maxDepth: 3.8, color: '#fb923c', tip: "Bab: Nagy mag, de epigeikus! Ha túl mélyre teszed, a vastag hátizsák elakad a kérges földben." }
+    };
+
+    let activeKey = 'mustard';
+    let currentDepth = 2.0;
+    let animProgress = 0;
+    let isRunning = false;
+    let outcomeText = '';
+    let outcomeSuccess = false;
+
+    function resizeCanvas() {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+    }
+    window.addEventListener('resize', () => { resizeCanvas(); render(); });
+
+    function setSeed(key) {
+      activeKey = key;
+      document.querySelectorAll('.btn-seed').forEach(b => b.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+      document.getElementById('ruleTip').innerHTML = `💡 <strong>Tipp:</strong> ${SEED_DATA[key].tip}`;
+      resetSim();
+    }
+
+    function changeDepth(val) {
+      currentDepth = parseFloat(val);
+      document.getElementById('depthLabel').innerText = currentDepth.toFixed(1);
+
+      let finger = "Fél ujjperc";
+      if (currentDepth > 1.2 && currentDepth <= 2.8) finger = "1 ujjperc";
+      else if (currentDepth > 2.8 && currentDepth <= 4.5) finger = "2 ujjperc";
+      else if (currentDepth > 4.5) finger = "Túl mély árok!";
+      document.getElementById('fingerLabel').innerText = finger;
+
+      resetSim();
+    }
+
+    function resetSim() {
+      isRunning = false;
+      animProgress = 0;
+      outcomeText = '';
+      render();
+    }
+
+    function render() {
+      if (!canvas.width) resizeCanvas();
+      const w = canvas.width;
+      const h = canvas.height;
+      const surfaceY = 70;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Égbolt
+      ctx.fillStyle = '#0284c7';
+      ctx.fillRect(0, 0, w, surfaceY);
+
+      // Nap
+      ctx.fillStyle = '#fde047';
+      ctx.beginPath();
+      ctx.arc(w - 60, 35, 18, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Talajréteg színátmenet
+      const soilGrad = ctx.createLinearGradient(0, surfaceY, 0, h);
+      soilGrad.addColorStop(0, '#78350f');
+      soilGrad.addColorStop(0.3, '#451a03');
+      soilGrad.addColorStop(1, '#291002');
+      ctx.fillStyle = soilGrad;
+      ctx.fillRect(0, surfaceY, w, h - surfaceY);
+
+      // Fű a talajfelszínen
+      ctx.strokeStyle = '#22c55e';
+      ctx.lineWidth = 2.5;
+      for (let i = 15; i < w; i += 30) {
+        ctx.beginPath();
+        ctx.moveTo(i, surfaceY);
+        ctx.lineTo(i - 4, surfaceY - 7);
+        ctx.lineTo(i + 4, surfaceY);
+        ctx.stroke();
+      }
+
+      // Mélységskála bal oldalon
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.font = '11px sans-serif';
+      for (let d = 1; d <= 7; d++) {
+        let py = surfaceY + (d * 34);
+        ctx.fillRect(15, py, 20, 1);
+        ctx.fillText(d + " cm", 40, py + 4);
+      }
+
+      // Mag koordináták
+      const seed = SEED_DATA[activeKey];
+      const seedX = w / 2;
+      const seedY = surfaceY + (currentDepth * 34);
+
+      ctx.save();
+      ctx.translate(seedX, seedY);
+
+      // Gyökér és hajtás növekedés
+      if (animProgress > 0) {
+        // Gyökér (lefelé)
+        ctx.strokeStyle = '#fef08a';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(0, 4);
+        ctx.quadraticCurveTo(6, animProgress * 25, -4, animProgress * 50);
+        ctx.stroke();
+
+        // Hajtás
+        const targetShootY = - (currentDepth * 34) - 15;
+        const currentShootY = targetShootY * animProgress;
+
+        ctx.strokeStyle = '#86efac';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(0, -4);
+
+        if (seed.type === 'epigeal') {
+          // Epigeikus: magot emeli a hipokotil kampó
+          let hookY = Math.max(currentShootY, targetShootY);
+          ctx.lineTo(0, hookY + 8);
+          ctx.stroke();
+
+          // Sziklevél felhúzva
+          ctx.fillStyle = seed.color;
+          ctx.beginPath();
+          ctx.arc(4, hookY + 6, seed.size * 0.8, 0, Math.PI * 2);
+          ctx.fill();
+
+          if (animProgress >= 1 && outcomeSuccess) {
+            // Zöld sziklevelek kinyílnak
+            ctx.fillStyle = '#22c55e';
+            ctx.beginPath();
+            ctx.ellipse(-10, targetShootY - 4, 10, 5, -0.4, 0, Math.PI * 2);
+            ctx.ellipse(12, targetShootY - 4, 10, 5, 0.4, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        } else {
+          // Hypogeikus: sziklevél lenn marad a bunkerben!
+          ctx.lineTo(0, currentShootY);
+          ctx.stroke();
+
+          if (animProgress >= 1 && outcomeSuccess) {
+            ctx.fillStyle = '#22c55e';
+            ctx.beginPath();
+            ctx.moveTo(0, targetShootY);
+            ctx.lineTo(-6, targetShootY - 12);
+            ctx.lineTo(0, targetShootY - 8);
+            ctx.lineTo(6, targetShootY - 12);
+            ctx.fill();
+          }
+        }
+      }
+
+      // Magbelső teste a földben (ha hypogeal, végig itt van; ha epigeal, a kezdeti mag látszik)
+      if (seed.type === 'hypogeal' || animProgress === 0) {
+        ctx.fillStyle = seed.color;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, seed.size, seed.size * 0.8, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#052e16';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+
+      ctx.restore();
+
+      // Értékelő szalag a vászon tetején
+      if (outcomeText) {
+        ctx.fillStyle = 'rgba(11, 19, 43, 0.9)';
+        ctx.fillRect(w / 2 - 190, 12, 380, 44);
+        ctx.strokeStyle = outcomeSuccess ? '#22c55e' : '#ef4444';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(w / 2 - 190, 12, 380, 44);
+
+        ctx.fillStyle = outcomeSuccess ? '#86efac' : '#fca5a5';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(outcomeText, w / 2, 38);
+        ctx.textAlign = 'left';
+      }
+    }
+
+    function launchGermination() {
+      if (isRunning) return;
+      isRunning = true;
+      animProgress = 0;
+      outcomeText = '';
+
+      const seed = SEED_DATA[activeKey];
+
+      // Fizikai ellenőrzés
+      if (currentDepth < seed.minDepth) {
+        outcomeSuccess = false;
+        outcomeText = '❌ KISZÁRADT! A felszínen nem érte elég pára!';
+      } else if (currentDepth > seed.maxDepth) {
+        outcomeSuccess = false;
+        outcomeText = '❌ LEMERÜLT AZ AKKUJA! Éhen halt a sötétben!';
+      } else {
+        outcomeSuccess = true;
+        outcomeText = '✅ TÖKÉLETES KELÉS! Sikeres fotoszintézis!';
+      }
+
+      let step = 0;
+      const timer = setInterval(() => {
+        step++;
+        animProgress = step / 35;
+        render();
+
+        if (step >= 35) {
+          clearInterval(timer);
+          isRunning = false;
+          render();
+        }
+      }, 30);
+    }
+
+    setTimeout(() => { resizeCanvas(); render(); }, 150);
+  </script>
+</body>
+</html>
