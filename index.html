@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vegrots Nemesítő Hub // Rábapatona</title>
+  <style>
+    :root {
+      --bg: #0b132b;
+      --card-bg: #1c2541;
+      --accent: #4ade80;
+      --gold: #facc15;
+      --cyan: #38bdf8;
+      --danger: #ef4444;
+      --text: #f8fafc;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; user-select: none; }
+    body { background: var(--bg); color: var(--text); padding: 16px; min-height: 100vh; }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 14px 20px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .title-box h1 { font-size: 1.6rem; color: var(--accent); }
+    .title-box span { font-size: 0.85rem; color: #94a3b8; }
+
+    /* FŐ NAVIGÁCIÓ */
+    .nav-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .nav-btn {
+      flex: 1;
+      min-width: 140px;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: bold;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card-bg);
+      color: #94a3b8;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .nav-btn.active {
+      background: var(--accent);
+      color: #064e3b;
+      border-color: var(--accent);
+      box-shadow: 0 0 15px rgba(74, 222, 128, 0.3);
+    }
+    .nav-btn.locked { border-color: var(--gold); }
+
+    .view-container { display: none; }
+    .view-container.active { display: block; }
+
+    /* RÁCSOK ÉS KÁRTYÁK */
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+    .card {
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .card:hover { border-color: var(--cyan); }
+
+    .score-badge {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: var(--gold);
+      text-align: center;
+      background: #0b132b;
+      padding: 8px;
+      border-radius: 10px;
+    }
+
+    .btn-touch {
+      padding: 10px 16px;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      display: inline-block;
+    }
+    .btn-touch.green { background: var(--accent); color: #064e3b; }
+    .btn-touch.gold { background: var(--gold); color: #713f12; }
+    .btn-touch.gray { background: #334155; color: #fff; }
+    .btn-touch.cyan { background: var(--cyan); color: #082f49; }
+    .btn-touch:active { transform: scale(0.96); }
+
+    /* PIN MODAL */
+    .pin-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(11, 19, 43, 0.85);
+      backdrop-filter: blur(8px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .pin-overlay.active { display: flex; }
+
+    .pin-modal {
+      background: var(--card-bg);
+      border: 2px solid var(--gold);
+      border-radius: 20px;
+      padding: 24px;
+      width: 320px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .pin-display {
+      width: 100%;
+      height: 50px;
+      background: #0b132b;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .pin-dot { width: 16px; height: 16px; border-radius: 50%; background: #334155; }
+    .pin-dot.filled { background: var(--gold); box-shadow: 0 0 10px var(--gold); }
+
+    .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; }
+    .key-btn {
+      aspect-ratio: 1; font-size: 1.6rem; font-weight: bold; border-radius: 14px;
+      border: 1px solid var(--border); background: #0f172a; color: var(--text); cursor: pointer;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .key-btn:active { background: #334155; }
+    .key-btn.action { color: var(--gold); }
+    .key-btn.cancel { color: var(--danger); }
+
+    /* FOTÓ ÉS DOKUMENTÁCIÓS RÁCS */
+    .doc-slots { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 10px; }
+    .doc-slot {
+      background: #0f172a; border: 1px dashed var(--border); border-radius: 8px;
+      padding: 8px; text-align: center; font-size: 0.75rem; display: flex; flex-direction: column;
+      align-items: center; gap: 4px; min-height: 85px; justify-content: center;
+    }
+    .doc-slot.done { border-color: var(--accent); background: rgba(74, 222, 128, 0.05); }
+    .doc-slot img { width: 100%; height: 45px; object-fit: cover; border-radius: 4px; }
+
+    /* MAG-DETEKTÍV TESZT */
+    .quiz-container {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 16px;
+    }
+    .quiz-item {
+      padding: 12px;
+      border-bottom: 1px solid #1e293b;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .quiz-item:last-child { border-bottom: none; }
+    .quiz-select {
+      background: #1c2541;
+      color: #fff;
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="title-box">
+      <h1>VEGROTS // SULIKERT HUB</h1>
+      <span>Rábapatona Petőfi S. Ált. Iskola • 4. Osztály</span>
+    </div>
+    <div id="auth-status" style="font-size: 0.9rem; color: #94a3b8;">Diák üzemmód</div>
+  </header>
+
+  <nav class="nav-tabs">
+    <button class="nav-btn active" onclick="switchView('tananyag')">📚 Tananyagok</button>
+    <button class="nav-btn" onclick="switchView('feladatok')">🎯 1. Óra Feladatai</button>
+    <button class="nav-btn" onclick="switchView('public')">🏆 Ranglista</button>
+    <button class="nav-btn" onclick="switchView('teams')">🔬 Csapat Laborok</button>
+    <button class="nav-btn locked" onclick="requestMasterAccess()">🔒 Mesterfelület</button>
+  </nav>
+
+  <!-- 1. TANANYAG MAPPA -->
+  <main id="view-tananyag" class="view-container active">
+    <h2 style="color:var(--cyan); margin-bottom:12px;">Nyílt Iskolakerti Tananyagok</h2>
+    <div class="grid" id="tananyagGrid"></div>
+  </main>
+
+  <!-- 2. FELADATOK MAPPA -->
+  <main id="view-feladatok" class="view-container">
+    <h2 style="color:var(--accent); margin-bottom:12px;">1. Óra: Mag-Detektív & Kaviár Labor</h2>
+    <div class="grid" id="feladatokGrid"></div>
+  </main>
+
+  <!-- 3. RANGLISTA -->
+  <main id="view-public" class="view-container">
+    <h2 style="color:var(--gold); margin-bottom:12px;">Élő Csapat Rangsor</h2>
+    <div class="grid" id="publicScoreGrid"></div>
+  </main>
+
+  <!-- 4. CSAPAT LABOROK (MIND ZÁRVA INDUL) -->
+  <main id="view-teams" class="view-container">
+    <div style="margin-bottom: 16px; display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px;" id="teamTabButtons"></div>
+    <div class="card" id="activeTeamWorkspace"></div>
+  </main>
+
+  <!-- 5. MESTERFELÜLET -->
+  <main id="view-master" class="view-container">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <h2 style="color:var(--gold);">Mester Irányítópult (Tanár)</h2>
+      <button class="btn-touch gray" onclick="lockMaster()">Kilépés / Zárolás</button>
+    </div>
+    <div class="grid" id="masterControlGrid"></div>
+  </main>
+
+  <!-- PIN-PAD MODAL -->
+  <div class="pin-overlay" id="pinOverlay">
+    <div class="pin-modal">
+      <h3 style="margin-bottom:6px; color:#fff;" id="pinTitle">PIN Kód</h3>
+      <p style="font-size:0.8rem; color:#94a3b8; margin-bottom:14px;" id="pinSubtitle">Add meg a 4-jegyű kódot</p>
+      
+      <div class="pin-display">
+        <div class="pin-dot" id="dot-0"></div>
+        <div class="pin-dot" id="dot-1"></div>
+        <div class="pin-dot" id="dot-2"></div>
+        <div class="pin-dot" id="dot-3"></div>
+      </div>
+
+      <div class="keypad">
+        <button class="key-btn" onclick="pressKey('1')">1</button>
+        <button class="key-btn" onclick="pressKey('2')">2</button>
+        <button class="key-btn" onclick="pressKey('3')">3</button>
+        <button class="key-btn" onclick="pressKey('4')">4</button>
+        <button class="key-btn" onclick="pressKey('5')">5</button>
+        <button class="key-btn" onclick="pressKey('6')">6</button>
+        <button class="key-btn" onclick="pressKey('7')">7</button>
+        <button class="key-btn" onclick="pressKey('8')">8</button>
+        <button class="key-btn" onclick="pressKey('9')">9</button>
+        <button class="key-btn cancel" onclick="closePinPad()">✕</button>
+        <button class="key-btn" onclick="pressKey('0')">0</button>
+        <button class="key-btn action" onclick="clearPin()">⌫</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const TANANYAGOK = [
+      { id: 1, title: "1. Lecke: Magok anatómiája & Sziklevéltan", file: "tananyag/ora1_magok_csirazas.html", desc: "Monocot, Dicot, Polycot és a tápanyagraktár rejtélye.", icon: "🌱" },
+      { id: 2, title: "2. Lecke: Hypogeal vs. Epigeal", file: "tananyag/ora2_hypo_epigeal.html", desc: "A bútorszállító bab és a bunkerben rejtőző borsó titka.", icon: "🛡️" },
+      { id: 3, title: "3. Lecke: Bionika & Mag-Arsenal", file: "tananyag/ora3_bionika_fegyverek.html", desc: "Önfúró gémorr, 25 baros vízágyú és a tépőzár története.", icon: "⚡" }
+    ];
+
+    const FELADATOK = [
+      { id: "detektiv", title: "10 Mag Rejtélye Teszt", file: "#", desc: "Azonosítsátok a tálcán lévő mintákat a saját laborotokban! (10 pont)", icon: "🔍", reward: "+100 XP" },
+      { id: "vetes", title: "Vetésmélység Szimulátor", file: "feladatok/vetesmelyseg_szimulator.html", desc: "Állítsd be az ujjperceket! Ne hagyd kifulladni a magot a sötétben.", icon: "🎮", reward: "+50 XP" },
+      { id: "bomba", title: "Magbomba Keverő (3:1 Pindstrup)", file: "feladatok/magbomba_labor.html", desc: "100g Pindstrup + 30g agyag. Nem csinálunk kőgolyót!", icon: "💣", reward: "+80 XP" },
+      { id: "kaviar", title: "Magkaviár Készítő & Számláló", file: "feladatok/magkaviar_szamlalo.html", desc: "Számoljátok meg a csapat által gömbölyített kaviárokat!", icon: "🧪", reward: "+60 XP" }
+    ];
+
+    // 10 MAG DETEKTÍV KÉRDÉSSOR ÉS MEGOLDÓKULCS
+    const SEED_QUESTIONS = [
+      { id: 1, clue: "7–8 mm-es zöld golyó, hypogeikus (sziklevél lent marad).", correct: "Zöldborsó" },
+      { id: 2, clue: "10–15 mm-es, vese alakú epigeikus 'bútorszállító'.", correct: "Veteménybab" },
+      { id: 3, clue: "1–1.5 mm-es apró fekete gömb; mélyre vetve lemerül az akkuja.", correct: "Mustár / Repce" },
+      { id: 4, clue: "Hosszúkás szem, barázdával a hasán; pajzsocskával szívja a keményítőt.", correct: "Őszi búza" },
+      { id: 5, clue: "Lapított, sárga, kemény üveges szem; pattogatni is lehet.", correct: "Kukorica" },
+      { id: 6, clue: "Lapos, fekete vagy csíkos csepp alakú fás kaszat; madáreleség.", correct: "Napraforgó" },
+      { id: 7, clue: "2–3 mm-es mag, vizezve zselésedik, 4 hét alatt friss zöld vitamin lesz.", correct: "Kerti zsázsa / Retek" },
+      { id: 8, clue: "Aszimmetrikus hártyás szárny, helikopterként pörög (autorotáció).", correct: "Juharmag (ikerlependék)" },
+      { id: 9, clue: "Kemény tok spirális farokkal, nedvességre becsavarja magát a talajba.", correct: "Bürök gémorr" },
+      { id: 10, clue: "Fényes fekete mag, oldalán fehér zsíros hangyakenyérrel (elaioszóma).", correct: "Keltike / Ibolya" }
+    ];
+
+    const SEED_OPTIONS = [
+      "Válassz magot...",
+      "Zöldborsó",
+      "Veteménybab",
+      "Mustár / Repce",
+      "Őszi búza",
+      "Kukorica",
+      "Napraforgó",
+      "Kerti zsázsa / Retek",
+      "Juharmag (ikerlependék)",
+      "Bürök gémorr",
+      "Keltike / Ibolya"
+    ];
+
+    const MASTER_PIN = "2026";
+    let isMasterUnlocked = false;
+
+    const DEFAULT_TEAMS = [
+      { id: 1, name: "Arany Kalászok", logo: "🌾", score: 0, pin: "1111", bombCount: 0, caviarCount: 0, quizScore: 0, quizAnswers: {}, docs: ["", "", "", "", ""] },
+      { id: 2, name: "Bio-Bunkerek", logo: "🛡️", score: 0, pin: "2222", bombCount: 0, caviarCount: 0, quizScore: 0, quizAnswers: {}, docs: ["", "", "", "", ""] },
+      { id: 3, name: "Fekete Repcék", logo: "⚫", score: 0, pin: "3333", bombCount: 0, caviarCount: 0, quizScore: 0, quizAnswers: {}, docs: ["", "", "", "", ""] },
+      { id: 4, name: "Zöld Lándzsások", logo: "🌱", score: 0, pin: "4444", bombCount: 0, caviarCount: 0, quizScore: 0, quizAnswers: {}, docs: ["", "", "", "", ""] },
+      { id: 5, name: "Gémorr Fúrók", logo: "🔩", score: 0, pin: "5555", bombCount: 0, caviarCount: 0, quizScore: 0, quizAnswers: {}, docs: ["", "", "", "", ""] },
+      { id: 6, name: "Mag-Ágyúsok", logo: "💥", score: 0, pin: "6666", bombCount: 0, caviarCount: 0, quizScore: 0, quizAnswers: {}, docs: ["", "", "", "", ""] },
+      { id: 7, name: "Vitorlázó Jávaiak", logo: "🪁", score: 0, pin: "7777", bombCount: 0, caviarCount: 0, quizScore: 0, quizAnswers: {}, docs: ["", "", "", "", ""] },
+      { id: 8, name: "Hangya-Taxik", logo: "🐜", score: 0, pin: "8888", bombCount: 0, caviarCount: 0, quizScore: 0, quizAnswers: {}, docs: ["", "", "", "", ""] }
+    ];
+
+    let teams = JSON.parse(localStorage.getItem('vegrots_teams_v4')) || DEFAULT_TEAMS;
+    let currentTeamId = null;
+    let teamUnlocked = {};
+
+    function saveState() {
+      localStorage.setItem('vegrots_teams_v4', JSON.stringify(teams));
+    }
+
+    function switchView(viewId) {
+      document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      
+      document.getElementById('view-' + viewId).classList.add('active');
+      renderAll();
+    }
+
+    // ==========================================
+    // PIN-PAD LOGIKA
+    // ==========================================
+    let currentInputPin = "";
+    let pinTargetType = "master";
+    let pendingTeamId = null;
+
+    function openPinPad(type, teamId = null) {
+      pinTargetType = type;
+      pendingTeamId = teamId;
+      currentInputPin = "";
+      updatePinDots();
+
+      const overlay = document.getElementById('pinOverlay');
+      if (type === 'master') {
+        document.getElementById('pinTitle').innerText = "Mester PIN Kód";
+        document.getElementById('pinSubtitle').innerText = "Tanári hozzáférés";
+      } else {
+        const t = teams.find(x => x.id === teamId);
+        document.getElementById('pinTitle').innerText = `${t.name}`;
+        document.getElementById('pinSubtitle').innerText = "Add meg a csapat 4-jegyű PIN kódját!";
+      }
+      overlay.classList.add('active');
+    }
+
+    function closePinPad() {
+      document.getElementById('pinOverlay').classList.remove('active');
+      currentInputPin = "";
+    }
+
+    function pressKey(num) {
+      if (currentInputPin.length < 4) {
+        currentInputPin += num;
+        updatePinDots();
+        if (currentInputPin.length === 4) setTimeout(verifyPin, 150);
+      }
+    }
+
+    function clearPin() {
+      currentInputPin = currentInputPin.slice(0, -1);
+      updatePinDots();
+    }
+
+    function updatePinDots() {
+      for (let i = 0; i < 4; i++) {
+        const dot = document.getElementById(`dot-${i}`);
+        if (i < currentInputPin.length) dot.classList.add('filled');
+        else dot.classList.remove('filled');
+      }
+    }
+
+    function verifyPin() {
+      if (pinTargetType === 'master') {
+        if (currentInputPin === MASTER_PIN) {
+          isMasterUnlocked = true;
+          document.getElementById('auth-status').innerText = "🔓 Mester Mód";
+          document.getElementById('auth-status').style.color = "var(--accent)";
+          closePinPad();
+          switchView('master');
+        } else {
+          alert("Hibás Mester PIN!");
+          clearPin();
+        }
+      } else if (pinTargetType === 'team') {
+        const t = teams.find(x => x.id === pendingTeamId);
+        if (t && currentInputPin === t.pin) {
+          teamUnlocked[t.id] = true;
+          currentTeamId = t.id;
+          closePinPad();
+          renderTeamTabs();
+          renderTeamWorkspace();
+        } else {
+          alert("Hibás Csapat PIN!");
+          clearPin();
+        }
+      }
+    }
+
+    function requestMasterAccess() {
+      if (isMasterUnlocked) switchView('master');
+      else openPinPad('master');
+    }
+
+    function lockMaster() {
+      isMasterUnlocked = false;
+      document.getElementById('auth-status').innerText = "Diák üzemmód";
+      document.getElementById('auth-status').style.color = "#94a3b8";
+      switchView('tananyag');
+    }
+
+    // ==========================================
+    // RENDER FOLYAMATOK
+    // ==========================================
+    function renderAll() {
+      renderTananyag();
+      renderFeladatok();
+      renderPublic();
+      renderTeamTabs();
+      renderTeamWorkspace();
+      if (isMasterUnlocked) renderMaster();
+    }
+
+    function renderTananyag() {
+      const c = document.getElementById('tananyagGrid');
+      c.innerHTML = '';
+      TANANYAGOK.forEach(item => {
+        c.innerHTML += `
+          <div class="card">
+            <div style="font-size:2rem;">${item.icon}</div>
+            <h3>${item.title}</h3>
+            <p style="color:#94a3b8; font-size:0.9rem;">${item.desc}</p>
+            <a href="${item.file}" target="_blank" class="btn-touch cyan">Megnyitás Teljes Képernyőn ➔</a>
+          </div>
+        `;
+      });
+    }
+
+    function renderFeladatok() {
+      const c = document.getElementById('feladatokGrid');
+      c.innerHTML = '';
+      FELADATOK.forEach(item => {
+        const actionHtml = item.id === 'detektiv'
+          ? `<button class="btn-touch gold" onclick="switchView('teams')">Kitöltés a Csapat Laborban ➔</button>`
+          : `<a href="${item.file}" target="_blank" class="btn-touch green">Gyakorlati Feladat Indítása ➔</a>`;
+
+        c.innerHTML += `
+          <div class="card" style="border-color: var(--accent);">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:2rem;">${item.icon}</span>
+              <span style="color:var(--gold); font-weight:bold;">${item.reward}</span>
+            </div>
+            <h3>${item.title}</h3>
+            <p style="color:#94a3b8; font-size:0.9rem;">${item.desc}</p>
+            ${actionHtml}
+          </div>
+        `;
+      });
+    }
+
+    function renderPublic() {
+      const c = document.getElementById('publicScoreGrid');
+      c.innerHTML = '';
+      teams.forEach(t => {
+        const completedDocs = t.docs.filter(d => d !== "").length;
+        c.innerHTML += `
+          <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:1.8rem;">${t.logo}</span>
+              <strong>${t.id}. ${t.name}</strong>
+            </div>
+            <div class="score-badge">${t.score} XP</div>
+            <div style="font-size:0.85rem; color:#94a3b8;">
+              <div>🔍 Mag-Detektív: <b>${t.quizScore} / 10 pont</b></div>
+              <div>💣 Magbombák: <b>${t.bombCount} db</b></div>
+              <div>🧪 Magkaviárok: <b>${t.caviarCount} db</b></div>
+              <div>📸 Dokumentáció: <b>${completedDocs} / 5 fotó</b></div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderTeamTabs() {
+      const c = document.getElementById('teamTabButtons');
+      c.innerHTML = '';
+      teams.forEach(t => {
+        const isCurrent = t.id === currentTeamId;
+        const isUnlocked = teamUnlocked[t.id];
+        c.innerHTML += `
+          <button class="btn-touch ${isCurrent ? 'green' : 'gray'}" style="flex:none; padding:8px 14px;" onclick="selectTeamWorkspace(${t.id})">
+            ${t.logo} ${t.id}. ${t.name} ${isUnlocked ? '🔓' : '🔒'}
+          </button>
+        `;
+      });
+    }
+
+    function selectTeamWorkspace(id) {
+      if (teamUnlocked[id] || isMasterUnlocked) {
+        currentTeamId = id;
+        renderTeamTabs();
+        renderTeamWorkspace();
+      } else {
+        openPinPad('team', id);
+      }
+    }
+
+    function renderTeamWorkspace() {
+      const c = document.getElementById('activeTeamWorkspace');
+      if (!currentTeamId) {
+        c.innerHTML = `
+          <div style="text-align:center; padding:40px;">
+            <h3>🔒 Válassz ki egy csapatot a fenti gombokkal!</h3>
+            <p style="color:#94a3b8; margin-top:8px;">A munkaterület megnyitásához add meg az asztal 4-jegyű kódját.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const t = teams.find(x => x.id === currentTeamId);
+
+      // FOTÓNAPLÓ SLOTO-K
+      let docSlotsHtml = '';
+      for (let i = 0; i < 5; i++) {
+        const img = t.docs[i];
+        docSlotsHtml += `
+          <div class="doc-slot ${img ? 'done' : ''}">
+            <span>${i + 1}. Mérés</span>
+            ${img ? `<img src="${img}">` : `<button class="btn-touch gray" style="font-size:0.65rem; padding:4px;" onclick="uploadPhotoSlot(${i})">📷 Fotó</button>`}
+          </div>
+        `;
+      }
+
+      // MAG-DETEKTÍV TESZT GENERÁLÁS
+      let quizHtml = '';
+      SEED_QUESTIONS.forEach(q => {
+        const selected = t.quizAnswers[q.id] || "";
+        let opts = '';
+        SEED_OPTIONS.forEach(opt => {
+          opts += `<option value="${opt}" ${selected === opt ? 'selected' : ''}>${opt}</option>`;
+        });
+
+        quizHtml += `
+          <div class="quiz-item">
+            <div><strong>${q.id}. Minta:</strong> <span style="color:#94a3b8;">${q.clue}</span></div>
+            <select class="quiz-select" id="seed-q-${q.id}">${opts}</select>
+          </div>
+        `;
+      });
+
+      c.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <h2>${t.logo} ${t.name} Belső Laborja</h2>
+          <span style="color:var(--gold); font-size:1.4rem; font-weight:bold;">${t.score} XP</span>
+        </div>
+
+        <div class="quiz-container">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h3 style="color:var(--gold);">🔍 1. Küldetés: A 10 Mag Rejtélye (10 Pont)</h3>
+            <span style="font-weight:bold; color:var(--accent);">Jelenlegi eredmény: ${t.quizScore} / 10 pont</span>
+          </div>
+          <p style="color:#94a3b8; font-size:0.85rem; margin-bottom:12px;">Vizsgáljátok meg a tálcán lévő mintákat a leírások alapján, és válasszátok ki a megfelelő növényt!</p>
+          ${quizHtml}
+          <button class="btn-touch gold" style="margin-top:14px; width:100%;" onclick="submitSeedQuiz()">Értékelés & Pontszám Mentése ➔</button>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:16px;">
+          <div class="card" style="background:#0f172a;">
+            <label><strong>💣 Készített Magbombák (3:1 Pindstrup):</strong></label>
+            <input type="number" id="teamBombs" value="${t.bombCount}" style="padding:8px; font-size:1.2rem; background:#1c2541; border:1px solid var(--border); color:#fff; border-radius:6px;">
+          </div>
+          <div class="card" style="background:#0f172a;">
+            <label><strong>🧪 Számlált Magkaviárok:</strong></label>
+            <input type="number" id="teamCaviar" value="${t.caviarCount}" style="padding:8px; font-size:1.2rem; background:#1c2541; border:1px solid var(--border); color:#fff; border-radius:6px;">
+          </div>
+        </div>
+
+        <div style="margin-top:16px;">
+          <label><strong>📸 5 Alkalmas Csírázási Fotónapló:</strong></label>
+          <div class="doc-slots">${docSlotsHtml}</div>
+        </div>
+
+        <button class="btn-touch green" style="margin-top:16px;" onclick="saveTeamLabData()">💾 Magbomba & Kaviár Adatok Mentése</button>
+      `;
+    }
+
+    // MAG-DETEKTÍV TESZT KIÉRTÉKELŐ
+    function submitSeedQuiz() {
+      const t = teams.find(x => x.id === currentTeamId);
+      if (!t) return;
+
+      let score = 0;
+      SEED_QUESTIONS.forEach(q => {
+        const val = document.getElementById(`seed-q-${q.id}`).value;
+        t.quizAnswers[q.id] = val;
+        if (val === q.correct) {
+          score++;
+        }
+      });
+
+      // XP különbözet számítása (1 pont = +10 XP)
+      const prevXp = t.quizScore * 10;
+      const newXp = score * 10;
+      t.score = Math.max(0, t.score - prevXp + newXp);
+      t.quizScore = score;
+
+      saveState();
+      alert(`Teszt kiértékelve: ${score} / 10 helyes válasz! Jóváírva: +${newXp} XP.`);
+      renderTeamWorkspace();
+      renderPublic();
+    }
+
+    function saveTeamLabData() {
+      const t = teams.find(x => x.id === currentTeamId);
+      if (t) {
+        t.bombCount = parseInt(document.getElementById('teamBombs').value) || 0;
+        t.caviarCount = parseInt(document.getElementById('teamCaviar').value) || 0;
+        saveState();
+        alert("Labor adatok elmentve!");
+        renderPublic();
+      }
+    }
+
+    function uploadPhotoSlot(slotIndex) {
+      const url = prompt("Másold be az elkészült fotó URL-jét:");
+      if (url) {
+        const t = teams.find(x => x.id === currentTeamId);
+        t.docs[slotIndex] = url;
+        t.score += 20;
+        saveState();
+        renderTeamWorkspace();
+        renderPublic();
+      }
+    }
+
+    function renderMaster() {
+      const c = document.getElementById('masterControlGrid');
+      c.innerHTML = '';
+      teams.forEach(t => {
+        c.innerHTML += `
+          <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span>${t.logo} <strong>${t.id}. ${t.name}</strong></span>
+              <span style="color:var(--gold); font-weight:bold;">${t.score} XP</span>
+            </div>
+            <div style="font-size:0.8rem; color:#94a3b8;">Detektív: ${t.quizScore}/10 | Bombák: ${t.bombCount} | Kaviár: ${t.caviarCount}</div>
+            <div style="display:flex; gap:6px;">
+              <button class="btn-touch gray" style="flex:1;" onclick="adminChangeScore(${t.id}, -5)">-5</button>
+              <button class="btn-touch green" style="flex:1;" onclick="adminChangeScore(${t.id}, 5)">+5</button>
+              <button class="btn-touch gold" style="flex:1;" onclick="adminChangeScore(${t.id}, 20)">+20 XP</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function adminChangeScore(id, delta) {
+      const t = teams.find(x => x.id === id);
+      if (t) {
+        t.score = Math.max(0, t.score + delta);
+        saveState();
+        renderAll();
+      }
+    }
+
+    renderAll();
+  </script>
+</body>
+</html>
