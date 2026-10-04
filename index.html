@@ -693,6 +693,37 @@
     }
 
     renderAll();
+
+    // URL paraméterek ellenőrzése és automatikus beléptetés
+function checkUrlAutoLogin() {
+  const params = new URLSearchParams(window.location.search);
+  
+  // 1. Tanári Mester autologin
+  const masterKey = params.get('master');
+  if (masterKey === MASTER_PIN) {
+    isMasterUnlocked = true;
+    document.getElementById('auth-status').innerText = "🔓 Mester Mód";
+    document.getElementById('auth-status').style.color = "var(--accent)";
+    switchView('master');
+    return;
+  }
+
+  // 2. Csapat autologin
+  const teamId = parseInt(params.get('team'));
+  const pin = params.get('pin');
+
+  if (teamId && pin) {
+    const t = teams.find(x => x.id === teamId);
+    if (t && t.pin === pin) {
+      teamUnlocked[t.id] = true;
+      currentTeamId = t.id;
+      switchView('teams'); // Egyből a Csapat Labor nézetre ugrik
+    }
+  }
+}
+
+// Az oldal betöltésekor azonnal lefut
+checkUrlAutoLogin();
   </script>
 </body>
 </html>
