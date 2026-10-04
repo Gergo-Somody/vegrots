@@ -17,7 +17,7 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; user-select: none; }
-    body { background: var(--bg); color: var(--text); padding: 16px; min-height: 100vh; }
+    body { background: var(--bg); color: var(--text); padding: 16px; min-height: 100vh; position: relative; }
 
     header {
       display: flex;
@@ -58,6 +58,7 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
+      transition: all 0.2s ease;
     }
     .nav-btn.active {
       background: var(--accent);
@@ -80,8 +81,15 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
     }
     .card:hover { border-color: var(--cyan); }
+    
+    .card.flash-success {
+      border-color: var(--accent) !important;
+      transform: scale(1.02);
+      box-shadow: 0 0 25px rgba(74, 222, 128, 0.45);
+    }
 
     .score-badge {
       font-size: 2.2rem;
@@ -103,6 +111,7 @@
       text-decoration: none;
       text-align: center;
       display: inline-block;
+      transition: opacity 0.15s, transform 0.1s;
     }
     .btn-touch.green { background: var(--accent); color: #064e3b; }
     .btn-touch.gold { background: var(--gold); color: #713f12; }
@@ -193,6 +202,58 @@
       font-size: 0.95rem;
       cursor: pointer;
     }
+
+    /* LEBEGŐ HANGVEZÉRLŐ GÖMB (MASTER MÓD) */
+    .mic-orb-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: none;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+      z-index: 600;
+    }
+    .mic-orb {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #38bdf8, #0284c7);
+      border: 3px solid #e0f2fe;
+      box-shadow: 0 0 24px rgba(56, 189, 248, 0.6);
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2.1rem;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .mic-orb:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.8);
+    }
+    .mic-orb.listening {
+      background: radial-gradient(circle at 30% 30%, #ef4444, #991b1b);
+      box-shadow: 0 0 35px rgba(239, 68, 68, 0.9);
+      animation: pulseMic 1.1s infinite alternate;
+      transform: scale(1.1);
+    }
+    @keyframes pulseMic {
+      0% { transform: scale(1.02); box-shadow: 0 0 20px rgba(239, 68, 68, 0.6); }
+      100% { transform: scale(1.15); box-shadow: 0 0 45px rgba(239, 68, 68, 1); }
+    }
+    .transcript-bubble {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border-radius: 16px;
+      font-size: 0.88rem;
+      color: var(--gold);
+      max-width: 280px;
+      text-align: right;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      line-height: 1.3;
+    }
   </style>
 </head>
 <body>
@@ -239,12 +300,21 @@
 
   <!-- 5. MESTERFELÜLET -->
   <main id="view-master" class="view-container">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-      <h2 style="color:var(--gold);">Mester Irányítópult (Tanár)</h2>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:8px;">
+      <div>
+        <h2 style="color:var(--gold);">Mester Irányítópult (Tanár)</h2>
+        <span style="font-size:0.85rem; color:#94a3b8;">Hangvezérlés és közvetlen pontfelügyelet bekapcsolva</span>
+      </div>
       <button class="btn-touch gray" onclick="lockMaster()">Kilépés / Zárolás</button>
     </div>
     <div class="grid" id="masterControlGrid"></div>
   </main>
+
+  <!-- LEBEGŐ HANGVEZÉRLŐ GÖMB (MASTER NÉZETBEN AKTÍV) -->
+  <div class="mic-orb-container" id="micContainer">
+    <div class="transcript-bubble" id="transcript">Kattints a gömbre és mondd: pl. "Egy pont a kettesnek!"</div>
+    <div class="mic-orb" id="micOrb" onclick="toggleSpeech()" title="Kattints a mikrofon indításához!">🎙️</div>
+  </div>
 
   <!-- PIN-PAD MODAL -->
   <div class="pin-overlay" id="pinOverlay">
@@ -278,7 +348,7 @@
 
   <script>
     const TANANYAGOK = [
-      { id: 0, title: "0. Termés vagy mag", file: "tananyag/ora0.html", desc: "Termés vagy mag.", icon: "🌱" },
+      { id: 0, title: "0. Termés vagy mag", file: "tananyag/ora0.html", desc: "A Matrjoska-szabály: házikó vagy lakó?", icon: "🌱" },
       { id: 1, title: "1. Lecke: Magok anatómiája & Sziklevéltan", file: "tananyag/ora1_magok_csirazas.html", desc: "Monocot, Dicot, Polycot és a tápanyagraktár rejtélye.", icon: "🌱" },
       { id: 2, title: "2. Lecke: Hypogeal vs. Epigeal", file: "tananyag/ora2_hypo_epigeal.html", desc: "A bútorszállító bab és a bunkerben rejtőző borsó titka.", icon: "🛡️" },
       { id: 3, title: "3. Lecke: Bionika & Mag-Arsenal", file: "tananyag/ora3_bionika_fegyverek.html", desc: "Önfúró gémorr, 25 baros vízágyú és a tépőzár története.", icon: "⚡" }
@@ -345,7 +415,31 @@
       document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
       
-      document.getElementById('view-' + viewId).classList.add('active');
+      const targetView = document.getElementById('view-' + viewId);
+      if (targetView) targetView.classList.add('active');
+
+      // Megfelelő gomb kiemelése
+      const btnMap = {
+        'tananyag': 0,
+        'feladatok': 1,
+        'public': 2,
+        'teams': 3,
+        'master': 4
+      };
+      const navButtons = document.querySelectorAll('.nav-btn');
+      if (navButtons[btnMap[viewId]]) {
+        navButtons[btnMap[viewId]].classList.add('active');
+      }
+
+      // Mikrofon gömb láthatóságának kezelése: csak Mester nézetben vagy feloldott Mester mellett
+      const micContainer = document.getElementById('micContainer');
+      if (viewId === 'master' || (isMasterUnlocked && viewId !== 'teams')) {
+        micContainer.style.display = 'flex';
+      } else {
+        micContainer.style.display = 'none';
+        if (isListening && recognition) recognition.stop();
+      }
+
       renderAll();
     }
 
@@ -368,7 +462,7 @@
         document.getElementById('pinSubtitle').innerText = "Tanári hozzáférés";
       } else {
         const t = teams.find(x => x.id === teamId);
-        document.getElementById('pinTitle').innerText = `${t.name}`;
+        document.getElementById('pinTitle').innerText = `${t ? t.name : 'Csapat'}`;
         document.getElementById('pinSubtitle').innerText = "Add meg a csapat 4-jegyű PIN kódját!";
       }
       overlay.classList.add('active');
@@ -409,7 +503,7 @@
           closePinPad();
           switchView('master');
         } else {
-          alert("Hibás Mester PIN!");
+          showFeedbackMessage("Hibás Mester PIN!", true);
           clearPin();
         }
       } else if (pinTargetType === 'team') {
@@ -421,7 +515,7 @@
           renderTeamTabs();
           renderTeamWorkspace();
         } else {
-          alert("Hibás Csapat PIN!");
+          showFeedbackMessage("Hibás Csapat PIN!", true);
           clearPin();
         }
       }
@@ -439,9 +533,6 @@
       switchView('tananyag');
     }
 
-    // ==========================================
-    // RENDER FOLYAMATOK
-    // ==========================================
     function renderAll() {
       renderTananyag();
       renderFeladatok();
@@ -494,7 +585,7 @@
       teams.forEach(t => {
         const completedDocs = t.docs.filter(d => d !== "").length;
         c.innerHTML += `
-          <div class="card">
+          <div class="card" id="public-card-${t.id}">
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <span style="font-size:1.8rem;">${t.logo}</span>
               <strong>${t.id}. ${t.name}</strong>
@@ -628,14 +719,13 @@
         }
       });
 
-      // XP különbözet számítása (1 pont = +10 XP)
       const prevXp = t.quizScore * 10;
       const newXp = score * 10;
       t.score = Math.max(0, t.score - prevXp + newXp);
       t.quizScore = score;
 
       saveState();
-      alert(`Teszt kiértékelve: ${score} / 10 helyes válasz! Jóváírva: +${newXp} XP.`);
+      showFeedbackMessage(`Teszt kiértékelve: ${score} / 10 helyes! (${newXp} XP)`);
       renderTeamWorkspace();
       renderPublic();
     }
@@ -646,36 +736,89 @@
         t.bombCount = parseInt(document.getElementById('teamBombs').value) || 0;
         t.caviarCount = parseInt(document.getElementById('teamCaviar').value) || 0;
         saveState();
-        alert("Labor adatok elmentve!");
+        showFeedbackMessage("Labor adatok elmentve!");
         renderPublic();
       }
     }
 
     function uploadPhotoSlot(slotIndex) {
-      const url = prompt("Másold be az elkészült fotó URL-jét:");
-      if (url) {
-        const t = teams.find(x => x.id === currentTeamId);
-        t.docs[slotIndex] = url;
-        t.score += 20;
+ let targetSlotIndex = null;
+
+// Amikor a diák a "📷 Fotó" gombra nyom
+function uploadPhotoSlot(slotIndex) {
+  targetSlotIndex = slotIndex;
+  // Megnyitja a telefon kameráját
+  document.getElementById('cameraInput').click();
+}
+
+// Amikor a fotó elkészült
+function handlePhotoCapture(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      // Kép átméretezése (max 800px), hogy elférjen a belső tárhelyen
+      const canvas = document.createElement('canvas');
+      const maxDim = 800;
+      let width = img.width;
+      let height = img.height;
+
+      if (width > height) {
+        if (width > maxDim) {
+          height = Math.round((height * maxDim) / width);
+          width = maxDim;
+        }
+      } else {
+        if (height > maxDim) {
+          width = Math.round((width * maxDim) / height);
+          height = maxDim;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // Tömörített Base64 kép előállítása (75%-os minőség)
+      const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.75);
+
+      // Mentés a csapat laborjába
+      const t = teams.find(x => x.id === currentTeamId);
+      if (t && targetSlotIndex !== null) {
+        t.docs[targetSlotIndex] = compressedDataUrl;
+        t.score += 20; // +20 XP a sikeres fotóért!
         saveState();
         renderTeamWorkspace();
         renderPublic();
+        alert("📸 Fotó sikeresen rögzítve a naplóban! (+20 XP)");
       }
-    }
+      
+      // Input resetelése a következő fotóhoz
+      event.target.value = '';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
 
     function renderMaster() {
       const c = document.getElementById('masterControlGrid');
       c.innerHTML = '';
       teams.forEach(t => {
         c.innerHTML += `
-          <div class="card">
+          <div class="card" id="master-card-${t.id}">
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <span>${t.logo} <strong>${t.id}. ${t.name}</strong></span>
-              <span style="color:var(--gold); font-weight:bold;">${t.score} XP</span>
+              <span style="color:var(--gold); font-weight:bold;" id="master-score-${t.id}">${t.score} XP</span>
             </div>
             <div style="font-size:0.8rem; color:#94a3b8;">Detektív: ${t.quizScore}/10 | Bombák: ${t.bombCount} | Kaviár: ${t.caviarCount}</div>
             <div style="display:flex; gap:6px;">
               <button class="btn-touch gray" style="flex:1;" onclick="adminChangeScore(${t.id}, -5)">-5</button>
+              <button class="btn-touch green" style="flex:1;" onclick="adminChangeScore(${t.id}, 1)">+1</button>
               <button class="btn-touch green" style="flex:1;" onclick="adminChangeScore(${t.id}, 5)">+5</button>
               <button class="btn-touch gold" style="flex:1;" onclick="adminChangeScore(${t.id}, 20)">+20 XP</button>
             </div>
@@ -689,42 +832,196 @@
       if (t) {
         t.score = Math.max(0, t.score + delta);
         saveState();
+        
+        // Felvillantás
+        flashTeamCards(t.id);
         renderAll();
       }
     }
 
-    renderAll();
+    function flashTeamCards(teamId) {
+      const mCard = document.getElementById(`master-card-${teamId}`);
+      if (mCard) {
+        mCard.classList.add('flash-success');
+        setTimeout(() => mCard.classList.remove('flash-success'), 650);
+      }
+      const pCard = document.getElementById(`public-card-${teamId}`);
+      if (pCard) {
+        pCard.classList.add('flash-success');
+        setTimeout(() => pCard.classList.remove('flash-success'), 650);
+      }
+    }
+
+    function showFeedbackMessage(msg, isError = false) {
+      const tBox = document.getElementById('transcript');
+      if (tBox) {
+        tBox.innerText = msg;
+        tBox.style.color = isError ? 'var(--danger)' : 'var(--accent)';
+      }
+    }
+
+    // ==========================================
+    // MAGYAR HANGVEZÉRLÉS (WEB SPEECH API)
+    // ==========================================
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let isListening = false;
+
+    if (!SpeechRecognition) {
+      const tBox = document.getElementById('transcript');
+      if (tBox) tBox.innerText = "A hangfelismerés csak Chrome vagy Edge böngészőben érhető el!";
+    } else {
+      recognition = new SpeechRecognition();
+      recognition.lang = 'hu-HU';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        isListening = true;
+        const orb = document.getElementById('micOrb');
+        if (orb) orb.classList.add('listening');
+        const tBox = document.getElementById('transcript');
+        if (tBox) {
+          tBox.style.color = 'var(--gold)';
+          tBox.innerText = "Hallgatlak... Mondd pl: 'Egy pont a kettesnek!'";
+        }
+      };
+
+      recognition.onend = () => {
+        isListening = false;
+        const orb = document.getElementById('micOrb');
+        if (orb) orb.classList.remove('listening');
+      };
+
+      recognition.onresult = (event) => {
+        if (event.results && event.results[0]) {
+          const text = event.results[0][0].transcript.toLowerCase();
+          const tBox = document.getElementById('transcript');
+          if (tBox) tBox.innerText = `"${text}"`;
+          processVoiceCommand(text);
+        }
+      };
+
+      recognition.onerror = (e) => {
+        isListening = false;
+        const orb = document.getElementById('micOrb');
+        if (orb) orb.classList.remove('listening');
+        showFeedbackMessage("Hanghiba: " + (e.error || "nem érthető"), true);
+      };
+    }
+
+    function toggleSpeech() {
+      if (!recognition) {
+        alert("A Web Speech API hangfelismerés ebben a böngészőben nem támogatott. Kérlek, használj Google Chrome-ot!");
+        return;
+      }
+      if (isListening) {
+        recognition.stop();
+      } else {
+        try {
+          recognition.start();
+        } catch (err) {
+          recognition.stop();
+        }
+      }
+    }
+
+    // Hangparancs feldolgozó motor (Magyar számlálás, nevek és pontok)
+    function processVoiceCommand(cmd) {
+      // 1. Pontszám meghatározása (alapértelmezett: 1)
+      let points = 1;
+      if (cmd.includes("két") || cmd.includes("kettő") || cmd.includes("2")) points = 2;
+      else if (cmd.includes("három") || cmd.includes("3")) points = 3;
+      else if (cmd.includes("négy") || cmd.includes("4")) points = 4;
+      else if (cmd.includes("öt") || cmd.includes("5")) points = 5;
+      else if (cmd.includes("tíz") || cmd.includes("10")) points = 10;
+      else if (cmd.includes("húsz") || cmd.includes("20")) points = 20;
+
+      // Előjel: levonás vagy mínusz
+      if (cmd.includes("mínusz") || cmd.includes("vesz el") || cmd.includes("levon") || cmd.includes("büntetés")) {
+        points = -points;
+      }
+
+      // 2. Csapat sorszám keresése
+      let targetTeamId = null;
+      const teamNumberMap = {
+        "egyes": 1, "egy": 1, "első": 1, "1": 1, "1-es": 1,
+        "kettes": 2, "kettő": 2, "két": 2, "második": 2, "2": 2, "2-es": 2,
+        "hármas": 3, "három": 3, "harmadik": 3, "3": 3, "3-as": 3,
+        "négyes": 4, "négy": 4, "negyedik": 4, "4": 4, "4-es": 4,
+        "ötös": 5, "öt": 5, "ötödik": 5, "5": 5, "5-ös": 5,
+        "hatos": 6, "hat": 6, "hatodik": 6, "6": 6, "6-os": 6,
+        "hetes": 7, "hét": 7, "hetedik": 7, "7": 7, "7-es": 7,
+        "nyolcas": 8, "nyolc": 8, "nyolcadik": 8, "8": 8, "8-as": 8
+      };
+
+      for (let word in teamNumberMap) {
+        if (
+          cmd.includes(`${word} csapat`) ||
+          cmd.includes(`csapat ${word}`) ||
+          cmd.includes(`${word}-nek`) ||
+          cmd.includes(`${word} nek`) ||
+          cmd.includes(`${word}-nak`) ||
+          cmd.includes(`${word} nak`) ||
+          cmd.includes(`${word}`)
+        ) {
+          targetTeamId = teamNumberMap[word];
+          break;
+        }
+      }
+
+      // Csapatnév szerinti felismerés, ha szám szerint nem találtuk
+      if (!targetTeamId) {
+        teams.forEach(t => {
+          const parts = t.name.toLowerCase().split(' ');
+          if (parts.some(p => cmd.includes(p))) {
+            targetTeamId = t.id;
+          }
+        });
+      }
+
+      // Jóváírás és villanás
+      if (targetTeamId) {
+        adminChangeScore(targetTeamId, points);
+        showFeedbackMessage(`✅ ${points > 0 ? '+'+points : points} XP jóváírva: #${targetTeamId} Csapat!`);
+      } else {
+        showFeedbackMessage(`❓ Nem találtam a csapatot: "${cmd}"`, true);
+      }
+    }
 
     // URL paraméterek ellenőrzése és automatikus beléptetés
-function checkUrlAutoLogin() {
-  const params = new URLSearchParams(window.location.search);
-  
-  // 1. Tanári Mester autologin
-  const masterKey = params.get('master');
-  if (masterKey === MASTER_PIN) {
-    isMasterUnlocked = true;
-    document.getElementById('auth-status').innerText = "🔓 Mester Mód";
-    document.getElementById('auth-status').style.color = "var(--accent)";
-    switchView('master');
-    return;
-  }
+    function checkUrlAutoLogin() {
+      const params = new URLSearchParams(window.location.search);
+      
+      // 1. Tanári Mester autologin
+      const masterKey = params.get('master');
+      if (masterKey === MASTER_PIN) {
+        isMasterUnlocked = true;
+        document.getElementById('auth-status').innerText = "🔓 Mester Mód";
+        document.getElementById('auth-status').style.color = "var(--accent)";
+        switchView('master');
+        return;
+      }
 
-  // 2. Csapat autologin
-  const teamId = parseInt(params.get('team'));
-  const pin = params.get('pin');
+      // 2. Csapat autologin
+      const teamId = parseInt(params.get('team'));
+      const pin = params.get('pin');
 
-  if (teamId && pin) {
-    const t = teams.find(x => x.id === teamId);
-    if (t && t.pin === pin) {
-      teamUnlocked[t.id] = true;
-      currentTeamId = t.id;
-      switchView('teams'); // Egyből a Csapat Labor nézetre ugrik
+      if (teamId && pin) {
+        const t = teams.find(x => x.id === teamId);
+        if (t && t.pin === pin) {
+          teamUnlocked[t.id] = true;
+          currentTeamId = t.id;
+          switchView('teams');
+        }
+      }
     }
-  }
-}
 
-// Az oldal betöltésekor azonnal lefut
-checkUrlAutoLogin();
+    // Inicializálás
+    renderAll();
+    checkUrlAutoLogin();
   </script>
+<!-- Rejtett kamera/fájl input -->
+<input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handlePhotoCapture(event)">
 </body>
 </html>
