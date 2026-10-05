@@ -383,7 +383,8 @@
     // GOOGLE APPS SCRIPT KONFIGURÁCIÓ
     // =========================================================================
     const API_URL = "https://script.google.com/macros/s/AKfycbwV50HLzLRAvtARPDB1_8uJYv-TCNEcoj4Qzuz3GttDoUdiQhrVGdqyLjAZJjWwwXWb2w/exec";
-
+// A Google Formod megosztási linkje
+    const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScsfpOoUO96HTIPVz68wjCc9GsK5eQkU2XINaRcyVybMSRvMg/viewform?usp=dialog";
     const TANANYAGOK = [
       { id: 0, title: "0. Termés vagy mag", file: "tananyag/ora0.html", desc: "A Matrjoska-szabály: házikó vagy lakó?", icon: "🌱" },
       { id: 1, title: "1. Lecke: Magok anatómiája & Sziklevéltan", file: "tananyag/ora1.html", desc: "Monocot, Dicot, Polycot és a tápanyagraktár rejtélye.", icon: "🌱" },
@@ -443,7 +444,7 @@
     // =========================================================================
     // FELHŐ SZINKRONIZÁLÁS (Google Apps Script API)
     // =========================================================================
-async function syncToGoogleSheets(teamId, pointsDelta, description, photoUrl = "") {
+async function syncToGoogleSheets(teamId, pointsDelta, description) {
   const t = teams.find(x => x.id === teamId);
   if (!t || API_URL.includes("IDE_MASOLD")) return;
 
@@ -457,7 +458,6 @@ async function syncToGoogleSheets(teamId, pointsDelta, description, photoUrl = "
         points: pointsDelta,
         totalScore: t.score,
         description: description,
-        photoUrl: photoUrl,
         bombCount: t.bombCount,
         caviarCount: t.caviarCount,
         quizScore: t.quizScore
@@ -466,15 +466,6 @@ async function syncToGoogleSheets(teamId, pointsDelta, description, photoUrl = "
 
     const result = await response.json();
     console.log("Szerver válasz:", result);
-
-    // Ha a szerver visszaküldte a generált Drive kép linket, frissítjük vele a helyi képet
-    if (result.status === "success" && result.photoUrl) {
-      if (targetSlotIndex !== null) {
-        t.docs[targetSlotIndex] = result.photoUrl;
-      }
-      saveState();
-      renderTeamWorkspace();
-    }
   } catch (err) {
     console.warn("Nem sikerült elküldeni az adatokat a felhőbe:", err);
   }
@@ -808,12 +799,21 @@ async function syncToGoogleSheets(teamId, pointsDelta, description, photoUrl = "
           </div>
         </div>
 
-        <div style="margin-top:16px;">
-          <label><strong>📸 5 Alkalmas Csírázási Fotónapló:</strong></label>
-          <div class="doc-slots">${docSlotsHtml}</div>
-        </div>
+        <!-- MENTÉS GOMB CSAK AZ ADATOKNAK -->
+        <button class="btn-touch green" style="margin-top:16px; width:100%; font-size:1.1rem; padding:14px;" onclick="saveTeamLabData()">
+          💾 Magbomba & Kaviár Adatok Mentése Felhőbe
+        </button>
 
-        <button class="btn-touch green" style="margin-top:16px;" onclick="saveTeamLabData()">💾 Magbomba & Kaviár Adatok Mentése Felhőbe</button>
+        <!-- NAGY FÉNYKÉPEZŐ GOMB A GOOGLE FORMSHOZ -->
+        <div style="margin-top:24px; text-align:center;">
+          <a href="${GOOGLE_FORM_URL}" target="_blank" class="btn-touch cyan" style="display:flex; align-items:center; justify-content:center; gap:12px; font-size:1.3rem; padding:18px; border-radius:16px; box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);">
+            <span style="font-size:2.2rem;">📸</span>
+            <span>Kerti Munka & Fotó Beküldése (Google Form) ➔</span>
+          </a>
+          <span style="display:block; font-size:0.85rem; color:#94a3b8; margin-top:8px;">
+            A fotókat a biztonságos Google Űrlapon keresztül rögzítjük, amik automatikusan megjelennek a közös falon!
+          </span>
+        </div>
       `;
     }
 
@@ -849,17 +849,13 @@ function saveTeamLabData() {
     t.caviarCount = parseInt(document.getElementById('teamCaviar').value) || 0;
     saveState();
 
-    // Megkeressük az utolsó érvényes fotót a slotokból
-    const lastPhoto = t.docs.filter(d => d !== "").pop() || "";
-
     syncToGoogleSheets(
       t.id, 
       0, 
-      `Labor mentés: ${t.bombCount} bomba, ${t.caviarCount} kaviár`, 
-      lastPhoto
+      `Labor mentés: ${t.bombCount} bomba, ${t.caviarCount} kaviár`
     );
 
-    showFeedbackMessage("Labor adatok és fotó mentése a felhőbe elküldve!");
+    showFeedbackMessage("Labor adatok elmentve a felhőbe!");
     renderPublic();
   }
 }
@@ -975,7 +971,7 @@ function saveTeamLabData() {
     // =========================================================================
     // HANGVEZÉRLÉS (Web Speech API)
     // =========================================================================
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition = null;
     let isListening = false;
 
