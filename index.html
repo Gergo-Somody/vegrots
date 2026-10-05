@@ -366,30 +366,76 @@
 
     // 10 MAG DETEKTÍV KÉRDÉSSOR ÉS MEGOLDÓKULCS
     const SEED_QUESTIONS = [
-      { id: 1, clue: "7–8 mm-es zöld golyó, hypogeikus (sziklevél lent marad).", correct: "Zöldborsó" },
-      { id: 2, clue: "10–15 mm-es, vese alakú epigeikus 'bútorszállító'.", correct: "Veteménybab" },
-      { id: 3, clue: "1–1.5 mm-es apró fekete gömb; mélyre vetve lemerül az akkuja.", correct: "Mustár / Repce" },
-      { id: 4, clue: "Hosszúkás szem, barázdával a hasán; pajzsocskával szívja a keményítőt.", correct: "Őszi búza" },
-      { id: 5, clue: "Lapított, sárga, kemény üveges szem; pattogatni is lehet.", correct: "Kukorica" },
-      { id: 6, clue: "Lapos, fekete vagy csíkos csepp alakú fás kaszat; madáreleség.", correct: "Napraforgó" },
-      { id: 7, clue: "2–3 mm-es mag, vizezve zselésedik, 4 hét alatt friss zöld vitamin lesz.", correct: "Kerti zsázsa / Retek" },
-      { id: 8, clue: "Aszimmetrikus hártyás szárny, helikopterként pörög (autorotáció).", correct: "Juharmag (ikerlependék)" },
-      { id: 9, clue: "Kemény tok spirális farokkal, nedvességre becsavarja magát a talajba.", correct: "Bürök gémorr" },
-      { id: 10, clue: "Fényes fekete mag, oldalán fehér zsíros hangyakenyérrel (elaioszóma).", correct: "Keltike / Ibolya" }
-    ];
+  { 
+    id: 1, 
+    clue: "6–8 mm-es, sárgás, kerekded gömb; nitrogénkötő zöldtrágya és állati takarmány.", 
+    correct: "Takarmányborsó" 
+  },
+  { 
+    id: 2, 
+    clue: "15–25 mm-es, világosbarna, lapított vaskos ovális; fehérjedús emberi eledel és talajjavító növény.", 
+    correct: "Lóbab" 
+  },
+  { 
+    id: 3, 
+    clue: "4–6 mm-es, szürkésfekete, kemény gömbölyded szem; gyomelnyomó zöldtrágya és hüvelyes takarmány.", 
+    correct: "Bükköny" 
+  },
+  { 
+    id: 4, 
+    clue: "1–2 mm-es, sárgásbarna, apró gömb; talajfertőtlenítő köztesnövény és csípős fűszer alapanyaga.", 
+    correct: "Mustár" 
+  },
+  { 
+    id: 5, 
+    clue: "1.5–2 mm-es, fényes sárgásvörös, apró tojásdad mag; legelőjavító pillangós és virágzó méhlegelő.", 
+    correct: "Bíborhere" 
+  },
+  { 
+    id: 6, 
+    clue: "2–3 mm-es, sötétszürke vagy barnásfekete, ráncos felületű ívelt csepp; kiváló talajlazító és a méhek egyik kedvenc nektárforrása.", 
+    correct: "Mézontófű" 
+  },
+  { 
+    id: 7, 
+    clue: "4–6 mm-es, sötétbarna vagy szürkésfekete, éles háromélű piramis; gluténmentes kása és baromficsalogató takarónövény.", 
+    correct: "Pohánka" 
+  },
+  { 
+    id: 8, 
+    clue: "4–5 mm-es, csillogó, rendkívül fényes gesztenyebarna, lapos hegyes ovális; emésztést segítő mag és olajnövény.", 
+    correct: "Len" 
+  },
+  { 
+    id: 9, 
+    clue: "6–8 mm-es, borostyánsárga vagy narancsszínű, tömzsi csepp alakú kemény szem; hevítésre szétpattanó csemege.", 
+    correct: "Pattogató kukorica" 
+  },
+  { 
+    id: 10, 
+    clue: "6–8 mm-es, aranybarna vagy sárgásvörös, hasi barázdás hosszúkás; a mindennapi kenyér legfontosabb lisztadó gabonája.", 
+    correct: "Búza" 
+  },
+  { 
+    id: 11, 
+    clue: "7–9 mm-es, szürkészöld vagy sárgásbarna, vékony hegyesedő hosszúkás szem; szegényebb homoktalajokon is megtermő, sötét kenyérnek való gabona.", 
+    correct: "Rozs" 
+  }
+];
 
     const SEED_OPTIONS = [
       "Válassz magot...",
-      "Zöldborsó",
-      "Veteménybab",
-      "Mustár / Repce",
-      "Őszi búza",
-      "Kukorica",
-      "Napraforgó",
-      "Kerti zsázsa / Retek",
-      "Juharmag (ikerlependék)",
-      "Bürök gémorr",
-      "Keltike / Ibolya"
+      "Takarmányborsó",
+      "Lóbab",
+      "Bükköny",
+      "Mustár",
+      "Bíborhere",
+      "Mézontófű",
+      "Pohánka",
+      "Len",
+      "Pattogató kukorica",
+      "Búza",
+      "Rozs"
     ];
 
     const MASTER_PIN = "2026";
