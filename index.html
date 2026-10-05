@@ -469,7 +469,7 @@
     }
 
     async function fetchScoresAndPhotos() {
-      if (API_URL.includes("https://script.google.com/macros/s/AKfycbwV50HLzLRAvtARPDB1_8uJYv-TCNEcoj4Qzuz3GttDoUdiQhrVGdqyLjAZJjWwwXWb2w/exec")) return;
+      if (API_URL.includes("IDE_MASOLD")) return;
       try {
         const response = await fetch(API_URL);
         if (!response.ok) return;
