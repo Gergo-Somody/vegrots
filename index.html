@@ -35,7 +35,6 @@
     .title-box h1 { font-size: 1.6rem; color: var(--accent); }
     .title-box span { font-size: 0.85rem; color: #94a3b8; }
 
-    /* FŐ NAVIGÁCIÓ */
     .nav-tabs {
       display: flex;
       gap: 10px;
@@ -71,7 +70,6 @@
     .view-container { display: none; }
     .view-container.active { display: block; }
 
-    /* RÁCSOK ÉS KÁRTYÁK */
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
     .card {
       background: var(--card-bg);
@@ -119,7 +117,35 @@
     .btn-touch.cyan { background: var(--cyan); color: #082f49; }
     .btn-touch:active { transform: scale(0.96); }
 
-    /* PIN MODAL */
+    /* Fotófal / Hírfolyam elemek */
+    .photo-feed-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 14px;
+    }
+    .feed-item {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .feed-item img {
+      width: 100%;
+      height: 170px;
+      object-fit: cover;
+      background: #1c2541;
+    }
+    .feed-caption {
+      padding: 10px 12px;
+      font-size: 0.85rem;
+    }
+    .feed-caption strong { color: var(--accent); }
+    .feed-caption p { color: #94a3b8; margin-top: 4px; }
+
+    /* PIN Modal */
     .pin-overlay {
       position: fixed;
       inset: 0;
@@ -167,7 +193,6 @@
     .key-btn.action { color: var(--gold); }
     .key-btn.cancel { color: var(--danger); }
 
-    /* FOTÓ ÉS DOKUMENTÁCIÓS RÁCS */
     .doc-slots { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 10px; }
     .doc-slot {
       background: #0f172a; border: 1px dashed var(--border); border-radius: 8px;
@@ -177,7 +202,6 @@
     .doc-slot.done { border-color: var(--accent); background: rgba(74, 222, 128, 0.05); }
     .doc-slot img { width: 100%; height: 45px; object-fit: cover; border-radius: 4px; }
 
-    /* MAG-DETEKTÍV TESZT */
     .quiz-container {
       background: #0f172a;
       border: 1px solid var(--border);
@@ -203,7 +227,7 @@
       cursor: pointer;
     }
 
-    /* LEBEGŐ HANGVEZÉRLŐ GÖMB (MASTER MÓD) */
+    /* Lebegő mikrofon */
     .mic-orb-container {
       position: fixed;
       bottom: 24px;
@@ -269,30 +293,35 @@
   <nav class="nav-tabs">
     <button class="nav-btn active" id="btn-nav-tananyag" onclick="switchView('tananyag')">📚 Tananyagok</button>
     <button class="nav-btn" id="btn-nav-feladatok" onclick="switchView('feladatok')">🎯 1. Óra Feladatai</button>
-    <button class="nav-btn" id="btn-nav-public" onclick="switchView('public')">🏆 Ranglista</button>
+    <button class="nav-btn" id="btn-nav-public" onclick="switchView('public')">🏆 Ranglista & Fotófal</button>
     <button class="nav-btn" id="btn-nav-teams" onclick="switchView('teams')">🔬 Csapat Laborok</button>
     <button class="nav-btn locked" id="btn-nav-master" onclick="requestMasterAccess()">🔒 Mesterfelület</button>
   </nav>
 
-  <!-- 1. TANANYAG MAPPA -->
+  <!-- 1. TANANYAG -->
   <main id="view-tananyag" class="view-container active">
     <h2 style="color:var(--cyan); margin-bottom:12px;">Nyílt Iskolakerti Tananyagok</h2>
     <div class="grid" id="tananyagGrid"></div>
   </main>
 
-  <!-- 2. FELADATOK MAPPA -->
+  <!-- 2. FELADATOK -->
   <main id="view-feladatok" class="view-container">
     <h2 style="color:var(--accent); margin-bottom:12px;">1. Óra: Mag-Detektív & Kaviár Labor</h2>
     <div class="grid" id="feladatokGrid"></div>
   </main>
 
-  <!-- 3. RANGLISTA -->
+  <!-- 3. RANGLISTA & FOTÓFAL -->
   <main id="view-public" class="view-container">
     <h2 style="color:var(--gold); margin-bottom:12px;">Élő Csapat Rangsor</h2>
     <div class="grid" id="publicScoreGrid"></div>
+
+    <h2 style="color:var(--cyan); margin-top:28px; margin-bottom:8px;">📸 Élő Kerti Fotófal & Tevékenységek</h2>
+    <div class="photo-feed-grid" id="feed-container">
+      <p style="color:#94a3b8; font-size:0.9rem;">Fotók betöltése folyamatban...</p>
+    </div>
   </main>
 
-  <!-- 4. CSAPAT LABOROK (MIND ZÁRVA INDUL) -->
+  <!-- 4. CSAPAT LABOROK -->
   <main id="view-teams" class="view-container">
     <div style="margin-bottom: 16px; display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px;" id="teamTabButtons"></div>
     <div class="card" id="activeTeamWorkspace"></div>
@@ -303,20 +332,20 @@
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:8px;">
       <div>
         <h2 style="color:var(--gold);">Mester Irányítópult (Tanár)</h2>
-        <span style="font-size:0.85rem; color:#94a3b8;">Hangvezérlés és közvetlen pontfelügyelet bekapcsolva</span>
+        <span style="font-size:0.85rem; color:#94a3b8;">Hangvezérlés és felhő-szinkronizálás aktív</span>
       </div>
       <button class="btn-touch gray" onclick="lockMaster()">Kilépés / Zárolás</button>
     </div>
     <div class="grid" id="masterControlGrid"></div>
   </main>
 
-  <!-- LEBEGŐ HANGVEZÉRLŐ GÖMB (MASTER NÉZETBEN AKTÍV) -->
+  <!-- LEBEGŐ HANGVEZÉRLŐ GÖMB -->
   <div class="mic-orb-container" id="micContainer">
     <div class="transcript-bubble" id="transcript">Kattints a gömbre és mondd: pl. "Egy pont a kettesnek!"</div>
     <div class="mic-orb" id="micOrb" onclick="toggleSpeech()" title="Kattints a mikrofon indításához!">🎙️</div>
   </div>
 
-  <!-- PIN-PAD MODAL -->
+  <!-- PIN MODAL -->
   <div class="pin-overlay" id="pinOverlay">
     <div class="pin-modal">
       <h3 style="margin-bottom:6px; color:#fff;" id="pinTitle">PIN Kód</h3>
@@ -346,10 +375,15 @@
     </div>
   </div>
 
-  <!-- REJTETT KAMERA / FÁJL INPUT -->
+  <!-- KAMERA INPUT -->
   <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handlePhotoCapture(event)">
 
   <script>
+    // =========================================================================
+    // GOOGLE APPS SCRIPT KONFIGURÁCIÓ
+    // =========================================================================
+    const API_URL = "https://script.google.com/macros/s/IDE_MASOLD_A_SCRIPT_URL-T/exec";
+
     const TANANYAGOK = [
       { id: 0, title: "0. Termés vagy mag", file: "tananyag/ora0.html", desc: "A Matrjoska-szabály: házikó vagy lakó?", icon: "🌱" },
       { id: 1, title: "1. Lecke: Magok anatómiája & Sziklevéltan", file: "tananyag/ora1.html", desc: "Monocot, Dicot, Polycot és a tápanyagraktár rejtélye.", icon: "🌱" },
@@ -364,79 +398,23 @@
       { id: "kaviar", title: "Magkaviár Készítő & Számláló", file: "feladatok/magkaviar_szamlalo.html", desc: "Számoljátok meg a csapat által gömbölyített kaviárokat!", icon: "🧪", reward: "+60 XP" }
     ];
 
-    // 10 MAG DETEKTÍV KÉRDÉSSOR ÉS MEGOLDÓKULCS
     const SEED_QUESTIONS = [
-        { 
-    id: 1, 
-    clue: "1–2 mm-es, sárgásbarna, apró gömb; talajfertőtlenítő köztesnövény és csípős fűszer alapanyaga.", 
-    correct: "Mustár" 
-  },
-        { 
-    id: 2, 
-    clue: "1.5–2 mm-es, fényes sárgásvörös, apró tojásdad mag; legelőjavító pillangós és virágzó méhlegelő.", 
-    correct: "Bíborhere" 
-  },
-  { 
-    id: 3, 
-    clue: "2–3 mm-es, sötétszürke vagy barnásfekete, ráncos felületű ívelt csepp; kiváló talajlazító és a méhek egyik kedvenc nektárforrása.", 
-    correct: "Mézontófű" 
-  },
-        { 
-    id: 4, 
-    clue: "4–5 mm-es, csillogó, rendkívül fényes gesztenyebarna, lapos hegyes ovális; emésztést segítő mag és olajnövény.", 
-    correct: "Len" 
-  },
-        { 
-    id: 5, 
-    clue: "4–6 mm-es, sötétbarna vagy szürkésfekete, éles háromélű piramis; gluténmentes kása és baromficsalogató takarónövény.", 
-    correct: "Pohánka" 
-  },
-        { 
-    id: 6, 
-    clue: "4–6 mm-es, szürkésfekete, kemény gömbölyded szem; gyomelnyomó zöldtrágya és hüvelyes takarmány.", 
-    correct: "Bükköny" 
-  },
-  { 
-    id: 7, 
-    clue: "6–8 mm-es, sárgás, kerekded gömb; nitrogénkötő zöldtrágya és állati takarmány.", 
-    correct: "Takarmányborsó" 
-  },
-        { 
-    id: 8, 
-    clue: "6–8 mm-es, borostyánsárga vagy narancsszínű, tömzsi csepp alakú kemény szem; hevítésre szétpattanó csemege.", 
-    correct: "Pattogató kukorica" 
-  },
-  { 
-    id: 9, 
-    clue: "6–8 mm-es, aranybarna vagy sárgásvörös, hasi barázdás hosszúkás; a mindennapi kenyér legfontosabb lisztadó gabonája.", 
-    correct: "Búza" 
-  },
-  { 
-    id: 10, 
-    clue: "7–9 mm-es, szürkészöld vagy sárgásbarna, vékony hegyesedő hosszúkás szem; szegényebb homoktalajokon is megtermő, sötét kenyérnek való gabona.", 
-    correct: "Rozs" 
-  },
-  { 
-    id: 11, 
-    clue: "15–25 mm-es, világosbarna, lapított vaskos ovális; fehérjedús emberi eledel és talajjavító növény.", 
-    correct: "Lóbab" 
-  },
-
-];
+      { id: 1, clue: "1–2 mm-es, sárgásbarna, apró gömb; talajfertőtlenítő köztesnövény és csípős fűszer alapanyaga.", correct: "Mustár" },
+      { id: 2, clue: "1.5–2 mm-es, fényes sárgásvörös, apró tojásdad mag; legelőjavító pillangós és virágzó méhlegelő.", correct: "Bíborhere" },
+      { id: 3, clue: "2–3 mm-es, sötétszürke vagy barnásfekete, ráncos felületű ívelt csepp; kiváló talajlazító és a méhek egyik kedvenc nektárforrása.", correct: "Mézontófű" },
+      { id: 4, clue: "4–5 mm-es, csillogó, rendkívül fényes gesztenyebarna, lapos hegyes ovális; emésztést segítő mag és olajnövény.", correct: "Len" },
+      { id: 5, clue: "4–6 mm-es, sötétbarna vagy szürkésfekete, éles háromélű piramis; gluténmentes kása és baromficsalogató takarónövény.", correct: "Pohánka" },
+      { id: 6, clue: "4–6 mm-es, szürkésfekete, kemény gömbölyded szem; gyomelnyomó zöldtrágya és hüvelyes takarmány.", correct: "Bükköny" },
+      { id: 7, clue: "6–8 mm-es, sárgás, kerekded gömb; nitrogénkötő zöldtrágya és állati takarmány.", correct: "Takarmányborsó" },
+      { id: 8, clue: "6–8 mm-es, borostyánsárga vagy narancsszínű, tömzsi csepp alakú kemény szem; hevítésre szétpattanó csemege.", correct: "Pattogató kukorica" },
+      { id: 9, clue: "6–8 mm-es, aranybarna vagy sárgásvörös, hasi barázdás hosszúkás; a mindennapi kenyér legfontosabb lisztadó gabonája.", correct: "Búza" },
+      { id: 10, clue: "7–9 mm-es, szürkészöld vagy sárgásbarna, vékony hegyesedő hosszúkás szem; szegényebb homoktalajokon is megtermő, sötét kenyérnek való gabona.", correct: "Rozs" },
+      { id: 11, clue: "15–25 mm-es, világosbarna, lapított vaskos ovális; fehérjedús emberi eledel és talajjavító növény.", correct: "Lóbab" }
+    ];
 
     const SEED_OPTIONS = [
-      "Válassz magot...",
-      "Takarmányborsó",
-      "Lóbab",
-      "Bükköny",
-      "Mustár",
-      "Bíborhere",
-      "Mézontófű",
-      "Pohánka",
-      "Len",
-      "Pattogató kukorica",
-      "Búza",
-      "Rozs"
+      "Válassz magot...", "Takarmányborsó", "Lóbab", "Bükköny", "Mustár",
+      "Bíborhere", "Mézontófű", "Pohánka", "Len", "Pattogató kukorica", "Búza", "Rozs"
     ];
 
     const MASTER_PIN = "2026";
@@ -456,12 +434,99 @@
     let teams = JSON.parse(localStorage.getItem('vegrots_teams_v4')) || DEFAULT_TEAMS;
     let currentTeamId = null;
     let teamUnlocked = {};
-    let targetSlotIndex = null; // ITT VOLT A HIÁNYZÓ VÁLTOZÓ!
+    let targetSlotIndex = null;
 
     function saveState() {
       localStorage.setItem('vegrots_teams_v4', JSON.stringify(teams));
     }
 
+    // =========================================================================
+    // FELHŐ SZINKRONIZÁLÁS (Google Apps Script API)
+    // =========================================================================
+    async function syncToGoogleSheets(teamId, pointsDelta, description, photoUrl = "") {
+      const t = teams.find(x => x.id === teamId);
+      if (!t || API_URL.includes("IDE_MASOLD")) return;
+
+      try {
+        await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            teamId: t.id,
+            team: t.name,
+            points: pointsDelta,
+            totalScore: t.score,
+            description: description,
+            photoUrl: photoUrl,
+            bombCount: t.bombCount,
+            caviarCount: t.caviarCount,
+            quizScore: t.quizScore
+          })
+        });
+      } catch (err) {
+        console.warn("Nem sikerült elküldeni az adatokat a felhőbe:", err);
+      }
+    }
+
+    async function fetchScoresAndPhotos() {
+      if (API_URL.includes("https://script.google.com/macros/s/AKfycbwV50HLzLRAvtARPDB1_8uJYv-TCNEcoj4Qzuz3GttDoUdiQhrVGdqyLjAZJjWwwXWb2w/exec")) return;
+      try {
+        const response = await fetch(API_URL);
+        if (!response.ok) return;
+        const data = await response.json();
+
+        // 1. Felhő pontok beolvasása ha érkeztek
+        if (data.leaderboard && Array.isArray(data.leaderboard)) {
+          data.leaderboard.forEach(remoteTeam => {
+            const local = teams.find(t => t.id === remoteTeam.id || t.name.toLowerCase() === (remoteTeam.name || "").toLowerCase());
+            if (local && typeof remoteTeam.score === 'number') {
+              local.score = remoteTeam.score;
+            }
+          });
+          saveState();
+          renderPublic();
+          if (isMasterUnlocked) renderMaster();
+        }
+
+        // 2. Fotófal / Hírcsatorna kirajzolása
+        if (data.activities) {
+          renderPhotoFeed(data.activities);
+        }
+      } catch (error) {
+        console.warn("Hiba a felhő adatok lekérésekor:", error);
+      }
+    }
+
+    function renderPhotoFeed(activities) {
+      const feedContainer = document.getElementById("feed-container");
+      if (!feedContainer) return;
+
+      const itemsWithPhoto = (activities || []).filter(item => item.photoUrl);
+      if (itemsWithPhoto.length === 0) {
+        feedContainer.innerHTML = '<p style="color:#94a3b8; font-size:0.9rem;">Még nem érkezett fotós beszámoló az űrlapról.</p>';
+        return;
+      }
+
+      feedContainer.innerHTML = itemsWithPhoto.map(item => `
+        <div class="feed-item">
+          <img src="${item.photoUrl}" alt="Kerti munka" loading="lazy" />
+          <div class="feed-caption">
+            <strong>${escapeHtml(item.team)}</strong> ${item.points ? `(+${item.points} XP)` : ''}
+            <p>${escapeHtml(item.description || 'Kerti feladat feltöltve')}</p>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[m]));
+    }
+
+    // =========================================================================
+    // NÉZETVEZÉRLÉS ÉS RENDERELÉS
+    // =========================================================================
     function switchView(viewId) {
       document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
@@ -483,9 +548,6 @@
       renderAll();
     }
 
-    // ==========================================
-    // PIN-PAD LOGIKA
-    // ==========================================
     let currentInputPin = "";
     let pinTargetType = "master";
     let pendingTeamId = null;
@@ -632,7 +694,7 @@
             </div>
             <div class="score-badge">${t.score} XP</div>
             <div style="font-size:0.85rem; color:#94a3b8;">
-              <div>🔍 Mag-Detektív: <b>${t.quizScore} / 10 pont</b></div>
+              <div>🔍 Mag-Detektív: <b>${t.quizScore} / 11 pont</b></div>
               <div>💣 Magbombák: <b>${t.bombCount} db</b></div>
               <div>🧪 Magkaviárok: <b>${t.caviarCount} db</b></div>
               <div>📸 Dokumentáció: <b>${completedDocs} / 5 fotó</b></div>
@@ -680,7 +742,6 @@
 
       const t = teams.find(x => x.id === currentTeamId);
 
-      // FOTÓNAPLÓ SLOTO-K
       let docSlotsHtml = '';
       for (let i = 0; i < 5; i++) {
         const img = t.docs[i];
@@ -692,7 +753,6 @@
         `;
       }
 
-      // MAG-DETEKTÍV TESZT GENERÁLÁS
       let quizHtml = '';
       SEED_QUESTIONS.forEach(q => {
         const selected = t.quizAnswers[q.id] || "";
@@ -717,8 +777,8 @@
 
         <div class="quiz-container">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <h3 style="color:var(--gold);">🔍 1. Küldetés: A 10 Mag Rejtélye (10 Pont)</h3>
-            <span style="font-weight:bold; color:var(--accent);">Jelenlegi eredmény: ${t.quizScore} / 10 pont</span>
+            <h3 style="color:var(--gold);">🔍 1. Küldetés: A 11 Mag Rejtélye</h3>
+            <span style="font-weight:bold; color:var(--accent);">Eredmény: ${t.quizScore} / 11 pont</span>
           </div>
           <p style="color:#94a3b8; font-size:0.85rem; margin-bottom:12px;">Vizsgáljátok meg a tálcán lévő mintákat a leírások alapján, és válasszátok ki a megfelelő növényt!</p>
           ${quizHtml}
@@ -741,11 +801,10 @@
           <div class="doc-slots">${docSlotsHtml}</div>
         </div>
 
-        <button class="btn-touch green" style="margin-top:16px;" onclick="saveTeamLabData()">💾 Magbomba & Kaviár Adatok Mentése</button>
+        <button class="btn-touch green" style="margin-top:16px;" onclick="saveTeamLabData()">💾 Magbomba & Kaviár Adatok Mentése Felhőbe</button>
       `;
     }
 
-    // MAG-DETEKTÍV TESZT KIÉRTÉKELŐ
     function submitSeedQuiz() {
       const t = teams.find(x => x.id === currentTeamId);
       if (!t) return;
@@ -754,18 +813,19 @@
       SEED_QUESTIONS.forEach(q => {
         const val = document.getElementById(`seed-q-${q.id}`).value;
         t.quizAnswers[q.id] = val;
-        if (val === q.correct) {
-          score++;
-        }
+        if (val === q.correct) score++;
       });
 
       const prevXp = t.quizScore * 10;
       const newXp = score * 10;
-      t.score = Math.max(0, t.score - prevXp + newXp);
+      const delta = newXp - prevXp;
+      
+      t.score = Math.max(0, t.score + delta);
       t.quizScore = score;
 
       saveState();
-      showFeedbackMessage(`Teszt kiértékelve: ${score} / 10 helyes! (${newXp} XP)`);
+      syncToGoogleSheets(t.id, delta, `Mag-detektív teszt: ${score}/11 pont`);
+      showFeedbackMessage(`Teszt mentve: ${score} / 11 helyes! (${newXp} XP)`);
       renderTeamWorkspace();
       renderPublic();
     }
@@ -776,18 +836,17 @@
         t.bombCount = parseInt(document.getElementById('teamBombs').value) || 0;
         t.caviarCount = parseInt(document.getElementById('teamCaviar').value) || 0;
         saveState();
-        showFeedbackMessage("Labor adatok elmentve!");
+        syncToGoogleSheets(t.id, 0, `Labor mentés: ${t.bombCount} bomba, ${t.caviarCount} kaviár`);
+        showFeedbackMessage("Labor adatok elmentve a felhőbe is!");
         renderPublic();
       }
     }
 
-    // Amikor a diák a "📷 Fotó" gombra nyom
     function uploadPhotoSlot(slotIndex) {
       targetSlotIndex = slotIndex;
       document.getElementById('cameraInput').click();
     }
 
-    // Amikor a fotó elkészült
     function handlePhotoCapture(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -825,11 +884,11 @@
             t.docs[targetSlotIndex] = compressedDataUrl;
             t.score += 20;
             saveState();
+            syncToGoogleSheets(t.id, 20, `${targetSlotIndex + 1}. Mérés fotója feltöltve`, compressedDataUrl);
             renderTeamWorkspace();
             renderPublic();
-            showFeedbackMessage("📸 Fotó sikeresen rögzítve! (+20 XP)");
+            showFeedbackMessage("📸 Fotó feltöltve és jóváírva! (+20 XP)");
           }
-          
           event.target.value = '';
         };
         img.src = e.target.result;
@@ -847,7 +906,7 @@
               <span>${t.logo} <strong>${t.id}. ${t.name}</strong></span>
               <span style="color:var(--gold); font-weight:bold;" id="master-score-${t.id}">${t.score} XP</span>
             </div>
-            <div style="font-size:0.8rem; color:#94a3b8;">Detektív: ${t.quizScore}/10 | Bombák: ${t.bombCount} | Kaviár: ${t.caviarCount}</div>
+            <div style="font-size:0.8rem; color:#94a3b8;">Detektív: ${t.quizScore}/11 | Bombák: ${t.bombCount} | Kaviár: ${t.caviarCount}</div>
             <div style="display:flex; gap:6px;">
               <button class="btn-touch gray" style="flex:1;" onclick="adminChangeScore(${t.id}, -5)">-5</button>
               <button class="btn-touch green" style="flex:1;" onclick="adminChangeScore(${t.id}, 1)">+1</button>
@@ -859,11 +918,12 @@
       });
     }
 
-    function adminChangeScore(id, delta) {
+    function adminChangeScore(id, delta, reason = "Tanári módosítás") {
       const t = teams.find(x => x.id === id);
       if (t) {
         t.score = Math.max(0, t.score + delta);
         saveState();
+        syncToGoogleSheets(t.id, delta, reason);
         flashTeamCards(t.id);
         renderAll();
       }
@@ -890,16 +950,16 @@
       }
     }
 
-    // ==========================================
-    // MAGYAR HANGVEZÉRLÉS (WEB SPEECH API)
-    // ==========================================
+    // =========================================================================
+    // HANGVEZÉRLÉS (Web Speech API)
+    // =========================================================================
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition = null;
     let isListening = false;
 
     if (!SpeechRecognition) {
       const tBox = document.getElementById('transcript');
-      if (tBox) tBox.innerText = "A hangfelismerés csak Chrome vagy Edge böngészőben érhető el!";
+      if (tBox) tBox.innerText = "A hangfelismerés Chrome vagy Edge böngészőben érhető el!";
     } else {
       recognition = new SpeechRecognition();
       recognition.lang = 'hu-HU';
@@ -913,7 +973,7 @@
         const tBox = document.getElementById('transcript');
         if (tBox) {
           tBox.style.color = 'var(--gold)';
-          tBox.innerText = "Hallgatlak... Mondd pl: 'Egy pont a kettesnek!'";
+          tBox.innerText = "Hallgatlak... Mondd: pl. 'Két pont a hármasnak fűnyírásért'";
         }
       };
 
@@ -942,7 +1002,7 @@
 
     function toggleSpeech() {
       if (!recognition) {
-        alert("A Web Speech API hangfelismerés ebben a böngészőben nem támogatott. Kérlek, használj Google Chrome-ot!");
+        alert("A Web Speech API ebben a böngészőben nem elérhető. Használj Google Chrome-ot!");
         return;
       }
       if (isListening) {
@@ -1006,7 +1066,7 @@
       }
 
       if (targetTeamId) {
-        adminChangeScore(targetTeamId, points);
+        adminChangeScore(targetTeamId, points, `Hangvezérlés: "${cmd}"`);
         showFeedbackMessage(`✅ ${points > 0 ? '+'+points : points} XP jóváírva: #${targetTeamId} Csapat!`);
       } else {
         showFeedbackMessage(`❓ Nem találtam a csapatot: "${cmd}"`, true);
@@ -1015,7 +1075,6 @@
 
     function checkUrlAutoLogin() {
       const params = new URLSearchParams(window.location.search);
-      
       const masterKey = params.get('master');
       if (masterKey === MASTER_PIN) {
         isMasterUnlocked = true;
@@ -1027,7 +1086,6 @@
 
       const teamId = parseInt(params.get('team'));
       const pin = params.get('pin');
-
       if (teamId && pin) {
         const t = teams.find(x => x.id === teamId);
         if (t && t.pin === pin) {
@@ -1038,9 +1096,11 @@
       }
     }
 
-    // Indítás
+    // Inicializálás
     renderAll();
     checkUrlAutoLogin();
+    fetchScoresAndPhotos();
+    setInterval(fetchScoresAndPhotos, 30000);
   </script>
 </body>
 </html>
