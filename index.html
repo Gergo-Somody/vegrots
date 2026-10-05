@@ -443,30 +443,42 @@
     // =========================================================================
     // FELHŐ SZINKRONIZÁLÁS (Google Apps Script API)
     // =========================================================================
-    async function syncToGoogleSheets(teamId, pointsDelta, description, photoUrl = "") {
-      const t = teams.find(x => x.id === teamId);
-      if (!t || API_URL.includes("IDE_MASOLD")) return;
+async function syncToGoogleSheets(teamId, pointsDelta, description, photoUrl = "") {
+  const t = teams.find(x => x.id === teamId);
+  if (!t || API_URL.includes("IDE_MASOLD")) return;
 
-      try {
-        await fetch(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({
-            teamId: t.id,
-            team: t.name,
-            points: pointsDelta,
-            totalScore: t.score,
-            description: description,
-            photoUrl: photoUrl,
-            bombCount: t.bombCount,
-            caviarCount: t.caviarCount,
-            quizScore: t.quizScore
-          })
-        });
-      } catch (err) {
-        console.warn("Nem sikerült elküldeni az adatokat a felhőbe:", err);
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({
+        teamId: t.id,
+        team: t.name,
+        points: pointsDelta,
+        totalScore: t.score,
+        description: description,
+        photoUrl: photoUrl,
+        bombCount: t.bombCount,
+        caviarCount: t.caviarCount,
+        quizScore: t.quizScore
+      })
+    });
+
+    const result = await response.json();
+    console.log("Szerver válasz:", result);
+
+    // Ha a szerver visszaküldte a generált Drive kép linket, frissítjük vele a helyi képet
+    if (result.status === "success" && result.photoUrl) {
+      if (targetSlotIndex !== null) {
+        t.docs[targetSlotIndex] = result.photoUrl;
       }
+      saveState();
+      renderTeamWorkspace();
     }
+  } catch (err) {
+    console.warn("Nem sikerült elküldeni az adatokat a felhőbe:", err);
+  }
+}
 
     async function fetchScoresAndPhotos() {
       if (API_URL.includes("IDE_MASOLD")) return;
@@ -830,17 +842,27 @@
       renderPublic();
     }
 
-    function saveTeamLabData() {
-      const t = teams.find(x => x.id === currentTeamId);
-      if (t) {
-        t.bombCount = parseInt(document.getElementById('teamBombs').value) || 0;
-        t.caviarCount = parseInt(document.getElementById('teamCaviar').value) || 0;
-        saveState();
-        syncToGoogleSheets(t.id, 0, `Labor mentés: ${t.bombCount} bomba, ${t.caviarCount} kaviár`);
-        showFeedbackMessage("Labor adatok elmentve a felhőbe is!");
-        renderPublic();
-      }
-    }
+function saveTeamLabData() {
+  const t = teams.find(x => x.id === currentTeamId);
+  if (t) {
+    t.bombCount = parseInt(document.getElementById('teamBombs').value) || 0;
+    t.caviarCount = parseInt(document.getElementById('teamCaviar').value) || 0;
+    saveState();
+
+    // Megkeressük az utolsó érvényes fotót a slotokból
+    const lastPhoto = t.docs.filter(d => d !== "").pop() || "";
+
+    syncToGoogleSheets(
+      t.id, 
+      0, 
+      `Labor mentés: ${t.bombCount} bomba, ${t.caviarCount} kaviár`, 
+      lastPhoto
+    );
+
+    showFeedbackMessage("Labor adatok és fotó mentése a felhőbe elküldve!");
+    renderPublic();
+  }
+}
 
     function uploadPhotoSlot(slotIndex) {
       targetSlotIndex = slotIndex;
