@@ -165,11 +165,11 @@
     if (selected === correct) {
       btn.classList.add("correct");
       feedback.style.color = "var(--accent)";
-      feedback.innerText = `✅ Helyes! +1 pont a(z) ${activeTeam.name} részére.`;
+      feedback.innerText = `✅ Helyes! +10 pont a(z) ${activeTeam.name} részére.`;
       
       // Helyi számláló és szerverhívás az igazi névvel (pl. "Mag Páncélosok")
       roundScores[activeTeam.name] = (roundScores[activeTeam.name] || 0) + 10;
-      awardPointToTeam(activeTeam, 1);
+      awardPointToTeam(activeTeam, 10);
     } else {
       btn.classList.add("wrong");
       feedback.style.color = "var(--danger)";
