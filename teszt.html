@@ -168,7 +168,7 @@
       feedback.innerText = `✅ Helyes! +1 pont a(z) ${activeTeam.name} részére.`;
       
       // Helyi számláló és szerverhívás az igazi névvel (pl. "Mag Páncélosok")
-      roundScores[activeTeam.name] = (roundScores[activeTeam.name] || 0) + 1;
+      roundScores[activeTeam.name] = (roundScores[activeTeam.name] || 0) + 10;
       awardPointToTeam(activeTeam, 1);
     } else {
       btn.classList.add("wrong");
