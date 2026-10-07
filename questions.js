@@ -156,7 +156,7 @@ const QUESTIONS_DB = [
   // --- 3. TÉMAKÖR: Egyszikűek és Kétszikűek (13 kérdés) ---
   {
     category: "Egyszikű - Kétszikű",
-    question: "Hány sziklevél bújik ki a talajból, amikor a búza kicsírázik?",
+    question: "Hány sziklevele van a fejlődő búzacsírának a mag belsejében?",
     options: ["Egyetlen sziklevél", "Két sziklevél", "Négy sziklevél"],
     correct: "Egyetlen sziklevél"
   },
@@ -216,7 +216,7 @@ const QUESTIONS_DB = [
   },
   {
     category: "Egyszikű - Kétszikű",
-    question: "Melyik növény tartozik az alábbiak közül az egyszikűek családjába?",
+    question: "Melyik növény tartozik az alábbiak közül az egyszikűek osztályába?",
     options: ["Búza", "Retek", "Paradicsom"],
     correct: "Búza"
   },
