@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VEGROTS // Csapat Kvíz Körverseny</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #22c55e;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --danger: #ef4444;
+      --border: #334155;
+    }
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 0; }
+    body { background-color: var(--bg); color: var(--text); padding: 1.5rem; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 650px; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+    h1 { font-size: 1.4rem; color: var(--accent); }
+    .status-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .team-badge { background: #3b82f6; color: white; padding: 0.5rem 1rem; border-radius: 9999px; font-size: 1.1rem; font-weight: bold; }
+    .round-badge { color: var(--muted); font-size: 0.95rem; font-weight: 600; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 1rem; padding: 1.5rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); }
+    .category { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-bottom: 0.5rem; }
+    .question { font-size: 1.25rem; font-weight: 600; margin-bottom: 1.5rem; line-height: 1.4; }
+    .options { display: flex; flex-direction: column; gap: 0.75rem; }
+    button.opt-btn { background: #283548; color: var(--text); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1rem; font-size: 1rem; text-align: left; cursor: pointer; transition: all 0.2s; }
+    button.opt-btn:hover:not(:disabled) { border-color: var(--accent); background: #334155; }
+    button.opt-btn.correct { background: rgba(34, 197, 94, 0.2); border-color: var(--accent); color: #4ade80; }
+    button.opt-btn.wrong { background: rgba(239, 68, 68, 0.2); border-color: var(--danger); color: #f87171; }
+    .footer-action { margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+    .feedback { font-weight: bold; font-size: 1.05rem; }
+    .btn-next { background: var(--accent); color: #052e16; font-weight: bold; border: none; padding: 0.8rem 1.5rem; border-radius: 0.5rem; cursor: pointer; display: none; }
+    .score-screen { text-align: center; padding: 2rem 0; }
+    .scoreboard { margin: 1.5rem 0; text-align: left; background: #0f172a; padding: 1rem; border-radius: 0.5rem; }
+    .score-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div>
+      <h1>VEGROTS // Körkvíz</h1>
+      <span style="color: var(--muted); font-size: 0.85rem;">Sulikert Labor • 4. Osztály</span>
+    </div>
+    <a href="index.html" style="color: var(--accent); text-decoration: none; font-size: 0.9rem;">← Vissza a Hub-ra</a>
+  </header>
+
+  <div id="quiz-container">
+    <div class="status-bar">
+      <div id="current-team" class="team-badge">1. Csapat</div>
+      <div id="round-indicator" class="round-badge">1. Forduló / 5</div>
+    </div>
+
+    <div class="card">
+      <div id="q-category" class="category">Kategória</div>
+      <div id="q-text" class="question">Kérdés betöltése...</div>
+      <div id="q-options" class="options"></div>
+      
+      <div class="footer-action">
+        <div id="feedback" class="feedback"></div>
+        <button id="btn-next" class="btn-next" onclick="nextStep()">Következő csapat ➔</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="result-container" class="card score-screen" style="display: none;">
+    <h2>🏆 5 Fordulós Kvíz Vége!</h2>
+    <p style="color: var(--muted);">A megszerzett pontok beírva a VEGROTS rangsorba.</p>
+    
+    <div class="scoreboard" id="score-summary"></div>
+
+    <button class="btn-next" style="display: inline-block;" onclick="location.reload()">Új játék indítása</button>
+  </div>
+</div>
+
+<script src="questions.js"></script>
+<script>
+  // 1. Konfiguráció: Csapatok és az Apps Script URL
+// Alapértelmezett nevek csak arra az esetre, ha a hálózat nem érné el a fájlt
+  let TEAMS = ["1. Csapat", "2. Csapat", "3. Csapat", "4. Csapat"];
+  const TOTAL_ROUNDS = 5;
+  const APPS_SCRIPT_URL = "IDE_ILLESZD_A_MEGLÉVŐ_APPS_SCRIPT_WEBAPP_URL-T";
+
+  let currentRound = 1;
+  let teamIndex = 0;
+  let questionPool = [];
+  let currentQuestion = null;
+  let sessionScores = {};
+
+  // 1. Csapatnevek automatikus beolvasása az index.html-ből
+  async function loadTeamsFromIndex() {
+    try {
+      const response = await fetch("index.html");
+      const htmlText = await response.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlText, "text/html");
+
+      let extractedTeams = [];
+
+      // A) Ha az index.html-ben van csapatválasztó <select id="team-select"> vagy hasonló:
+      const selectOptions = doc.querySelectorAll("select option");
+      if (selectOptions.length > 0) {
+        extractedTeams = Array.from(selectOptions)
+          .map(opt => opt.textContent.trim())
+          .filter(t => t && !t.toLowerCase().includes("válassz"));
+      }
+
+      // B) Ha a ranglistában vagy kártyákon szerepelnek (pl. class="team-name" vagy táblázat):
+      if (extractedTeams.length === 0) {
+        const teamElements = doc.querySelectorAll(".team-name, .csapat-nev, [data-team]");
+        if (teamElements.length > 0) {
+          extractedTeams = Array.from(teamElements).map(el => el.textContent.trim());
+        }
+      }
+
+      // Ha talált legalább 2 egyedi nevet, felülírja az alapértelmezetteket
+      const uniqueTeams = [...new Set(extractedTeams)];
+      if (uniqueTeams.length >= 2) {
+        TEAMS = uniqueTeams;
+        console.log("Sikeresen betöltött csapatok az index.html-ből:", TEAMS);
+      }
+    } catch (err) {
+      console.warn("Nem sikerült közvetlenül beolvasni az index.html-t, maradnak az alapnevek:", err);
+    }
+
+    // Pontszámláló előkészítése a dinamikus csapatokkal
+    sessionScores = {};
+    TEAMS.forEach(team => sessionScores[team] = 0);
+
+    // Kvíz indítása
+    initGame();
+  }
+
+  function initGame() {
+    questionPool = [...QUESTIONS_DB].sort(() => 0.5 - Math.random());
+    currentRound = 1;
+    teamIndex = 0;
+    loadQuestion();
+  }
+
+  // Az oldal betöltésekor először az index.html-ből olvassa be a csapatokat
+  window.onload = loadTeamsFromIndex;
+
+  function loadQuestion() {
+    if (questionPool.length === 0) {
+      questionPool = [...QUESTIONS_DB].sort(() => 0.5 - Math.random());
+    }
+    currentQuestion = questionPool.pop();
+
+    const activeTeam = TEAMS[teamIndex];
+    document.getElementById("current-team").innerText = `Soron van: ${activeTeam}`;
+    document.getElementById("round-indicator").innerText = `${currentRound}. Forduló / ${TOTAL_ROUNDS}`;
+    document.getElementById("q-category").innerText = currentQuestion.category;
+    document.getElementById("q-text").innerText = currentQuestion.question;
+    document.getElementById("feedback").innerText = "";
+    document.getElementById("btn-next").style.display = "none";
+
+    const optsContainer = document.getElementById("q-options");
+    optsContainer.innerHTML = "";
+
+    // 3 opció véletlenszerű sorrendje
+    const shuffledOpts = [...currentQuestion.options].sort(() => 0.5 - Math.random());
+
+    shuffledOpts.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.className = "opt-btn";
+      btn.innerText = opt;
+      btn.onclick = () => handleAnswer(btn, opt, currentQuestion.correct, activeTeam);
+      optsContainer.appendChild(btn);
+    });
+  }
+
+  function handleAnswer(btn, selected, correct, team) {
+    const allBtns = document.querySelectorAll(".opt-btn");
+    allBtns.forEach(b => b.disabled = true);
+
+    const feedback = document.getElementById("feedback");
+
+    if (selected === correct) {
+      btn.classList.add("correct");
+      feedback.style.color = "var(--accent)";
+      feedback.innerText = `✅ Helyes! +1 pont a(z) ${team} részére.`;
+      sessionScores[team]++;
+      sendPoint(team, 1);
+    } else {
+      btn.classList.add("wrong");
+      feedback.style.color = "var(--danger)";
+      feedback.innerText = `❌ Nem jó! 0 pont. (Helyes: ${correct})`;
+      allBtns.forEach(b => {
+        if (b.innerText === correct) b.classList.add("correct");
+      });
+    }
+
+    document.getElementById("btn-next").style.display = "block";
+  }
+
+  function nextStep() {
+    teamIndex++;
+    
+    // Ha végigértünk a csapatokon, új forduló kezdődik
+    if (teamIndex >= TEAMS.length) {
+      teamIndex = 0;
+      currentRound++;
+    }
+
+    // Ha lejárt az 5 teljes forduló
+    if (currentRound > TOTAL_ROUNDS) {
+      finishGame();
+    } else {
+      loadQuestion();
+    }
+  }
+
+  function finishGame() {
+    document.getElementById("quiz-container").style.display = "none";
+    document.getElementById("result-container").style.display = "block";
+
+    const summary = document.getElementById("score-summary");
+    summary.innerHTML = "";
+    TEAMS.forEach(team => {
+      const row = document.createElement("div");
+      row.className = "score-row";
+      row.innerHTML = `<span>${team}</span><strong>${sessionScores[team]} / ${TOTAL_ROUNDS} Pont</strong>`;
+      summary.appendChild(row);
+    });
+  }
+
+  async function sendPoint(team, pts) {
+    if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes("IDE_ILLESZD")) return;
+    try {
+      await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "addPoints",
+          team: team,
+          points: pts,
+          timestamp: new Date().toISOString()
+        })
+      });
+    } catch (err) {
+      console.warn("Pontküldési hiba:", err);
+    }
+  }
+
+  window.onload = initGame;
+</script>
+</body>
+</html>
