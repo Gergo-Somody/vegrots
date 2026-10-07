@@ -79,20 +79,21 @@
 </div>
 
 <script src="questions.js"></script>
+<script src="questions.js"></script>
 <script>
-  // 1. A megadott alapértelmezett csapatok
+  // 1. A VEGROTS eredeti csapatai
   const DEFAULT_TEAMS = [
-    { id: 1, name: "Arany Kalászok", logo: "🌾", score: 0 },
-    { id: 2, name: "Mag Páncélosok", logo: "🛡️", score: 0 },
-    { id: 3, name: "Kemény Magok", logo: "⚫", score: 0 },
-    { id: 4, name: "Zöld Lándzsások", logo: "🌱", score: 0 },
-    { id: 5, name: "Gémorr Fúrók", logo: "🔩", score: 0 },
-    { id: 6, name: "Mag-Ágyúsok", logo: "💥", score: 0 },
-    { id: 7, name: "Vitorlázó Jávaiak", logo: "🪁", score: 0 },
-    { id: 8, name: "Hangya-Taxik", logo: "🐜", score: 0 }
+    { id: 1, name: "Arany Kalászok", logo: "🌾", score: 0, pin: "1111" },
+    { id: 2, name: "Mag Páncélosok", logo: "🛡️", score: 0, pin: "2222" },
+    { id: 3, name: "Kemény Magok", logo: "⚫", score: 0, pin: "3333" },
+    { id: 4, name: "Zöld Lándzsások", logo: "🌱", score: 0, pin: "4444" },
+    { id: 5, name: "Gémorr Fúrók", logo: "🔩", score: 0, pin: "5555" },
+    { id: 6, name: "Mag-Ágyúsok", logo: "💥", score: 0, pin: "6666" },
+    { id: 7, name: "Vitorlázó Jávaiak", logo: "🪁", score: 0, pin: "7777" },
+    { id: 8, name: "Hangya-Taxik", logo: "🐜", score: 0, pin: "8888" }
   ];
 
-  // 2. Apps Script URL (ha van bekötve felhő-szinkronizálás)
+  // 2. Apps Script WebApp URL
   const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwV50HLzLRAvtARPDB1_8uJYv-TCNEcoj4Qzuz3GttDoUdiQhrVGdqyLjAZJjWwwXWb2w/exec";
   const TOTAL_ROUNDS = 5;
 
@@ -101,10 +102,9 @@
   let teamIndex = 0;
   let questionPool = [];
   let currentQuestion = null;
-  let roundScores = {}; // Csak az órai kvízben szerzett pontok nyilvántartása
+  let roundScores = {}; // Csak az órai játék pontjai csapatnevek szerint
 
   function initApp() {
-    // Ha a Hub menti a csapatokat a localStorage-ba, onnan vesszük a frisset, egyébként a DEFAULT_TEAMS-t
     const stored = localStorage.getItem("vegrots_teams") || localStorage.getItem("teams");
     if (stored) {
       try {
@@ -116,11 +116,11 @@
       teams = DEFAULT_TEAMS;
     }
 
-    // Órai pontszámláló nullázása
+    // Csapatnevek alapján inicializáljuk az órai pontszámlálót
     roundScores = {};
-    teams.forEach(t => roundScores[t.id] = 0);
+    teams.forEach(t => roundScores[t.name] = 0);
 
-    // Kérdések keverése
+    // Kérdéspakli keverése
     questionPool = [...QUESTIONS_DB].sort(() => 0.5 - Math.random());
     currentRound = 1;
     teamIndex = 0;
@@ -156,7 +156,7 @@
     });
   }
 
-  function handleAnswer(btn, selected, correct, team) {
+  function handleAnswer(btn, selected, correct, activeTeam) {
     const allBtns = document.querySelectorAll(".opt-btn");
     allBtns.forEach(b => b.disabled = true);
 
@@ -165,11 +165,11 @@
     if (selected === correct) {
       btn.classList.add("correct");
       feedback.style.color = "var(--accent)";
-      feedback.innerText = `✅ Helyes! +1 pont a(z) ${team.name} csapatnak.`;
+      feedback.innerText = `✅ Helyes! +1 pont a(z) ${activeTeam.name} részére.`;
       
-      // Pont jóváírása helyben és felhőben
-      roundScores[team.id]++;
-      awardPointToTeam(team.id, 1);
+      // Helyi számláló és szerverhívás az igazi névvel (pl. "Mag Páncélosok")
+      roundScores[activeTeam.name] = (roundScores[activeTeam.name] || 0) + 1;
+      awardPointToTeam(activeTeam, 1);
     } else {
       btn.classList.add("wrong");
       feedback.style.color = "var(--danger)";
@@ -185,7 +185,7 @@
   function nextStep() {
     teamIndex++;
     
-    // Ha mind a 8 csapat sorra került, lépünk a következő fordulóra
+    // Mind a 8 csapat után fordulószámlálás
     if (teamIndex >= teams.length) {
       teamIndex = 0;
       currentRound++;
@@ -198,13 +198,14 @@
     }
   }
 
-  // Pont mentése a Hub helyi adatbázisába és a Google Apps Script felé
-  function awardPointToTeam(teamId, pts) {
-    // 1. Frissítés a localStorage-ben (így a visszalépéskor az index.html rangsora is látja)
+  function awardPointToTeam(teamObj, pts) {
+    const teamName = teamObj.name;
+
+    // 1. Frissítés a localStorage-ban
     const stored = localStorage.getItem("vegrots_teams") || localStorage.getItem("teams");
     let allTeams = stored ? JSON.parse(stored) : teams;
     
-    const target = allTeams.find(t => t.id === teamId);
+    const target = allTeams.find(t => t.name === teamName);
     if (target) {
       target.score = (target.score || 0) + pts;
       target.quizScore = (target.quizScore || 0) + pts;
@@ -212,18 +213,18 @@
       localStorage.setItem("teams", JSON.stringify(allTeams));
     }
 
-    // 2. Apps Script hívás (ha be van állítva)
+    // 2. Apps Script küldés a feldolgozható névvel
     if (APPS_SCRIPT_URL && !APPS_SCRIPT_URL.includes("IDE_ILLESZD")) {
-      const teamObj = teams.find(t => t.id === teamId);
       fetch(APPS_SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "addPoints",
-          teamId: teamId,
-          teamName: teamObj ? teamObj.name : "",
+          team: teamName,        // <-- Pontosan: "Mag Páncélosok", "Kemény Magok", stb.
+          teamName: teamName,
           points: pts,
+          score: pts,
           timestamp: new Date().toISOString()
         })
       }).catch(err => console.warn("Hálózati hiba:", err));
@@ -237,13 +238,12 @@
     const summary = document.getElementById("score-summary");
     summary.innerHTML = "";
 
-    // Eredmények listázása
     teams.forEach(t => {
       const row = document.createElement("div");
       row.className = "score-row";
       row.innerHTML = `
         <span>${t.logo} <strong>${t.name}</strong></span>
-        <span style="color: var(--accent); font-weight: bold;">+${roundScores[t.id]} pont</span>
+        <span style="color: var(--accent); font-weight: bold;">+${roundScores[t.name] || 0} pont</span>
       `;
       summary.appendChild(row);
     });
