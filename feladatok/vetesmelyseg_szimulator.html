@@ -175,15 +175,15 @@
       <div class="seed-selector">
         <button class="btn-seed active" onclick="setSeed('mustard')">
           <span>🟡 Mustármag</span>
-          <small style="color:#cbd5e1;">1.5 mm • Epigeal</small>
+          <small style="color:#cbd5e1;">1.5 mm • Epigeikus</small>
         </button>
         <button class="btn-seed" onclick="setSeed('pea')">
           <span>🟢 Zöldborsó</span>
-          <small style="color:#cbd5e1;">8.0 mm • Hypogeal</small>
+          <small style="color:#cbd5e1;">8.0 mm • Hypogeikus</small>
         </button>
         <button class="btn-seed" onclick="setSeed('bean')">
           <span>🟤 Veteménybab</span>
-          <small style="color:#cbd5e1;">12.0 mm • Epigeal</small>
+          <small style="color:#cbd5e1;">12.0 mm • Epigeikus</small>
         </button>
       </div>
 
@@ -205,9 +205,9 @@
     const ctx = canvas.getContext('2d');
 
     const SEED_DATA = {
-      mustard: { name: 'Mustár', size: 3, type: 'epigeal', minDepth: 0.4, maxDepth: 1.6, color: '#facc15', tip: "Mustár: 1-1.5 mm aprómag. Épp csak porhanyós földdel takarjuk be (fél ujjperc)!" },
-      pea: { name: 'Zöldborsó', size: 10, type: 'hypogeal', minDepth: 2.0, maxDepth: 5.5, color: '#4ade80', tip: "Borsó: 8 mm-es gömb, hypogeikus (a sziklevél lenn marad a bunkerben). 2 ujjperc mélyre mehet!" },
-      bean: { name: 'Veteménybab', size: 14, type: 'epigeal', minDepth: 2.0, maxDepth: 3.8, color: '#fb923c', tip: "Bab: Nagy mag, de epigeikus! Ha túl mélyre teszed, a vastag hátizsák elakad a kérges földben." }
+      mustard: { name: 'Mustár', size: 3, type: 'epigeikus', minDepth: 0.4, maxDepth: 1.6, color: '#facc15', tip: "Mustár: 1-1.5 mm aprómag. Épp csak porhanyós földdel takarjuk be (fél ujjperc)!" },
+      pea: { name: 'Zöldborsó', size: 10, type: 'hypogeikus', minDepth: 2.0, maxDepth: 5.5, color: '#4ade80', tip: "Borsó: 8 mm-es gömb, hypogeikus (a sziklevél lenn marad a bunkerben). 2 ujjperc mélyre mehet!" },
+      bean: { name: 'Veteménybab', size: 14, type: 'epigeikus', minDepth: 2.0, maxDepth: 3.8, color: '#fb923c', tip: "Bab: Nagy mag, de epigeikus! Ha túl mélyre teszed, a vastag hátizsák elakad a kérges földben." }
     };
 
     let activeKey = 'mustard';
@@ -324,7 +324,7 @@
         ctx.beginPath();
         ctx.moveTo(0, -4);
 
-        if (seed.type === 'epigeal') {
+        if (seed.type === 'epigeikus') {
           // Epigeikus: magot emeli a hipokotil kampó
           let hookY = Math.max(currentShootY, targetShootY);
           ctx.lineTo(0, hookY + 8);
@@ -362,7 +362,7 @@
       }
 
       // Magbelső teste a földben (ha hypogeal, végig itt van; ha epigeal, a kezdeti mag látszik)
-      if (seed.type === 'hypogeal' || animProgress === 0) {
+      if (seed.type === 'hypogeikus' || animProgress === 0) {
         ctx.fillStyle = seed.color;
         ctx.beginPath();
         ctx.ellipse(0, 0, seed.size, seed.size * 0.8, 0, 0, Math.PI * 2);
