@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Magbomba Labor & k-NN AI // Vegrots</title>
+  <title>Magbomba Labor & 2D k-NN Térkép // Vegrots</title>
   <style>
     :root {
       --bg: #0b132b;
@@ -16,12 +16,12 @@
       --border: #334155;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; user-select: none; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; user-select: none; }
     body { background: var(--bg); color: var(--text); padding: 16px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
 
     header {
       width: 100%;
-      max-width: 1000px;
+      max-width: 1050px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -46,17 +46,18 @@
       color: var(--cyan);
       text-decoration: none;
       cursor: pointer;
+      transition: all 0.2s ease;
     }
-    .btn-nav:hover { border-color: var(--cyan); }
+    .btn-nav:hover { border-color: var(--cyan); box-shadow: 0 0 10px rgba(56, 189, 248, 0.3); }
 
     .main-grid {
       width: 100%;
-      max-width: 1000px;
+      max-width: 1050px;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 20px;
     }
-    @media (max-width: 820px) { .main-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 860px) { .main-grid { grid-template-columns: 1fr; } }
 
     .card {
       background: var(--card-bg);
@@ -69,10 +70,10 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     }
 
-    h2 { color: var(--gold); font-size: 1.2rem; display: flex; align-items: center; gap: 8px; }
+    h2 { color: var(--gold); font-size: 1.25rem; display: flex; align-items: center; gap: 8px; }
     h3 { color: var(--cyan); font-size: 1.05rem; }
 
-    /* RECEPT CSÚSZKÁK */
+    /* RECEPT CSÚSZKÁK & ARÁNYMÉRLEG */
     .scale-box {
       background: #0f172a;
       border-radius: 14px;
@@ -92,7 +93,7 @@
       display: flex;
       justify-content: space-between;
       font-weight: bold;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
     }
     .slider {
       width: 100%;
@@ -102,7 +103,7 @@
       cursor: pointer;
     }
 
-    /* AI PREDICITON KIJELZŐ */
+    /* ÉLŐ AI PREDIKCIÓS KIJELZŐ */
     .ai-badge {
       display: flex;
       flex-direction: column;
@@ -111,6 +112,7 @@
       border-radius: 12px;
       background: #0b132b;
       border: 2px solid var(--cyan);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
     }
     .ai-badge-header {
       display: flex;
@@ -120,21 +122,23 @@
       color: #94a3b8;
     }
     .ai-verdict {
-      font-size: 1.15rem;
+      font-size: 1.2rem;
       font-weight: 900;
       color: var(--accent);
+      letter-spacing: 0.3px;
     }
 
-    /* VIZUÁLIS BOMBA CANVAS */
+    /* CANVAS VIZUALIZÁCIÓK */
     .canvas-wrapper {
       width: 100%;
-      height: 220px;
+      height: 210px;
       border-radius: 12px;
       overflow: hidden;
       border: 2px solid var(--border);
       background: #1e293b;
+      position: relative;
     }
-    canvas { width: 100%; height: 100%; }
+    canvas { width: 100%; height: 100%; display: block; }
 
     .btn-touch {
       padding: 12px;
@@ -144,14 +148,14 @@
       border: none;
       cursor: pointer;
       text-align: center;
-      transition: transform 0.1s;
+      transition: all 0.15s ease;
     }
     .btn-touch.green { background: var(--accent); color: #064e3b; }
     .btn-touch.gold { background: var(--gold); color: #713f12; }
     .btn-touch.cyan { background: var(--cyan); color: #082f49; }
     .btn-touch:active { transform: scale(0.97); }
 
-    /* ADATBEVITELI ŰRLAP (AI TANÍTÁS) */
+    /* KERTI TANÍTÓ PANEL */
     .train-box {
       background: #0f172a;
       border-radius: 12px;
@@ -160,29 +164,46 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
     }
     .form-row {
       display: flex;
       gap: 8px;
     }
-    .form-row select, .form-row input {
+    @media (max-width: 500px) { .form-row { flex-direction: column; } }
+    .form-row select {
       flex: 1;
       padding: 8px 10px;
       background: #1c2541;
       border: 1px solid var(--border);
       border-radius: 8px;
       color: #fff;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
+      cursor: pointer;
     }
+
+    .legend-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 0.75rem;
+      margin-top: 2px;
+      justify-content: space-around;
+      background: #0f172a;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .legend-item { display: flex; align-items: center; gap: 5px; }
+    .legend-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
   </style>
 </head>
 <body>
 
   <header>
     <div class="title-box">
-      <h1>💣 MAGBOMBA LABOR & k-NN AI TANÍTÓ</h1>
-      <span>1. Óra Gyakorlat • 3:1 Szerves Pindstrup Architektúra</span>
+      <h1>💣 MAGBOMBA LABOR & 2D k-NN TÉRKÉP</h1>
+      <span>1. Óra Gyakorlat • 3:1 Szerves Pindstrup Architektúra & AI Vizualizáció</span>
     </div>
     <a href="../index.html" class="btn-nav">⬅ Vissza a Hub-ra</a>
   </header>
@@ -190,10 +211,13 @@
   <main class="main-grid">
     <!-- BAL OLDAL: RECEPTVEZÉRLŐ & ÉLŐ AI PREDIKCIÓ -->
     <div class="card">
-      <h2>⚖ Receptúra Tesztelése & AI Becslés</h2>
-      <p style="font-size:0.85rem; color:#94a3b8;">Mozgasd a csúszkákat! A beépített k-NN mesterséges intelligencia a korábbi kerti mérések alapján becsli meg a fizikai állapotot.</p>
+      <h2>⚖ Receptúra Vezérlés & AI Becslés</h2>
+      <p style="font-size:0.85rem; color:#94a3b8;">
+        Állítsd a csúszkákat a digitális mérlegen! A beépített k-NN mesterséges intelligencia élőben kiszámítja a fizikai viselkedést a meglévő kerti tapasztalatok alapján.
+      </p>
 
       <div class="scale-box">
+        <!-- TŐZEG -->
         <div class="ingredient-row">
           <div class="ingredient-head">
             <span style="color:#a3e635;">🌱 Pindstrup Tőzeg (Szerves váz)</span>
@@ -202,6 +226,7 @@
           <input type="range" class="slider" id="peatRange" min="50" max="500" step="10" value="300" oninput="updateMix()">
         </div>
 
+        <!-- AGYAG -->
         <div class="ingredient-row">
           <div class="ingredient-head">
             <span style="color:#fb923c;">🧱 Porított Agyag (Kötőanyag)</span>
@@ -210,43 +235,36 @@
           <input type="range" class="slider" id="clayRange" min="20" max="300" step="10" value="100" oninput="updateMix()">
         </div>
 
+        <!-- VÍZ -->
         <div class="ingredient-row">
           <div class="ingredient-head">
-            <span style="color:#38bdf8;">💧 Víz (Gyúrófolyadék)</span>
+            <span style="color:#38bdf8;">💧 Vízpermet (Gyúrófolyadék)</span>
             <span id="waterVal">80 ml</span>
           </div>
           <input type="range" class="slider" id="waterRange" min="20" max="300" step="10" value="80" oninput="updateMix()">
         </div>
 
-        <!-- ÉLŐ AI PREDIKCIÓ BLOKK -->
+        <!-- ÉLŐ AI PREDIKCIÓS BLOKK -->
         <div class="ai-badge">
           <div class="ai-badge-header">
-            <span>🤖 k-NN AI ELŐREJELZÉS (k=3)</span>
-            <span id="aiConfidence" style="color:var(--gold); font-weight:bold;">95% megbízhatóság</span>
+            <span>🤖 k-NN GÉPI DÖNTÉS (k=3 Szomszéd)</span>
+            <span id="aiConfidence" style="color:var(--gold); font-weight:bold;">Számolás...</span>
           </div>
           <div class="ai-verdict" id="aiVerdict">Betöltés...</div>
-          <div style="font-size:0.8rem; color:#94a3b8;" id="aiNeighborsInfo">Hasonló kerti kísérletek vizsgálata...</div>
+          <div style="font-size:0.8rem; color:#94a3b8;" id="aiNeighborsInfo">Legközelebbi kerti pontok elemzése...</div>
         </div>
       </div>
 
-      <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); padding: 10px 12px; border-radius: 10px; color: #fca5a5; font-size: 0.85rem;">
-        ⚠️ <strong>Fontos:</strong> Agyagból csak annyit használunk, amennyi összefogja a gömböt! Ha túlléped a 3:1 arányt, a magbomba betonkemény bunkerré válik, és a csírázó növény elpusztul a sötétben.
-      </div>
-    </div>
-
-    <!-- JOBB OLDAL: VIZUÁLIS BOMBA & KERTI ADATBEVITEL -->
-    <div class="card">
-      <h2>🔮 Röntgen Szimuláció & Tanítás</h2>
-      <div class="canvas-wrapper">
-        <canvas id="bombCanvas"></canvas>
+      <div style="background: rgba(239, 68, 68, 0.12); border: 1px solid var(--danger); padding: 10px 12px; border-radius: 10px; color: #fca5a5; font-size: 0.85rem; line-height:1.4;">
+        ⚠️ <strong>Agronómus Alapszabály:</strong> Az agyag kizárólag ragasztó! Ha a tőzeg:agyag arány 2:1 alá esik, a golyó csontkemény bunkerré szárad a napon, és a csírázó borsó megfullad.
       </div>
 
-      <button class="btn-touch green" onclick="simulateCrush()">🔨 PRÓBANYOMÁS (Morzsolódás teszt)</button>
-
-      <!-- KERTI MÉRÉSI JEGYZŐKÖNYV ADATBEVITEL (AI TANÍTÓ FORM) -->
+      <!-- KERTI MÉRÉSI ADATBEVITEL (AI TANÍTÁS) -->
       <div class="train-box">
-        <h4 style="color:var(--gold);">📥 Új Kerti Mérés Betáplálása az AI-ba</h4>
-        <p style="font-size:0.8rem; color:#94a3b8;">Ha az udvaron leteszteltétek a fenti arányt, rögzítsétek a valós kerti eredményt, hogy okosabb legyen a modell!</p>
+        <h4 style="color:var(--gold); font-size:0.95rem;">📥 Kerti Adatrögzítés (AI Modell Tanítása)</h4>
+        <p style="font-size:0.8rem; color:#94a3b8;">
+          Ha az udvaron leteszteltétek a fenti arányt a fizikai tesztekkel, mentsétek el a valós eredményt a közös adatbázisba!
+        </p>
         
         <div class="form-row">
           <select id="trainTeam">
@@ -267,34 +285,67 @@
           </select>
         </div>
 
-        <button class="btn-touch cyan" style="padding:8px;" onclick="saveGardenMeasurement()">💾 Mérés Mentése a Tanítóhalmazba</button>
+        <button class="btn-touch cyan" style="padding:10px;" onclick="saveGardenMeasurement()">💾 Új mérés mentése a tanítóhalmazba</button>
+      </div>
+    </div>
+
+    <!-- JOBB OLDAL: VIZUÁLIS RÖNTGEN & 2D DÖNTÉSI TÉRKÉP -->
+    <div class="card">
+      <!-- 1. BELSŐ RÖNTGEN -->
+      <div>
+        <h2>🔮 Magbomba Belső Röntgen</h2>
+        <div class="canvas-wrapper" style="height: 190px; margin-top:8px;">
+          <canvas id="bombCanvas"></canvas>
+        </div>
+        <button class="btn-touch green" style="width:100%; margin-top:8px;" onclick="simulateCrush()">🔨 PRÓBANYOMÁS (Morzsolódás teszt)</button>
+      </div>
+
+      <!-- 2. 2D k-NN DÖNTÉSI TÉRKÉP (KÖZVETLENÜL ALATTA) -->
+      <div>
+        <h2>🗺️ 2D k-NN Döntési Térkép (X: Arány, Y: Víz)</h2>
+        <p style="font-size:0.8rem; color:#94a3b8; margin-bottom:6px;">
+          A fehér pulzáló célkereszt a jelenlegi recept. A szaggatott vonalak a 3 legközelebbi kerti tanító-szomszédot kötik be!
+        </p>
+
+        <div class="canvas-wrapper" style="height: 250px;">
+          <canvas id="knnCanvas"></canvas>
+        </div>
+
+        <div class="legend-row">
+          <div class="legend-item"><span class="legend-dot" style="background:#4ade80;"></span> Ideális (Zöld)</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#ef4444;"></span> Kőkemény (Piros)</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#facc15;"></span> Szétmálló (Sárga)</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#38bdf8;"></span> Mocsaras (Kék)</div>
+        </div>
       </div>
     </div>
   </main>
 
   <script>
     // ==========================================
-    // k-NN OSZTÁLYOZÓ MOTOR
+    // k-NN GÉPI TANULÁSI OSZTÁLY (k-NEAREST NEIGHBORS)
     // ==========================================
     class MagbombaKNN {
       constructor(k = 3) {
         this.k = k;
         this.storageKey = 'vegrots_magbomba_dataset_v1';
+        
+        // Bemeneti skálázási határok a normalizáláshoz
         this.ranges = {
-          peat:  { min: 50,  max: 500 },
-          clay:  { min: 20,  max: 300 },
-          water: { min: 20,  max: 300 }
+          ratio: { min: 0.2, max: 8.5 }, // Tőzeg/Agyag arány
+          water: { min: 20,  max: 300 }  // Hozzáadott víz (ml)
         };
 
+        // Alapértelmezett kerti tanítóhalmaz
         this.defaultDataset = [
-          { id: 1, team: "Mester", peat: 300, clay: 100, water: 80,  label: "ideal", labelHu: "✅ Ideális Bionikus Bomba" },
-          { id: 2, team: "Mester", peat: 280, clay: 110, water: 90,  label: "ideal", labelHu: "✅ Ideális Bionikus Bomba" },
-          { id: 3, team: "Mester", peat: 100, clay: 280, water: 60,  label: "hard",  labelHu: "🪨 Kőkemény Bunker" },
-          { id: 4, team: "Mester", peat: 80,  clay: 300, water: 70,  label: "hard",  labelHu: "🪨 Kőkemény Bunker" },
-          { id: 5, team: "Mester", peat: 420, clay: 50,  water: 60,  label: "loose", labelHu: "💨 Szétmálló Por" },
-          { id: 6, team: "Mester", peat: 390, clay: 60,  water: 50,  label: "loose", labelHu: "💨 Szétmálló Por" },
-          { id: 7, team: "Mester", peat: 200, clay: 100, water: 240, label: "mud",   labelHu: "💧 Mocsaras Pacsni" },
-          { id: 8, team: "Mester", peat: 250, clay: 120, water: 260, label: "mud",   labelHu: "💧 Mocsaras Pacsni" }
+          { id: 1, team: "Mester", peat: 300, clay: 100, water: 80,  label: "ideal", labelHu: "Ideális Bionikus Bomba" },
+          { id: 2, team: "Mester", peat: 280, clay: 110, water: 90,  label: "ideal", labelHu: "Ideális Bionikus Bomba" },
+          { id: 3, team: "Mester", peat: 100, clay: 280, water: 60,  label: "hard",  labelHu: "Kőkemény Bunker" },
+          { id: 4, team: "Mester", peat: 80,  clay: 300, water: 70,  label: "hard",  labelHu: "Kőkemény Bunker" },
+          { id: 5, team: "Mester", peat: 420, clay: 50,  water: 60,  label: "loose", labelHu: "Szétmálló Por" },
+          { id: 6, team: "Mester", peat: 390, clay: 60,  water: 50,  label: "loose", labelHu: "Szétmálló Por" },
+          { id: 7, team: "Mester", peat: 200, clay: 100, water: 240, label: "mud",   labelHu: "Mocsaras Pacsni" },
+          { id: 8, team: "Mester", peat: 250, clay: 120, water: 260, label: "mud",   labelHu: "Mocsaras Pacsni" }
         ];
 
         this.dataset = this.loadDataset();
@@ -306,7 +357,11 @@
           localStorage.setItem(this.storageKey, JSON.stringify(this.defaultDataset));
           return [...this.defaultDataset];
         }
-        try { return JSON.parse(raw); } catch (e) { return [...this.defaultDataset]; }
+        try {
+          return JSON.parse(raw);
+        } catch (e) {
+          return [...this.defaultDataset];
+        }
       }
 
       addSample(teamName, peat, clay, water, label, labelHu) {
@@ -321,23 +376,34 @@
         };
         this.dataset.push(newSample);
         localStorage.setItem(this.storageKey, JSON.stringify(this.dataset));
+        return newSample;
       }
 
       normalize(val, min, max) {
         return Math.max(0, Math.min(1, (val - min) / (max - min)));
       }
 
-      calculateDistance(p1, p2) {
-        const dP = this.normalize(p1.peat, this.ranges.peat.min, this.ranges.peat.max) - this.normalize(p2.peat, this.ranges.peat.min, this.ranges.peat.max);
-        const dC = this.normalize(p1.clay, this.ranges.clay.min, this.ranges.clay.max) - this.normalize(p2.clay, this.ranges.clay.min, this.ranges.clay.max);
-        const dW = this.normalize(p1.water, this.ranges.water.min, this.ranges.water.max) - this.normalize(p2.water, this.ranges.water.min, this.ranges.water.max);
-        return Math.sqrt(dP * dP + dC * dC + dW * dW);
+      // Normalizált Euklideszi távolság az arány és a vízmennyiség alapján
+      calculateDistance(p1Ratio, p1Water, sample) {
+        const p2Ratio = sample.peat / sample.clay;
+        const dR = this.normalize(p1Ratio, this.ranges.ratio.min, this.ranges.ratio.max) -
+                   this.normalize(p2Ratio, this.ranges.ratio.min, this.ranges.ratio.max);
+
+        const dW = this.normalize(p1Water, this.ranges.water.min, this.ranges.water.max) -
+                   this.normalize(sample.water, this.ranges.water.min, this.ranges.water.max);
+
+        return Math.sqrt(dR * dR + dW * dW);
       }
 
       predict(peat, clay, water) {
         if (!this.dataset.length) return null;
-        const target = { peat: Number(peat), clay: Number(clay), water: Number(water) };
-        const distances = this.dataset.map(s => ({ sample: s, dist: this.calculateDistance(target, s) }));
+        const currentRatio = peat / clay;
+
+        const distances = this.dataset.map(sample => ({
+          sample: sample,
+          dist: this.calculateDistance(currentRatio, water, sample)
+        }));
+
         distances.sort((a, b) => a.dist - b.dist);
 
         const neighbors = distances.slice(0, Math.min(this.k, distances.length));
@@ -346,49 +412,65 @@
         let totalW = 0;
 
         neighbors.forEach(({ sample, dist }) => {
-          const w = 1 / (dist + 0.001);
+          const w = 1 / (dist + 0.0001);
           votes[sample.label] = (votes[sample.label] || 0) + w;
           meta[sample.label] = sample.labelHu;
           totalW += w;
         });
 
-        let winLabel = null;
+        let winningLabel = null;
         let maxW = -1;
-        for (const [l, w] of Object.entries(votes)) {
-          if (w > maxW) { maxW = w; winLabel = l; }
+        for (const [lbl, weight] of Object.entries(votes)) {
+          if (weight > maxW) {
+            maxW = weight;
+            winningLabel = lbl;
+          }
         }
 
         return {
-          label: winLabel,
-          labelHu: meta[winLabel],
+          label: winningLabel,
+          labelHu: meta[winningLabel],
           confidence: Math.round((maxW / totalW) * 100),
-          neighbors: neighbors.map(n => `${n.sample.team}: ${n.sample.labelHu}`)
+          neighbors: neighbors,
+          maxNeighborDistance: neighbors[neighbors.length - 1].dist
         };
       }
     }
 
     const aiModel = new MagbombaKNN(3);
 
-    // ==========================================
-    // FELÜLETI VEZÉRLÉS & CANVAS RÖNTGEN
-    // ==========================================
-    const canvas = document.getElementById('bombCanvas');
-    const ctx = canvas.getContext('2d');
-    let peat = 300, clay = 100, water = 80;
-    let crushAnim = 0, isCrushing = false;
+    const bombCanvas = document.getElementById('bombCanvas');
+    const bombCtx = bombCanvas.getContext('2d');
 
-    function resizeCanvas() {
-      canvas.width = canvas.parentElement.clientWidth;
-      canvas.height = canvas.parentElement.clientHeight;
+    const knnCanvas = document.getElementById('knnCanvas');
+    const knnCtx = knnCanvas.getContext('2d');
+
+    let peat = 300;
+    let clay = 100;
+    let water = 80;
+    let crushAnim = 0;
+    let isCrushing = false;
+    let pulseAngle = 0;
+
+    function resizeAllCanvases() {
+      if (bombCanvas.parentElement) {
+        bombCanvas.width = bombCanvas.parentElement.clientWidth;
+        bombCanvas.height = bombCanvas.parentElement.clientHeight;
+      }
+      if (knnCanvas.parentElement) {
+        knnCanvas.width = knnCanvas.parentElement.clientWidth;
+        knnCanvas.height = knnCanvas.parentElement.clientHeight;
+      }
     }
-    window.addEventListener('resize', () => { resizeCanvas(); drawBomb(); });
+    window.addEventListener('resize', () => { resizeAllCanvases(); updateMix(); });
 
     function updateMix() {
       peat = parseInt(document.getElementById('peatRange').value);
       clay = parseInt(document.getElementById('clayRange').value);
       water = parseInt(document.getElementById('waterRange').value);
 
-      document.getElementById('peatVal').innerText = `${peat} g (${(peat/clay).toFixed(1)} rész)`;
+      const ratio = (peat / clay).toFixed(1);
+      document.getElementById('peatVal').innerText = `${peat} g (${ratio} : 1)`;
       document.getElementById('clayVal').innerText = `${clay} g (1 rész)`;
       document.getElementById('waterVal').innerText = `${water} ml`;
 
@@ -397,95 +479,218 @@
       if (pred) {
         const vEl = document.getElementById('aiVerdict');
         vEl.innerText = pred.labelHu;
-        
+
         if (pred.label === 'ideal') vEl.style.color = 'var(--accent)';
         else if (pred.label === 'hard') vEl.style.color = 'var(--danger)';
         else if (pred.label === 'loose') vEl.style.color = 'var(--gold)';
         else vEl.style.color = 'var(--cyan)';
 
         document.getElementById('aiConfidence').innerText = `${pred.confidence}% megbízhatóság`;
-        document.getElementById('aiNeighborsInfo').innerText = `Referencia: ${pred.neighbors[0]}`;
+        
+        const topNeighbor = pred.neighbors[0].sample;
+        document.getElementById('aiNeighborsInfo').innerText = 
+          `Legközelebbi teszt: ${topNeighbor.team} (${(topNeighbor.peat / topNeighbor.clay).toFixed(1)} arány, ${topNeighbor.water}ml víz)`;
+
+        drawBomb();
+        drawKNNMap(pred.neighbors, pred.maxNeighborDistance);
       }
-
-      drawBomb();
-    }
-
-    function saveGardenMeasurement() {
-      const team = document.getElementById('trainTeam').value;
-      const select = document.getElementById('trainLabel');
-      const label = select.value;
-      const labelHu = select.selectedOptions[0].text;
-
-      aiModel.addSample(team, peat, clay, water, label, labelHu);
-      alert(`✅ Mérés sikeresen elmentve!\nCsapat: ${team}\nRecept: ${peat}g tőzeg, ${clay}g agyag, ${water}ml víz\nEredmény: ${labelHu}`);
-      updateMix();
     }
 
     function drawBomb() {
-      if (!canvas.width) resizeCanvas();
-      const w = canvas.width, h = canvas.height;
-      const cx = w / 2, cy = h / 2;
+      if (!bombCanvas.width) resizeAllCanvases();
+      const w = bombCanvas.width;
+      const h = bombCanvas.height;
+      const cx = w / 2;
+      const cy = h / 2;
 
-      ctx.clearRect(0, 0, w, h);
+      bombCtx.clearRect(0, 0, w, h);
 
       const ratio = peat / clay;
-      let shellColor = '#451a03';
-      if (ratio < 2.0) shellColor = '#78350f';
-      if (water > 160) shellColor = '#1f2937';
+      let shellColor = '#451a03'; // Természetes tőzegbarna
+      if (ratio < 2.0) shellColor = '#78350f'; // Sárgás agyagos
+      if (water > 160) shellColor = '#1e293b'; // Túlöntözött iszapfekete
 
-      ctx.save();
-      ctx.translate(cx, cy);
+      bombCtx.save();
+      bombCtx.translate(cx, cy);
 
-      // Külső test
-      ctx.fillStyle = shellColor;
-      ctx.beginPath();
-      const radius = 55 + (crushAnim * 12);
-      ctx.ellipse(0, 0, radius, radius * (1 - crushAnim * 0.4), 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = '#0f172a';
-      ctx.lineWidth = 3;
-      ctx.stroke();
+      // Külső magbomba burok
+      bombCtx.fillStyle = shellColor;
+      bombCtx.beginPath();
+      const radius = 50 + (crushAnim * 12);
+      bombCtx.ellipse(0, 0, radius, radius * (1 - crushAnim * 0.4), 0, 0, Math.PI * 2);
+      bombCtx.fill();
+      bombCtx.strokeStyle = '#0f172a';
+      bombCtx.lineWidth = 3;
+      bombCtx.stroke();
 
-      // Pindstrup szerves rostok
-      ctx.fillStyle = '#a3e635';
+      // Pindstrup rostos textúra pontok
+      bombCtx.fillStyle = '#a3e635';
       for (let i = 0; i < 16; i++) {
         let ang = (i * 22.5) * (Math.PI / 180);
-        let dist = (i % 2 === 0 ? 25 : 40) + (crushAnim * 8);
-        ctx.beginPath();
-        ctx.arc(Math.cos(ang) * dist, Math.sin(ang) * dist * (1 - crushAnim * 0.4), 2, 0, Math.PI * 2);
-        ctx.fill();
+        let dist = (i % 2 === 0 ? 22 : 36) + (crushAnim * 8);
+        bombCtx.beginPath();
+        bombCtx.arc(Math.cos(ang) * dist, Math.sin(ang) * dist * (1 - crushAnim * 0.4), 2, 0, Math.PI * 2);
+        bombCtx.fill();
       }
 
-      // Repedések teszt esetén
+      // Repedések szimulációja próbanyomáskor
       if (crushAnim > 0) {
-        ctx.strokeStyle = '#facc15';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(-25, -15); ctx.lineTo(-8, 5); ctx.lineTo(-30, 15);
-        ctx.moveTo(20, -10); ctx.lineTo(10, 8); ctx.lineTo(25, 20);
-        ctx.stroke();
+        bombCtx.strokeStyle = '#facc15';
+        bombCtx.lineWidth = 2.5;
+        bombCtx.beginPath();
+        bombCtx.moveTo(-22, -14); bombCtx.lineTo(-8, 4); bombCtx.lineTo(-26, 14);
+        bombCtx.moveTo(18, -10); bombCtx.lineTo(8, 7); bombCtx.lineTo(22, 18);
+        bombCtx.stroke();
       }
 
-      // Belső védett magvak (Zöldborsó + repce)
-      ctx.fillStyle = '#4ade80';
-      ctx.beginPath();
-      ctx.arc(-8, 0, 12, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = '#064e3b';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
+      // Védett magkamra: Zöldborsó szem
+      bombCtx.fillStyle = '#4ade80';
+      bombCtx.beginPath();
+      bombCtx.arc(-7, 0, 11, 0, Math.PI * 2);
+      bombCtx.fill();
+      bombCtx.strokeStyle = '#064e3b';
+      bombCtx.lineWidth = 1.5;
+      bombCtx.stroke();
 
-      ctx.fillStyle = '#facc15';
-      ctx.beginPath();
-      ctx.arc(14, -5, 4.5, 0, Math.PI * 2);
-      ctx.fill();
+      // Védett magkamra: Apró mustár/repcemag
+      bombCtx.fillStyle = '#facc15';
+      bombCtx.beginPath();
+      bombCtx.arc(13, -5, 4, 0, Math.PI * 2);
+      bombCtx.fill();
 
-      ctx.restore();
+      bombCtx.restore();
 
-      ctx.fillStyle = '#f8fafc';
-      ctx.font = 'bold 11px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText("Védett Bionikus Magkamra (Borsó + Repce)", cx, h - 12);
+      // Felirat
+      bombCtx.fillStyle = '#94a3b8';
+      bombCtx.font = 'bold 11px sans-serif';
+      bombCtx.textAlign = 'center';
+      bombCtx.fillText("Védett Kamra: Borsó + Repce tőzegágyban", cx, h - 10);
+    }
+
+    function drawKNNMap(neighbors = [], maxDist = 0) {
+      if (!knnCanvas.width) resizeAllCanvases();
+      const w = knnCanvas.width;
+      const h = knnCanvas.height;
+      knnCtx.clearRect(0, 0, w, h);
+
+      const padX = 46;
+      const padY = 28;
+      const plotW = w - padX - 20;
+      const plotH = h - padY - 32;
+
+      // Háttér rácsháló és határok
+      knnCtx.fillStyle = '#0f172a';
+      knnCtx.fillRect(padX, padY, plotW, plotH);
+      knnCtx.strokeStyle = '#1e293b';
+      knnCtx.lineWidth = 1;
+
+      // Vízszintes víz-rácsok (50 ml lépésekben)
+      for (let v = 50; v <= 300; v += 50) {
+        let y = (padY + plotH) - (v / 300) * plotH;
+        knnCtx.beginPath();
+        knnCtx.moveTo(padX, y);
+        knnCtx.lineTo(padX + plotW, y);
+        knnCtx.stroke();
+
+        knnCtx.fillStyle = '#64748b';
+        knnCtx.font = '9px monospace';
+        knnCtx.textAlign = 'right';
+        knnCtx.fillText(`${v}`, padX - 6, y + 3);
+      }
+
+      // Függőleges arány-rácsok (0-8 arány lépésekben)
+      for (let r = 0; r <= 8; r += 2) {
+        let x = padX + (r / 8) * plotW;
+        knnCtx.beginPath();
+        knnCtx.moveTo(x, padY);
+        knnCtx.lineTo(x, padY + plotH);
+        knnCtx.stroke();
+
+        knnCtx.fillStyle = '#64748b';
+        knnCtx.font = '9px monospace';
+        knnCtx.textAlign = 'center';
+        knnCtx.fillText(`${r}:1`, x, padY + plotH + 14);
+      }
+
+      // Tengely feliratok
+      knnCtx.fillStyle = '#94a3b8';
+      knnCtx.font = 'bold 10px sans-serif';
+      knnCtx.textAlign = 'center';
+      knnCtx.fillText("Tőzeg : Agyag arány (X)", padX + plotW / 2, h - 4);
+
+      knnCtx.save();
+      knnCtx.translate(14, padY + plotH / 2);
+      knnCtx.rotate(-Math.PI / 2);
+      knnCtx.fillText("Víz ml (Y)", 0, 0);
+      knnCtx.restore();
+
+      // Aktuális minta koordinátái
+      const currentRatio = peat / clay;
+      const curX = padX + Math.min(plotW, (currentRatio / 8) * plotW);
+      const curY = (padY + plotH) - Math.min(plotH, (water / 300) * plotH);
+
+      // Hatósugár kör megrajzolása a legtávolabbi szomszédig
+      if (neighbors.length > 0) {
+        const radiusPx = maxDist * Math.min(plotW, plotH) * 1.05;
+        knnCtx.strokeStyle = 'rgba(56, 189, 248, 0.25)';
+        knnCtx.fillStyle = 'rgba(56, 189, 248, 0.05)';
+        knnCtx.beginPath();
+        knnCtx.arc(curX, curY, Math.max(16, radiusPx), 0, Math.PI * 2);
+        knnCtx.fill();
+        knnCtx.stroke();
+
+        // Szaggatott vonalak a k legközelebbi szomszédhoz
+        neighbors.forEach(n => {
+          const sRatio = n.sample.peat / n.sample.clay;
+          const sX = padX + Math.min(plotW, (sRatio / 8) * plotW);
+          const sY = (padY + plotH) - Math.min(plotH, (n.sample.water / 300) * plotH);
+
+          knnCtx.strokeStyle = 'rgba(250, 204, 21, 0.7)';
+          knnCtx.lineWidth = 1.8;
+          knnCtx.setLineDash([4, 4]);
+          knnCtx.beginPath();
+          knnCtx.moveTo(curX, curY);
+          knnCtx.lineTo(sX, sY);
+          knnCtx.stroke();
+          knnCtx.setLineDash([]);
+        });
+      }
+
+      // Adathalmaz pontjainak kirajzolása (Tanító minták)
+      aiModel.dataset.forEach(pt => {
+        const pRatio = pt.peat / pt.clay;
+        const px = padX + Math.min(plotW, (pRatio / 8) * plotW);
+        const py = (padY + plotH) - Math.min(plotH, (pt.water / 300) * plotH);
+
+        let color = '#4ade80';
+        if (pt.label === 'hard') color = '#ef4444';
+        else if (pt.label === 'loose') color = '#facc15';
+        else if (pt.label === 'mud') color = '#38bdf8';
+
+        knnCtx.fillStyle = color;
+        knnCtx.beginPath();
+        knnCtx.arc(px, py, 6, 0, Math.PI * 2);
+        knnCtx.fill();
+        knnCtx.strokeStyle = '#0b132b';
+        knnCtx.lineWidth = 1.5;
+        knnCtx.stroke();
+      });
+
+      // AKTUÁLIS PONT: Pulzáló fehér célkereszt
+      const pulseSize = 7 + Math.sin(pulseAngle) * 2;
+      knnCtx.strokeStyle = '#ffffff';
+      knnCtx.lineWidth = 2;
+      knnCtx.fillStyle = '#ffffff';
+
+      knnCtx.beginPath();
+      knnCtx.arc(curX, curY, pulseSize, 0, Math.PI * 2);
+      knnCtx.fill();
+
+      // Célkereszt szálak
+      knnCtx.beginPath();
+      knnCtx.moveTo(curX - 12, curY); knnCtx.lineTo(curX + 12, curY);
+      knnCtx.moveTo(curX, curY - 12); knnCtx.lineTo(curX, curY + 12);
+      knnCtx.stroke();
     }
 
     function simulateCrush() {
@@ -496,7 +701,7 @@
       let step = 0;
       const timer = setInterval(() => {
         step++;
-        crushAnim = Math.sin((step / 20) * Math.PI) * 0.4;
+        crushAnim = Math.sin((step / 20) * Math.PI) * 0.45;
         drawBomb();
 
         if (step >= 20) {
@@ -504,12 +709,49 @@
           isCrushing = false;
           crushAnim = 0;
           drawBomb();
-          alert("Próbanyomás kész: A szerves tőzegburok rugalmasan enged, a magvak épek maradtak a bunkerben!");
+          
+          const ratio = peat / clay;
+          if (water > 160) {
+            alert("Próbanyomás: A golyó elfolyt és szétmállott az ujjak között (Túl sok víz).");
+          } else if (ratio < 2.0) {
+            alert("Próbanyomás: Betonkemény agyaggolyó! Kézzel összenyomhatatlan, a csíra nem tud áttörni.");
+          } else if (ratio > 4.5) {
+            alert("Próbanyomás: Kézbevételkor porrá omlott! Nincs agyag, ami egyben tartaná.");
+          } else {
+            alert("Próbanyomás SIKERES! A szerves tőzegburok rugalmasan repedt, a magok védve maradtak.");
+          }
         }
       }, 30);
     }
 
-    setTimeout(() => { resizeCanvas(); updateMix(); }, 150);
+    function saveGardenMeasurement() {
+      const team = document.getElementById('trainTeam').value;
+      const select = document.getElementById('trainLabel');
+      const label = select.value;
+      const labelHu = select.selectedOptions[0].text;
+
+      aiModel.addSample(team, peat, clay, water, label, labelHu);
+      alert(`✅ Mérés sikeresen elmentve!\nCsapat: ${team}\nRecept: ${peat}g tőzeg, ${clay}g agyag, ${water}ml víz\nEredmény: ${labelHu}`);
+      
+      updateMix();
+    }
+
+    // Animációs ciklus a célkereszt pulzálásához
+    function animate() {
+      pulseAngle += 0.08;
+      const pred = aiModel.predict(peat, clay, water);
+      if (pred) {
+        drawKNNMap(pred.neighbors, pred.maxNeighborDistance);
+      }
+      requestAnimationFrame(animate);
+    }
+
+    // Inicializálás betöltéskor
+    window.onload = function() {
+      resizeAllCanvases();
+      updateMix();
+      animate();
+    };
   </script>
 </body>
 </html>
