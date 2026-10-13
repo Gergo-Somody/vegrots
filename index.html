@@ -423,14 +423,13 @@
     let isMasterUnlocked = false;
 
     const DEFAULT_TEAMS = [
-      { id: 1, name: "Arany Kalászok", logo: "🌾", score: 0, pin: "1111", bombCount: 0, caviarCount: 0, quizScore: 0, quizAnswers: {}, docs: ["", "", "", "", ""] },
-      { id: 2, name: "Mag Páncélosok", logo: "🛡️", score: 0, pin: "2222", bombCount: 0, caviarCount: 0, quizScore: 0, quizAnswers: {}, docs: ["", "", "", "", ""] },
-      { id: 3, name: "Kemény Magok", logo: "⚫", score: 0, pin: "3333", bombCount: 0, caviarCount: 0, quizScore: 0, quizAnswers: {}, docs: ["", "", "", "", ""] },
-      { id: 4, name: "Zöld Lándzsások", logo: "🌱", score: 0, pin: "4444", bombCount: 0, caviarCount: 0, quizScore: 0, quizAnswers: {}, docs: ["", "", "", "", ""] },
-      { id: 5, name: "Gémorr Fúrók", logo: "🔩", score: 0, pin: "5555", bombCount: 0, caviarCount: 0, quizScore: 0, quizAnswers: {}, docs: ["", "", "", "", ""] },
-      { id: 6, name: "Mag-Ágyúsok", logo: "💥", score: 0, pin: "6666", bombCount: 0, caviarCount: 0, quizScore: 0, quizAnswers: {}, docs: ["", "", "", "", ""] },
-      { id: 7, name: "Vitorlázó Jávaiak", logo: "🪁", score: 0, pin: "7777", bombCount: 0, caviarCount: 0, quizScore: 0, quizAnswers: {}, docs: ["", "", "", "", ""] },
-      { id: 8, name: "Hangya-Taxik", logo: "🐜", score: 0, pin: "8888", bombCount: 0, caviarCount: 0, quizScore: 0, quizAnswers: {}, docs: ["", "", "", "", ""] }
+      { id: 1, name: "Mag Páncélosok", logo: "🛡️", score: 0, pin: "1111", bombCount: 0, caviarCount: 0, quizScore: 0, quizAnswers: {}, docs: ["", "", "", "", ""] },
+      { id: 2, name: "Kemény Magok", logo: "⚫", score: 0, pin: "2222", bombCount: 0, caviarCount: 0, quizScore: 0, quizAnswers: {}, docs: ["", "", "", "", ""] },
+      { id: 3, name: "Zöld Lándzsások", logo: "🌱", score: 0, pin: "3333", bombCount: 0, caviarCount: 0, quizScore: 0, quizAnswers: {}, docs: ["", "", "", "", ""] },
+      { id: 4, name: "Gémorr Fúrók", logo: "🔩", score: 0, pin: "4444", bombCount: 0, caviarCount: 0, quizScore: 0, quizAnswers: {}, docs: ["", "", "", "", ""] },
+      { id: 5, name: "Mag-Ágyúsok", logo: "💥", score: 0, pin: "5555", bombCount: 0, caviarCount: 0, quizScore: 0, quizAnswers: {}, docs: ["", "", "", "", ""] },
+      { id: 6, name: "Vitorlázó Jávaiak", logo: "🪁", score: 0, pin: "6666", bombCount: 0, caviarCount: 0, quizScore: 0, quizAnswers: {}, docs: ["", "", "", "", ""] },
+      { id: 7, name: "Hangya-Taxik", logo: "🐜", score: 0, pin: "7777", bombCount: 0, caviarCount: 0, quizScore: 0, quizAnswers: {}, docs: ["", "", "", "", ""] }
     ];
 
     let teams = JSON.parse(localStorage.getItem('vegrots_teams_v4')) || DEFAULT_TEAMS;
