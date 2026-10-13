@@ -242,6 +242,182 @@
   </main>
 
   <script>
+
+    class MagbombaKNN {
+  constructor(k = 3) {
+    this.k = k;
+    this.storageKey = 'vegrots_magbomba_dataset_v1';
+    
+    // Alapértelmezett bemeneti határok a normalizáláshoz (Min-Max skálázás)
+    this.ranges = {
+      peat:  { min: 50,  max: 500 },  // Komposzt / Tőzeg (g)
+      clay:  { min: 20,  max: 300 },  // Agyag (g)
+      water: { min: 20,  max: 300 }   // Víz (ml)
+    };
+
+    // Alapértelmezett kezdő tanítóhalmaz (ha a böngésző tárhelye még üres)
+    this.defaultDataset = [
+      { id: 1, team: "Mester", peat: 300, clay: 100, water: 80,  label: "ideal", labelHu: "Ideális Bionikus Bomba" },
+      { id: 2, team: "Mester", peat: 280, clay: 110, water: 90,  label: "ideal", labelHu: "Ideális Bionikus Bomba" },
+      { id: 3, team: "Mester", peat: 100, clay: 280, water: 60,  label: "hard",  labelHu: "Kőkemény Bunker" },
+      { id: 4, team: "Mester", peat: 80,  clay: 300, water: 70,  label: "hard",  labelHu: "Kőkemény Bunker" },
+      { id: 5, team: "Mester", peat: 420, clay: 50,  water: 60,  label: "loose", labelHu: "Szétmálló Por" },
+      { id: 6, team: "Mester", peat: 390, clay: 60,  water: 50,  label: "loose", labelHu: "Szétmálló Por" },
+      { id: 7, team: "Mester", peat: 200, clay: 100, water: 240, label: "mud",   labelHu: "Mocsaras Pacsni" },
+      { id: 8, team: "Mester", peat: 250, clay: 120, water: 260, label: "mud",   labelHu: "Mocsaras Pacsni" }
+    ];
+
+    this.dataset = this.loadDataset();
+  }
+
+  // Adathalmaz betöltése localStorage-ból
+  loadDataset() {
+    const raw = localStorage.getItem(this.storageKey);
+    if (!raw) {
+      localStorage.setItem(this.storageKey, JSON.stringify(this.defaultDataset));
+      return [...this.defaultDataset];
+    }
+    try {
+      return JSON.parse(raw);
+    } catch (e) {
+      return [...this.defaultDataset];
+    }
+  }
+
+  // Új tanulói kerti mérés hozzáadása
+  addSample(teamName, peat, clay, water, label, labelHu) {
+    const newSample = {
+      id: Date.now(),
+      team: teamName || "Névtelen Csapat",
+      peat: Number(peat),
+      clay: Number(clay),
+      water: Number(water),
+      label: label,
+      labelHu: labelHu,
+      timestamp: new Date().toISOString()
+    };
+
+    this.dataset.push(newSample);
+    localStorage.setItem(this.storageKey, JSON.stringify(this.dataset));
+    return newSample;
+  }
+
+  // Visszaállítás az alapértékekre
+  resetDataset() {
+    this.dataset = [...this.defaultDataset];
+    localStorage.setItem(this.storageKey, JSON.stringify(this.dataset));
+  }
+
+  // Érték normalizálása 0.0 és 1.0 közé a dimenziók egyenlő súlyozásáért
+  normalize(val, min, max) {
+    return Math.max(0, Math.min(1, (val - min) / (max - min)));
+  }
+
+  // 3 dimenziós normalizált euklideszi távolság: d = sqrt(Δp² + Δc² + Δw²)
+  calculateDistance(p1, p2) {
+    const dPeat = this.normalize(p1.peat, this.ranges.peat.min, this.ranges.peat.max) -
+                  this.normalize(p2.peat, this.ranges.peat.min, this.ranges.peat.max);
+
+    const dClay = this.normalize(p1.clay, this.ranges.clay.min, this.ranges.clay.max) -
+                  this.normalize(p2.clay, this.ranges.clay.min, this.ranges.clay.max);
+
+    const dWater = this.normalize(p1.water, this.ranges.water.min, this.ranges.water.max) -
+                   this.normalize(p2.water, this.ranges.water.min, this.ranges.water.max);
+
+    return Math.sqrt(dPeat * dPeat + dClay * dClay + dWater * dWater);
+  }
+
+  // Predikció új receptre a k legközelebbi szomszéd alapján
+  predict(peat, clay, water) {
+    if (this.dataset.length === 0) {
+      throw new Error("A tanítóhalmaz üres!");
+    }
+
+    const target = { peat: Number(peat), clay: Number(clay), water: Number(water) };
+
+    // 1. Távolság kiszámítása az összes meglévő ponthoz
+    const distances = this.dataset.map(sample => ({
+      sample: sample,
+      distance: this.calculateDistance(target, sample)
+    }));
+
+    // 2. Rendezzük növekvő sorrendbe (legközelebbi legelöl)
+    distances.sort((a, b) => a.distance - b.distance);
+
+    // 3. Kiválasztjuk a k legközelebbi szomszédot
+    const effectiveK = Math.min(this.k, distances.length);
+    const neighbors = distances.slice(0, effectiveK);
+
+    // 4. Szavazatok összegzése fordított távolsági súlyozással (Inverse Distance Weighting)
+    const votes = {};
+    const labelMetadata = {};
+    let totalWeight = 0;
+
+    neighbors.forEach(({ sample, distance }) => {
+      // 0 távolság esetén elkerüljük az osztást nullával
+      const weight = 1 / (distance + 0.001);
+      votes[sample.label] = (votes[sample.label] || 0) + weight;
+      labelMetadata[sample.label] = sample.labelHu;
+      totalWeight += weight;
+    });
+
+    // 5. Győztes osztály és valószínűség meghatározása
+    let winningLabel = null;
+    let maxWeight = -1;
+
+    for (const [lbl, w] of Object.entries(votes)) {
+      if (w > maxWeight) {
+        maxWeight = w;
+        winningLabel = lbl;
+      }
+    }
+
+    const confidence = Math.round((maxWeight / totalWeight) * 100);
+
+    return {
+      prediction: winningLabel,
+      predictionHu: labelMetadata[winningLabel],
+      confidence: confidence,
+      nearestNeighbors: neighbors.map(n => ({
+        team: n.sample.team,
+        labelHu: n.sample.labelHu,
+        distance: Number(n.distance.toFixed(4)),
+        recipe: `${n.sample.peat}g tőzeg, ${n.sample.clay}g agyag, ${n.sample.water}ml víz`
+      }))
+    };
+  }
+}
+    // 1. Példányosítás (k = 3 szomszéd)
+const aiModel = new MagbombaKNN(3);
+
+// 2. Új kerti mérés rögzítése, amikor a csapat leadja az eredményt:
+function onSaveGardenMeasurement() {
+  const p = document.getElementById('inputPeat').value;
+  const c = document.getElementById('inputClay').value;
+  const w = document.getElementById('inputWater').value;
+  const label = document.getElementById('selectResult').value; // pl. "ideal"
+  const labelText = document.getElementById('selectResult').selectedOptions[0].text;
+
+  aiModel.addSample("2. Csapat (Bio-Bunkerek)", p, c, w, label, labelText);
+  alert("✅ Mérés hozzáadva a központi mesterséges intelligencia modellhez!");
+}
+
+// 3. Tesztelés / Előrejelzés ismeretlen receptre:
+function onTestRecipe() {
+  const testP = document.getElementById('testPeat').value;
+  const testC = document.getElementById('testClay').value;
+  const testW = document.getElementById('testWater').value;
+
+  const result = aiModel.predict(testP, testC, testW);
+
+  console.log("Becsült osztály:", result.predictionHu);
+  console.log("Konfidencia:", result.confidence + "%");
+  console.log("Legközelebbi kerti kísérletek:", result.nearestNeighbors);
+
+  // Eredmény kiírása a gyerekeknek
+  document.getElementById('aiResultText').innerText = 
+    `🤖 AI Becslés: ${result.predictionHu} (${result.confidence}% megbízhatóság)`;
+}
     const canvas = document.getElementById('bombCanvas');
     const ctx = canvas.getContext('2d');
     let peat = 300;
