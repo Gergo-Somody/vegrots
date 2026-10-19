@@ -223,7 +223,7 @@
             <span style="color:#a3e635;">🌱 Pindstrup Tőzeg (Szerves váz)</span>
             <span id="peatVal">10 g</span>
           </div>
-          <input type="range" class="slider" id="peatRange" min="50" max="500" step="10" value="300" oninput="updateMix()">
+          <input type="range" class="slider" id="peatRange" min="10" max="50" step="10" value="10" oninput="updateMix()">
         </div>
 
         <!-- AGYAG -->
@@ -232,7 +232,7 @@
             <span style="color:#fb923c;">🧱 Porított Agyag (Kötőanyag)</span>
             <span id="clayVal">10 g</span>
           </div>
-          <input type="range" class="slider" id="clayRange" min="20" max="300" step="10" value="100" oninput="updateMix()">
+          <input type="range" class="slider" id="clayRange" min="10" max="50" step="10" value="10" oninput="updateMix()">
         </div>
 
         <!-- VÍZ -->
@@ -241,7 +241,7 @@
             <span style="color:#38bdf8;">💧 Vízpermet (Gyúrófolyadék)</span>
             <span id="waterVal">10 ml</span>
           </div>
-          <input type="range" class="slider" id="waterRange" min="20" max="300" step="10" value="80" oninput="updateMix()">
+          <input type="range" class="slider" id="waterRange" min="10" max="50" step="10" value="10" oninput="updateMix()">
         </div>
 
         <!-- ÉLŐ AI PREDIKCIÓS BLOKK -->
@@ -338,13 +338,13 @@
         // Alapértelmezett kerti tanítóhalmaz
         this.defaultDataset = [
           { id: 1, team: "Mester", peat: 10, clay: 10, water: 10,  label: "ideal", labelHu: "Ideális Bionikus Bomba" },
-          { id: 2, team: "Mester", peat: 150 clay: 10, water: 10,  label: "ideal", labelHu: "Ideális Bionikus Bomba" },
-          { id: 3, team: "Mester", peat: 20, clay: 10, water: 10,  label: "hard",  labelHu: "Kőkemény Bunker" },
-          { id: 4, team: "Mester", peat: 80,  clay: 10, water: 10,  label: "hard",  labelHu: "Kőkemény Bunker" },
-          { id: 5, team: "Mester", peat: 20, clay: 10,  water: 10,  label: "loose", labelHu: "Szétmálló Por" },
-          { id: 6, team: "Mester", peat: 30, clay: 10,  water: 5,  label: "loose", labelHu: "Szétmálló Por" },
+          { id: 2, team: "Mester", peat: 20, clay: 10, water: 10,  label: "ideal", labelHu: "Ideális Bionikus Bomba" },
+          { id: 3, team: "Mester", peat: 10, clay: 20, water: 10,  label: "hard",  labelHu: "Kőkemény Bunker" },
+          { id: 4, team: "Mester", peat: 20,  clay: 80, water: 10,  label: "hard",  labelHu: "Kőkemény Bunker" },
+          { id: 5, team: "Mester", peat: 30, clay: 10,  water: 10,  label: "loose", labelHu: "Szétmálló Por" },
+          { id: 6, team: "Mester", peat: 40, clay: 10,  water: 5,  label: "loose", labelHu: "Szétmálló Por" },
           { id: 7, team: "Mester", peat: 20, clay: 10, water: 50, label: "mud",   labelHu: "Mocsaras Pacsni" },
-          { id: 8, team: "Mester", peat: 25, clay: 12, water: 100, label: "mud",   labelHu: "Mocsaras Pacsni" }
+          { id: 8, team: "Mester", peat: 30, clay: 10, water: 100, label: "mud",   labelHu: "Mocsaras Pacsni" }
         ];
 
         this.dataset = this.loadDataset();
