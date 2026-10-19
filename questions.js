@@ -306,4 +306,99 @@ const QUESTIONS_DB = [
     options: ["Szemtermés (ahol a termésfal összenőtt a maghéjjal)", "Csonthéjas termés", "Makktermés"],
     correct: "Szemtermés (ahol a termésfal összenőtt a maghéjjal)"
   }
+{
+    category: "Mi kell a csírázáshoz?",
+    question: "Melyik az a három dolog, ami feltétlenül szükséges ahhoz, hogy a magok többsége kicsírázzon?",
+    options: ["Víz, megfelelő hőmérséklet és levegő (oxigén)", "Sötétség, fagy és szél", "Műtrágya, virágcserép és erős napsütés"],
+    correct: "Víz, megfelelő hőmérséklet és levegő (oxigén)"
+  },
+  {
+    category: "Mi kell a csírázáshoz?",
+    question: "Szüksége van-e a legtöbb magnak közvetlen napfényre a föld alatt a csírázás pillanatában?",
+    options: ["Igen, enélkül nem tud kinyílni a maghéj", "Nem, a föld alatt a sötétben is kicsíráznak", "Csak akkor, ha nyáron ültetjük el"],
+    correct: "Nem, a föld alatt a sötétben is kicsíráznak"
+  },
+  {
+    category: "Mi kell a csírázáshoz?",
+    question: "Honnan szerzi a kis csíra a növekedéshez szükséges táplálékot a kibújás előtt?",
+    options: ["A magban elraktározott tápanyagokból (sziklevélből)", "A kerti földből eszi meg", "A giliszták készítik neki"],
+    correct: "A magban elraktározott tápanyagokból (sziklevélből)"
+  },
+  {
+    category: "Mi kell a csírázáshoz?",
+    question: "Mi történik a maggal, ha a földbe tesszük, de soha egy csepp vizet sem kap?",
+    options: ["Azonnal virágot hajt", "Alvó állapotban marad vagy elszárad, nem csírázik ki", "Saját maga termel vizet"],
+    correct: "Alvó állapotban marad vagy elszárad, nem csírázik ki"
+  },
+  {
+    category: "Mi kell a csírázáshoz?",
+    question: "Miért fulladhatnak meg a magok a csírázás során, ha teljesen ellepi őket az állóvíz?",
+    options: ["Mert a víz elzárja előlük a levegőt (oxigént)", "Mert a magok utálják a nedvességet", "Mert túl nehéz lesz tőle a maghéj"],
+    correct: "Mert a víz elzárja előlük a levegőt (oxigént)"
+  },
+
+  // --- 2. TÉMAKÖR: Kibírja a telet Magyarországon vagy nem? (5 kérdés) ---
+  {
+    category: "Kibírja a telet?",
+    question: "Kint maradhat-e a kertben télen a fagyban a muskátli?",
+    options: ["Igen, imádja a havat és a fagyot", "Nem, fagymentes helyre (pl. pincébe, lépcsőházba) kell menekíteni", "Igen, mert elhullajtja a leveleit és úgy telel át"],
+    correct: "Nem, fagymentes helyre (pl. pincébe, lépcsőházba) kell menekíteni"
+  },
+  {
+    category: "Kibírja a telet?",
+    question: "Túléli-e a szabadban a magyarországi telet a kocsányos tölgyfa?",
+    options: ["Igen, lehullajtja a leveleit, vastag kérge védi", "Nem, minden télen ki kell ásni a gyökerét", "Csak akkor, ha sátort építünk fölé"],
+    correct: "Igen, lehullajtja a leveleit, vastag kérge védi"
+  },
+  {
+    category: "Kibírja a telet?",
+    question: "Kibírja-e a szabadföldben a téli kemény fagyokat a narancsfa vagy a banánfa?",
+    options: ["Igen, semmi bajuk nem lesz a hó alatt", "Nem, melegebb éghajlatról származnak, megfagynának", "Csak a jégcsapokat kell leszedni róluk"],
+    correct: "Nem, melegebb éghajlatról származnak, megfagynának"
+  },
+  {
+    category: "Kibírja a telet?",
+    question: "Hogyan éli túl a telet a hóvirág és a tulipán a szabadban?",
+    options: ["A talaj mélyén lévő hagymájukban biztonságban átvészelik a fagyot", "Minden ősszel maguktól elköltöznek délre", "Leveleikkel betakaróznak a föld felszínén"],
+    correct: "A talaj mélyén lévő hagymájukban biztonságban átvészelik a fagyot"
+  },
+  {
+    category: "Kibírja a telet?",
+    question: "Kint maradhat-e télen a fenyőfa a magyar kertekben és erdőkben?",
+    options: ["Nem, mert a tűlevelei azonnal letörnek a hidegben", "Igen, viaszos tűlevelei jól bírják a fagyos időjárást", "Csak akkor, ha fűtött fóliasátrat húzunk rá"],
+    correct: "Igen, viaszos tűlevelei jól bírják a fagyos időjárást"
+  },
+
+  // --- 3. TÉMAKÖR: Mit esznek a növények? (5 kérdés) ---
+  {
+    category: "Mit esznek a növények?",
+    question: "Hogyan jutnak táplálékhoz a zöld növények a természetben?",
+    options: ["Összegyűjtik az apró rovarokat a földről", "Saját maguk készítik el a napfény, víz és a levegő segítségével (fotoszintézis)", "A fák etetik a kisebb növényeket virágporral"],
+    correct: "Saját maguk készítik el a napfény, víz és a levegő segítségével (fotoszintézis)"
+  },
+  {
+    category: "Mit esznek a növények?",
+    question: "Melyik gázt veszik fel a növények a levegőből a tápanyagkészítéshez a zöld leveleiken keresztül?",
+    options: ["Szén-dioxidot", "Héliumot", "Tiszta vízgőzt"],
+    correct: "Szén-dioxidot"
+  },
+  {
+    category: "Mit esznek a növények?",
+    question: "Mit szívnak fel a növények a gyökereiken keresztül a talajból?",
+    options: ["Vizet és benne oldott ásványi anyagokat (tápanyagokat)", "Kisebb kavicsokat és homokszemeket", "Elhalt rovarok szárnyait"],
+    correct: "Vizet és benne oldott ásványi anyagokat (tápanyagokat)"
+  },
+  {
+    category: "Mit esznek a növények?",
+    question: "Melyik létfontosságú gázt termelik és engedik ki a növények a környezetbe, miközben táplálékot készítenek?",
+    options: ["Oxigént, amit mi is belélegzünk", "Füstöt", "Szén-monoxidot"],
+    correct: "Oxigént, amit mi is belélegzünk"
+  },
+  {
+    category: "Mit esznek a növények?",
+    question: "Milyen zöld színanyag segíti a növényeket abban, hogy befogják a napfény energiáját?",
+    options: ["Klorofill (zöld színtest)", "Festékpor", "Gyanta"],
+    correct: "Klorofill (zöld színtest)"
+  }
+  
 ];
