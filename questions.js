@@ -305,7 +305,7 @@ const QUESTIONS_DB = [
     question: "Mi a búzaszem és kukoricaszem szakszerű botanikai elnevezése?",
     options: ["Szemtermés (ahol a termésfal összenőtt a maghéjjal)", "Csonthéjas termés", "Makktermés"],
     correct: "Szemtermés (ahol a termésfal összenőtt a maghéjjal)"
-  }
+  },
 {
     category: "Mi kell a csírázáshoz?",
     question: "Melyik az a három dolog, ami feltétlenül szükséges ahhoz, hogy a magok többsége kicsírázzon?",
