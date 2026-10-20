@@ -1235,13 +1235,13 @@ const BED_NEIGHBORS = {
 };
 
 let allTeamsGardenData = {
-  'Magágyúsok': { cropsY1: 'Paradicsom', cropsY2: 'Csemegekukorica', cropsY3: 'Paradicsom', pest: 'Fitoftóra & Bogár 🐛', isClean: false },
-  'Gémorr fúrók': { cropsY1: 'Csemegekukorica', cropsY2: 'Paradicsom', cropsY3: 'Csemegekukorica', pest: 'Kukoricabogár 🦗', isClean: false },
-  'Zöld lándzsások': { cropsY1: 'Paradicsom', cropsY2: 'Paradicsom', cropsY3: 'Paprika', pest: 'Súlyos Fitoftóra 🐛', isClean: false },
-  'Vitorlázó jávaiak': { cropsY1: 'Cukkini', cropsY2: 'Cukkini', cropsY3: 'Fejeskáposzta', pest: 'Lisztharmat & Légy 🍂', isClean: false },
-  'Mag páncélosok': { cropsY1: 'Fejeskáposzta', cropsY2: 'Hónapos retek', cropsY3: 'Káposzta', pest: 'Gyökérgolyva 🦟', isClean: false },
-  'Hangya-taxik': { cropsY1: 'Paradicsom', cropsY2: 'Csemegekukorica', cropsY3: 'Paradicsom', pest: 'Burgonyabogár 🐛', isClean: false },
-  'Kemény magok': { cropsY1: 'Bokorbab', cropsY2: 'Kerti borsó', cropsY3: 'Bokorbab', pest: 'Zsizsik & Fuzárium 🍄', isClean: false }
+  'Magágyúsok': { cropsY1: '—', cropsY2: '—', cropsY3: '—', pest: 'Várakozás...', isClean: true },
+  'Gémorr fúrók': { cropsY1: '—', cropsY2: '—', cropsY3: '—', pest: 'Várakozás...', isClean: true },
+  'Zöld lándzsások': { cropsY1: '—', cropsY2: '—', cropsY3: '—', pest: 'Várakozás...', isClean: true },
+  'Vitorlázó jávaiak': { cropsY1: '—', cropsY2: '—', cropsY3: '—', pest: 'Várakozás...', isClean: true },
+  'Mag páncélosok': { cropsY1: '—', cropsY2: '—', cropsY3: '—', pest: 'Várakozás...', isClean: true },
+  'Hangya-taxik': { cropsY1: '—', cropsY2: '—', cropsY3: '—', pest: 'Várakozás...', isClean: true },
+  'Kemény magok': { cropsY1: '—', cropsY2: '—', cropsY3: '—', pest: 'Várakozás...', isClean: true }
 };
 
 let gameState = {
@@ -1318,11 +1318,12 @@ function evaluateGardenEcology() {
   const teams = Object.keys(allTeamsGardenData);
   const currentTeam = teamSelector.value;
 
+  // 1. Kertszintű számláló csak a már kiválasztott növényekre
   const familyCount = {};
   teams.forEach(t => {
     const cropName = allTeamsGardenData[t].cropsY3;
     const crop = CROPS.find(c => c.name === cropName);
-    if (crop) {
+    if (crop && crop.family) {
       familyCount[crop.family] = (familyCount[crop.family] || 0) + 1;
     }
   });
@@ -1341,23 +1342,29 @@ function evaluateGardenEcology() {
     let weakConflict = false;
     let statusBadge = '<span class="synergy-tag-ok">Tiszta Talaj ✨</span>';
 
-    neighbors.forEach(nName => {
-      const neighborCrop = CROPS.find(c => c.name === allTeamsGardenData[nName].cropsY3);
-      if (currentCrop && neighborCrop && currentCrop.family === neighborCrop.family) {
-        strongConflict = true;
+    // Ha még nincs kitöltve az adott ágyás
+    if (!currentCrop) {
+      statusBadge = '<span style="color:var(--text-muted); font-size:0.7rem;">Még nincs vetve ⏳</span>';
+    } else {
+      // Csak akkor vizsgálunk szomszédot, ha a szomszédnak is van már zöldsége
+      neighbors.forEach(nName => {
+        const neighborCrop = CROPS.find(c => c.name === allTeamsGardenData[nName].cropsY3);
+        if (neighborCrop && currentCrop.family === neighborCrop.family) {
+          strongConflict = true;
+        }
+      });
+
+      if (familyCount[currentCrop.family] >= 3) {
+        weakConflict = true;
       }
-    });
 
-    if (currentCrop && familyCount[currentCrop.family] >= 3) {
-      weakConflict = true;
-    }
-
-    if (strongConflict) {
-      statusBadge = '<span class="synergy-tag-strong">🚨 Erős lánc: Gyökérfertőzés!</span>';
-      totalPestPressure += 2;
-    } else if (weakConflict) {
-      statusBadge = '<span class="synergy-tag-weak">⚠️ Gyenge lánc: Lepkerajzás!</span>';
-      totalPestPressure += 1;
+      if (strongConflict) {
+        statusBadge = '<span class="synergy-tag-strong">🚨 Erős lánc: Gyökérfertőzés!</span>';
+        totalPestPressure += 2;
+      } else if (weakConflict) {
+        statusBadge = '<span class="synergy-tag-weak">⚠️ Gyenge lánc: Lepkerajzás!</span>';
+        totalPestPressure += 1;
+      }
     }
 
     const tr = document.createElement('tr');
@@ -1373,6 +1380,7 @@ function evaluateGardenEcology() {
   });
 
   const crisisBanner = document.getElementById('crisisShockBanner');
+  // Csak akkor jön a válság-banner, ha tényleg volt legalább 3 fertőzési pont
   if (totalPestPressure >= 3) {
     crisisBanner.style.display = 'block';
   } else {
