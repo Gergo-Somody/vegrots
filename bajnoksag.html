@@ -1,4 +1,5 @@
-html lang="hu">
+<!DOCTYPE html>
+<html lang="hu">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1038,58 +1039,96 @@ btnCommit.addEventListener('click', () => {
 
   // ELŐZŐ CIKLUS CSALÁDOK ÖSSZEGYŰJTÉSE
   let prevFamilies = [];
+  let prevSummerCrop = null;
+
   if (year === 1) {
     prevFamilies = base.families;
   } else {
     const prevYear = gameState.history[gameState.history.length - 1];
     prevFamilies = [...prevYear.early, ...prevYear.summer, ...prevYear.winter].map(c => c.family);
+    if (prevYear.summer && prevYear.summer.length > 0) {
+      prevSummerCrop = prevYear.summer[0];
+    }
   }
 
-  // --- 1. SZEZON: KORA TAVASZ KIÉRTÉKELÉSE ---
+  // --- 1. SZEZON: KORA TAVASZ KIÉRTÉKELÉSE (Február 15 – Április) ---
   plan.early.forEach(crop => {
-    // Fagyvizsgálat
+    // 1.1 Fagyvizsgálat: Kora tavasszal a fagyérzékenyek (paradicsom, paprika, kukorica, cukkini, bab) azonnal elfagynak!
     if (!crop.frostProof || !crop.earlyOk) {
-      gameState.soilHealth -= 20;
-      logs.push({ type: 'danger', text: `🥶 FAGYHALÁL KORA TAVASSZAL! A(z) ${crop.name} február-márciusban elfagyott! 0 termés (-20 talajélet).` });
+      gameState.soilHealth -= 25;
+      logs.push({ type: 'danger', text: `🥶 KORA TAVASZI FAGYHALÁL! A melegigényes ${crop.name} február-márciusban elfagyott! 0 kosár termés, kárba veszett mag (-25 talajélet).` });
     } else {
-      // Elővetemény / család ismétlődés
+      // 1.2 Elővetemény / család ismétlődés kora tavasszal
       if (prevFamilies.includes(crop.family) && crop.family !== 'none') {
         gameState.soilHealth -= 25;
-        logs.push({ type: 'danger', text: `🚨 KÁRTEVŐ ÉS FONÁLFÉREG VESZÉLY! A(z) ${crop.name} előtt azonos család (${crop.family}) volt a talajban (-25 pont)!` });
+        logs.push({ type: 'danger', text: `🚨 KÁRTEVŐ ÉS FONÁLFÉREG VESZÉLY! A(z) ${crop.name} előtt azonos növénycsalád (${crop.family}) volt a parcellában (-25 talajpont)!` });
       } else {
         const y = crop.yield || 0;
         gameState.totalYield += y;
         gameState.nitrogen -= (crop.cost || 0);
-        logs.push({ type: 'success', text: `🌱 Sikeres kora tavaszi idény: ${crop.name} betakarítva (+${y} kosár)!` });
+        logs.push({ type: 'success', text: `🌱 Sikeres kora tavaszi idény: ${crop.name} szépen beérett (+${y} kosár)!` });
       }
     }
   });
 
-  // --- 2. SZEZON: NYÁRI FŐKULTÚRA KIÉRTÉKELÉSE ---
+  // --- 2. SZEZON: NYÁRI FŐKULTÚRA KIÉRTÉKELÉSE (Május – Augusztus) ---
   plan.summer.forEach(crop => {
-    // Előző tavaszi kultúra kártevő ellenőrzése
+    // 2.1 NYÁRI FELMAGZÁSI TILALOM: Retek és kora spenót nyáron felmagzik, ehetetlen, 0 termés!
+    if (crop.id === 'retek' || crop.id === 'spenot') {
+      gameState.soilHealth -= 10;
+      logs.push({ type: 'danger', text: `☀️ HŐSOKK & FELMAGZÁS! A 30°C-os nyári kánikulában a(z) ${crop.name} azonnal magba szökött! Gumó és levél helyett fás virágszárat hozott: 0 kosár termés!` });
+      return;
+    }
+
+    // 2.2 TENYÉSZIDŐ ÜTKÖZÉS: Ha kora tavasszal sárgarépa (100 nap) volt, utána a hosszú tenyészidejű paradicsom/paprika nem fér bele az őszig!
+    let timePenalty = 1.0;
+    const hadLongEarlyCrop = plan.early.some(c => c.days >= 90);
+    if (hadLongEarlyCrop && crop.days >= 110) {
+      timePenalty = 0.3;
+      logs.push({ type: 'warn', text: `⏳ TENYÉSZIDŐ CSÚSZÁS! A tavaszi gyökérzöldség júliusig foglalta a földet. A későn ültetett ${crop.name} nem tudott beérni az őszi hidegek előtt (-70% termés)!` });
+    }
+
+    // 2.3 ÉVEK KÖZÖTTI NYÁRI VETÉSFORGÓ ELLENŐRZÉSE (Pl. Paradicsom ➔ Paradicsom nyáron)
+    let summerPestMultiplier = 1.0;
+    if (prevSummerCrop && prevSummerCrop.family === crop.family && crop.family !== 'none') {
+      gameState.soilHealth -= 35;
+      summerPestMultiplier = 0.2; // 80%-os terméskiesés
+      logs.push({ type: 'danger', text: `🚨 SÚLYOS VETÉSFORGÓ HIBA! Két nyáron egymás után volt ${crop.family} (${prevSummerCrop.name} ➔ ${crop.name})! Felszaporodtak a talajkártevők és fonalférgek (-35 talajpont, -80% termés)!` });
+    }
+
+    // 2.4 KÖZVETLEN TAVASZI ROKON HATÁSA (ugyanazon év tavaszán rokon kultúra)
     const earlyFamilies = plan.early.map(c => c.family);
     if (earlyFamilies.includes(crop.family) && crop.family !== 'none') {
-      gameState.soilHealth -= 30;
-      logs.push({ type: 'danger', text: `❌ HALMOZOTT CSALÁD-KOCKÁZAT! Nyáron sem cseréltetek növénycsaládot (${crop.family})! A kártevők elvitték a termés felét.` });
-      gameState.totalYield += Math.round((crop.yield || 0) * 0.4);
+      gameState.soilHealth -= 25;
+      summerPestMultiplier = Math.min(summerPestMultiplier, 0.4);
+      logs.push({ type: 'danger', text: `❌ AZONOS CSALÁD EGY ÉVEN BELÜL! Tavasz után nyáron is ${crop.family} növényt raktatok: a kártevők áttelepedtek!` });
+    }
+
+    // 2.5 TÁPANYAG- ÉS NITROGÉNMÉRLEG VIZSGÁLATA
+    if (crop.demand === 'heavy' && gameState.nitrogen <= 0) {
+      // Teljes tápanyag-kimerülés: 0 termés a nagyétkűnek!
+      gameState.soilHealth -= 25;
+      logs.push({ type: 'danger', text: `🥀 TÁPANYAG-ÉHÍNSÉG! A talaj nitrogénkészlete teljesen kimerült (0 N). A(z) ${crop.name} elsárgult, eldobta virágait: 0 kosár termés (-25 talajpont)!` });
     } else {
-      // Nitrogén egyenleg vizsgálat
+      // Normál vagy csökkentett termés
       gameState.nitrogen -= (crop.cost || 0);
+      const rawYield = crop.yield || 0;
+      let finalYield = Math.round(rawYield * summerPestMultiplier * timePenalty);
+
       if (gameState.nitrogen < 0) {
-        gameState.soilHealth -= 20;
-        const lowY = Math.round((crop.yield || 0) * 0.3);
-        gameState.totalYield += lowY;
-        logs.push({ type: 'warn', text: `⚠️ ÉHEZIK A PARCELLA! A(z) ${crop.name} kifogyasztotta a nitrogént (+${lowY} kosár, -20 talajpont).` });
+        // Enyhe hiány
+        gameState.soilHealth -= 15;
+        finalYield = Math.round(finalYield * 0.4);
+        gameState.totalYield += finalYield;
+        logs.push({ type: 'warn', text: `⚠️ FOGYÓBAN A NITROGÉN! A(z) ${crop.name} kimerítette a tartalékokat (+${finalYield} kosár, -15 talajpont).` });
       } else {
-        const y = crop.yield || 0;
-        gameState.totalYield += y;
-        logs.push({ type: 'success', text: `🧺 MAXI KOSÁR NYÁRON! A(z) ${crop.name} csúcsminőségben termett (+${y} kosár)!` });
+        gameState.totalYield += finalYield;
+        logs.push({ type: 'success', text: `🧺 BŐSÉGES NYÁRI ARATÁS: A(z) ${crop.name} csúcsminőségben termett (+${finalYield} kosár)!` });
       }
     }
   });
 
-  // --- 3. SZEZON: ŐSZ ÉS TÉL (TAKARÓNÖVÉNY KEVERÉK VAGY ZÖLDSÉG) ---
+  // --- 3. SZEZON: ŐSZ ÉS TÉL (TAKARÓNÖVÉNY KEVERÉK VAGY TÉLI ZÖLDSÉG) ---
   const winterBox = document.querySelector('.season-box[data-slot="winter"]');
   const isWinterCover = winterBox.dataset.mode === 'cover';
 
@@ -1099,34 +1138,47 @@ btnCommit.addEventListener('click', () => {
     let coverNBonus = 0;
 
     plan.winter.forEach(c => {
-      coverSoilBonus += (c.soilBonus || 15);
-      if (c.family === 'fabaceae') coverNBonus += 2;
+      // 3.1 POHÁNKA TÉLI KIFAGYÁSA: Nem ad téli gyökérvédelmet, mert októberben elfagy!
+      if (c.id === 'pohanka') {
+        logs.push({ type: 'warn', text: `🍂 HIDEGSORK: A pohánka melegkedvelő, már az októberi fagyokban elpusztult, így nem védte a talajt télen!` });
+      } else {
+        coverSoilBonus += (c.soilBonus || 15);
+        if (c.family === 'fabaceae') coverNBonus += 2;
+      }
     });
 
-    // Biodiverzitás szinergia keverékeknél
+    // 3.2 BIODIVERZITÁS SZINERGIA KEVERÉKEKNÉL
     if (count >= 3) {
       coverSoilBonus += 25;
       coverNBonus += 1;
-      logs.push({ type: 'purple', text: `🌟 SZUPER-REGENERATÍV KEVERÉK! ${count} különböző takarónövény védte a talajt télen (+${coverSoilBonus} talajpont, +${coverNBonus} N)!` });
+      logs.push({ type: 'purple', text: `🌟 SZUPER-REGENERATÍV KEVERÉK! ${count} különböző takarónövény védte a talajt télen (+${coverSoilBonus} talajpont, +${coverNBonus} N szinergia)!` });
     } else if (count === 2) {
       coverSoilBonus += 10;
-      logs.push({ type: 'info', text: `🌾 Hatékony 2-fajtás takarókeverék: Megvédte a humuszt a fagyoktól (+${coverSoilBonus} talajpont).` });
+      logs.push({ type: 'info', text: `🌾 Hatékony 2-fajtás takarókeverék: Megvédte a humuszt a téli eróziótól (+${coverSoilBonus} talajpont).` });
     } else if (count === 1) {
-      logs.push({ type: 'info', text: `🌱 1-fajtás takarónövény: Jobb, mint a semmi, de a keverék sokkal többet ad (+${coverSoilBonus} pont).` });
+      logs.push({ type: 'info', text: `🌱 1-fajtás takarónövény: Jobb, mint a semmi, de a több faj keveréke sokkal nagyobb erőt ad (+${coverSoilBonus} pont).` });
     }
 
     gameState.soilHealth += coverSoilBonus;
     gameState.nitrogen += coverNBonus;
   } else {
-    // Téli főzöldség, nem takarónövény!
+    // 3.3 TÉLI ZÖLDSÉG MÓD (Fagyvédelem szigorítása!)
     plan.winter.forEach(crop => {
-      gameState.totalYield += (crop.yield || 0);
-      gameState.soilHealth -= 25; // Nincs pihenő, a talaj kizsigerelődik
-      logs.push({ type: 'danger', text: `💨 TALAJKIZSIGERELÉS! Téli takaró helyett zöldséget erőltettetek: a humusz és a talajélet zuhanórepülésben (-25 talajpont)!` });
+      if (!crop.frostProof) {
+        // Melegigényes növény (paradicsom, paprika, tök, kukorica, bab) télen azonnal elpusztul!
+        gameState.soilHealth -= 30;
+        logs.push({ type: 'danger', text: `🥶 TÉLI FAGYHALÁL! A melegigényes ${crop.name} az első novemberi fagyban megfeketedett és elpusztult: 0 termés (-30 talajpont)!` });
+      } else {
+        // Valóban fagytűrő zöldség télen (pl. őszi káposzta, fokhagyma, spenót)
+        const partialYield = Math.round((crop.yield || 0) * 0.5);
+        gameState.totalYield += partialYield;
+        gameState.soilHealth -= 20; // Takarónövény hiányában a talajélet csökken
+        logs.push({ type: 'warn', text: `❄️ Téli szüret: A fagytűrő ${crop.name} fele termést adott (+${partialYield} kosár), de a takarónövény hiánya miatt a talajélet kimerült (-20 pont)!` });
+      }
     });
   }
 
-  // VÉGSŐ KORRÁCIÓK ÉS TALAJCSŐD ELLENŐRZÉS
+  // ÉRTÉK-KORLÁTOK ÉS CSŐD-FIGYELÉS
   gameState.soilHealth = Math.max(0, Math.min(180, gameState.soilHealth));
   gameState.nitrogen = Math.max(0, Math.min(6, gameState.nitrogen));
 
@@ -1138,7 +1190,7 @@ btnCommit.addEventListener('click', () => {
     winter: [...plan.winter]
   });
 
-  // Naplózás a felületre
+  // Naplózás frissítése
   logs.forEach(l => {
     const d = document.createElement('div');
     d.className = `log-entry log-${l.type}`;
@@ -1148,7 +1200,7 @@ btnCommit.addEventListener('click', () => {
 
   updateDashboard();
 
-  // TALAJCSŐD VIZSGÁLATA
+  // TALAJCSŐD VIZSGÁLATA (Ha kizsigerelték a talajt)
   if (gameState.soilHealth <= 15) {
     showGameOver(true);
     return;
@@ -1162,8 +1214,8 @@ btnCommit.addEventListener('click', () => {
     document.getElementById(`stepYear${gameState.currentYear}`).classList.add('active');
 
     document.getElementById('currentYearHeading').textContent = `${gameState.currentYear}. Év: Tervezzétek a következő kört!`;
-    const lastSummerCrop = plan.summer[0] ? plan.summer[0].name : 'Zöldség';
-    document.getElementById('precoverInfo').innerHTML = `Előző évi főtermény: <strong>${lastSummerCrop}</strong> | Téli takarás lezárva.`;
+    const lastSummerCrop = plan.summer[0] ? plan.summer[0].name : (plan.early[0] ? plan.early[0].name : 'Elővetemény');
+    document.getElementById('precoverInfo').innerHTML = `Előző évi főtermény: <strong>${lastSummerCrop}</strong> | Téli szakasz lezárva. Figyeljetek a vetésforgóra!`;
 
     btnReset.click();
   } else {
