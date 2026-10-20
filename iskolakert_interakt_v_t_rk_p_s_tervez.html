@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Iskolakert & Ágyástérkép Projekt</title>
+  <title>Iskolakerti Térkép és Vetésterv - VegRots Projekt</title>
+  
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Phosphor Icons & FontAwesome -->
+  <!-- FontAwesome ikonok -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Betűtípusok -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
@@ -32,7 +34,6 @@
               700: '#15803d',
               800: '#166534',
               900: '#14532d',
-              950: '#052e16',
             },
             botanic: {
               dark: '#1c3127',
@@ -41,7 +42,6 @@
               accent: '#74c69d',
               pale: '#d8f3dc',
               soil: '#58311d',
-              clay: '#b06b3f',
               anthracite: '#2f3542'
             }
           }
@@ -51,35 +51,30 @@
   </script>
 
   <style>
-    /* Egyedi interaktív stílusok és finom kerti animációk */
+    /* Interaktív ágyás animációk & kiemelések */
     .garden-bed-shape {
-      transition: all 0.25s ease-in-out;
+      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
       cursor: pointer;
     }
     .garden-bed-shape:hover {
-      filter: drop-shadow(0 6px 12px rgba(45, 106, 79, 0.45));
-      transform: translateY(-2px);
+      filter: drop-shadow(0 6px 14px rgba(45, 106, 79, 0.55));
+      transform: scale(1.015);
+      transform-origin: center;
     }
-    .active-bed {
+    .active-zone {
       stroke: #f59e0b !important;
       stroke-width: 4 !important;
-      filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.6)) !important;
+      filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.85)) !important;
     }
-    .soil-pattern {
-      background-image: radial-gradient(#d1a980 1px, transparent 1px);
-      background-size: 16px 16px;
+    .dimmed-zone {
+      opacity: 0.18 !important;
+      filter: grayscale(85%) !important;
     }
-    /* Hullámlemez textúra effekt */
-    .corrugated-metal {
-      background: repeating-linear-gradient(
-        90deg,
-        #2a303c,
-        #2a303c 6px,
-        #3b4252 6px,
-        #3b4252 12px
-      );
+    .highlight-filter {
+      stroke: #22c55e !important;
+      stroke-width: 3.5 !important;
+      filter: drop-shadow(0 0 10px rgba(34, 197, 94, 0.85)) !important;
     }
-    /* Scrollbar csinosítás */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -91,87 +86,84 @@
       background: #94a3b8;
       border-radius: 9999px;
     }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #64748b;
-    }
   </style>
 </head>
-<body class="bg-stone-50 text-slate-800 font-sans min-h-screen flex flex-col">
+<body class="bg-stone-50 text-slate-800 font-sans min-h-screen flex flex-col selection:bg-emerald-200">
 
-  <!-- Felső navigáció & Fejléc -->
-  <header class="bg-botanic-dark text-white shadow-lg sticky top-0 z-40 border-b border-emerald-900/40">
+  <!-- FELSŐ FEJLÉC ÉS NAVIGÁCIÓ -->
+  <header class="bg-botanic-dark text-white shadow-lg sticky top-0 z-40 border-b border-emerald-900/50 backdrop-blur-md">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-20">
         
-        <!-- Logó és Cím -->
-        <div class="flex items-center space-x-3">
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-botanic-primary to-botanic-light flex items-center justify-center shadow-md text-white text-2xl">
+        <!-- Cím és logó -->
+        <div class="flex items-center space-x-3.5">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-botanic-primary to-botanic-light flex items-center justify-center shadow-lg text-white text-2xl border border-emerald-400/20">
             <i class="fa-solid fa-seedling"></i>
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <span class="text-xs uppercase tracking-widest font-semibold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-800">VegRots Iskolakert</span>
-              <span class="text-xs text-stone-300 hidden sm:inline"><i class="fa-solid fa-location-dot text-amber-400 mr-1"></i>Iskolaudvar Magaságyások</span>
+              <span class="text-[10px] uppercase tracking-widest font-bold text-emerald-400 bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-700/50">VegRots Iskolakerti Rendszer</span>
+              <span class="text-xs text-stone-300 hidden sm:inline"><i class="fa-solid fa-compass text-amber-400 mr-1"></i>Tájolt Ágyástérkép</span>
             </div>
             <h1 class="text-xl sm:text-2xl font-bold font-display tracking-tight text-white flex items-center gap-2">
-              Kerti Kutató & Térképező
+              Kerti Kutató & Parcellatérkép
             </h1>
           </div>
         </div>
 
         <!-- Fő Navigációs fülek -->
-        <nav class="hidden md:flex items-center space-x-1 lg:space-x-2 bg-emerald-950/50 p-1.5 rounded-2xl border border-emerald-800/40">
-          <button onclick="switchTab('map-tab')" id="nav-map-tab" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-botanic-primary text-white shadow-sm flex items-center gap-2">
-            <i class="fa-solid fa-map-location-dot"></i> Udvartérkép
+        <nav class="hidden md:flex items-center space-x-1.5 bg-emerald-950/60 p-1.5 rounded-2xl border border-emerald-800/40">
+          <button onclick="switchTab('map-tab')" id="nav-map-tab" class="nav-btn px-4 py-2 rounded-xl text-xs lg:text-sm font-semibold transition-all bg-botanic-primary text-white shadow-sm flex items-center gap-2">
+            <i class="fa-solid fa-map-location-dot"></i> Térképnézet
           </button>
-          <button onclick="switchTab('monitoring-tab')" id="nav-monitoring-tab" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 text-stone-300 hover:text-white hover:bg-emerald-900/60 flex items-center gap-2">
+          <button onclick="switchTab('monitoring-tab')" id="nav-monitoring-tab" class="nav-btn px-4 py-2 rounded-xl text-xs lg:text-sm font-semibold transition-all text-stone-300 hover:text-white hover:bg-emerald-900/60 flex items-center gap-2">
             <i class="fa-solid fa-clipboard-check"></i> Adatfelvétel & Napló
           </button>
-          <button onclick="switchTab('spring-tab')" id="nav-spring-tab" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 text-stone-300 hover:text-white hover:bg-emerald-900/60 flex items-center gap-2">
+          <button onclick="switchTab('spring-tab')" id="nav-spring-tab" class="nav-btn px-4 py-2 rounded-xl text-xs lg:text-sm font-semibold transition-all text-stone-300 hover:text-white hover:bg-emerald-900/60 flex items-center gap-2">
             <i class="fa-solid fa-calendar-days"></i> Tavaszi Vetésterv
           </button>
-          <button onclick="switchTab('plants-tab')" id="nav-plants-tab" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 text-stone-300 hover:text-white hover:bg-emerald-900/60 flex items-center gap-2">
+          <button onclick="switchTab('plants-tab')" id="nav-plants-tab" class="nav-btn px-4 py-2 rounded-xl text-xs lg:text-sm font-semibold transition-all text-stone-300 hover:text-white hover:bg-emerald-900/60 flex items-center gap-2">
             <i class="fa-solid fa-book-open"></i> Növényhatározó
           </button>
-          <button onclick="switchTab('gallery-tab')" id="nav-gallery-tab" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 text-stone-300 hover:text-white hover:bg-emerald-900/60 flex items-center gap-2">
-            <i class="fa-solid fa-camera"></i> Kerti Galéria
+          <button onclick="switchTab('gallery-tab')" id="nav-gallery-tab" class="nav-btn px-4 py-2 rounded-xl text-xs lg:text-sm font-semibold transition-all text-stone-300 hover:text-white hover:bg-emerald-900/60 flex items-center gap-2">
+            <i class="fa-solid fa-camera"></i> Fotógaléria
           </button>
         </nav>
 
-        <!-- Külön link a VegRots főoldalhoz + gyors segítség gomb -->
+        <!-- Külső VegRots link & Info gomb -->
         <div class="flex items-center gap-2">
-          <a href="https://gergo-somody.github.io/vegrots/index.html" target="_blank" rel="noopener noreferrer" class="hidden sm:inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-stone-800/80 hover:bg-stone-700 text-stone-200 text-xs font-medium border border-stone-700 transition">
+          <a href="https://gergo-somody.github.io/vegrots/index.html" target="_blank" rel="noopener noreferrer" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-stone-800/90 hover:bg-stone-700 text-stone-200 text-xs font-semibold border border-stone-700 transition">
             <span>VegRots Főoldal</span>
             <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
           </a>
-          <button onclick="openInfoModal()" class="w-10 h-10 rounded-xl bg-botanic-light/20 hover:bg-botanic-light/40 text-emerald-300 border border-emerald-600/30 flex items-center justify-center transition" title="Információ & Segítség">
+          <button onclick="openInfoModal()" class="w-10 h-10 rounded-xl bg-botanic-light/20 hover:bg-botanic-light/40 text-emerald-300 border border-emerald-600/40 flex items-center justify-center transition" title="Útmutató és elrendezés infó">
             <i class="fa-solid fa-circle-question text-lg"></i>
           </button>
         </div>
       </div>
       
-      <!-- Mobil menü sáv -->
-      <div class="flex md:hidden overflow-x-auto py-2.5 space-x-2 border-t border-emerald-900/60 scrollbar-none text-xs">
-        <button onclick="switchTab('map-tab')" class="mobile-nav-btn whitespace-nowrap px-3 py-1.5 rounded-lg bg-botanic-primary text-white font-medium flex items-center gap-1.5" data-tab="map-tab">
+      <!-- Mobil menüsáv -->
+      <div class="flex md:hidden overflow-x-auto py-2.5 space-x-2 border-t border-emerald-900/70 text-xs scrollbar-none">
+        <button onclick="switchTab('map-tab')" class="mobile-nav-btn px-3 py-1.5 rounded-lg bg-botanic-primary text-white font-medium shrink-0 flex items-center gap-1.5" data-tab="map-tab">
           <i class="fa-solid fa-map"></i> Térkép
         </button>
-        <button onclick="switchTab('monitoring-tab')" class="mobile-nav-btn whitespace-nowrap px-3 py-1.5 rounded-lg bg-emerald-950/70 text-stone-300 font-medium flex items-center gap-1.5" data-tab="monitoring-tab">
+        <button onclick="switchTab('monitoring-tab')" class="mobile-nav-btn px-3 py-1.5 rounded-lg bg-emerald-950/70 text-stone-300 font-medium shrink-0 flex items-center gap-1.5" data-tab="monitoring-tab">
           <i class="fa-solid fa-clipboard-list"></i> Napló
         </button>
-        <button onclick="switchTab('spring-tab')" class="mobile-nav-btn whitespace-nowrap px-3 py-1.5 rounded-lg bg-emerald-950/70 text-stone-300 font-medium flex items-center gap-1.5" data-tab="spring-tab">
+        <button onclick="switchTab('spring-tab')" class="mobile-nav-btn px-3 py-1.5 rounded-lg bg-emerald-950/70 text-stone-300 font-medium shrink-0 flex items-center gap-1.5" data-tab="spring-tab">
           <i class="fa-solid fa-calendar"></i> Vetésterv
         </button>
-        <button onclick="switchTab('plants-tab')" class="mobile-nav-btn whitespace-nowrap px-3 py-1.5 rounded-lg bg-emerald-950/70 text-stone-300 font-medium flex items-center gap-1.5" data-tab="plants-tab">
+        <button onclick="switchTab('plants-tab')" class="mobile-nav-btn px-3 py-1.5 rounded-lg bg-emerald-950/70 text-stone-300 font-medium shrink-0 flex items-center gap-1.5" data-tab="plants-tab">
           <i class="fa-solid fa-leaf"></i> Növények
         </button>
-        <button onclick="switchTab('gallery-tab')" class="mobile-nav-btn whitespace-nowrap px-3 py-1.5 rounded-lg bg-emerald-950/70 text-stone-300 font-medium flex items-center gap-1.5" data-tab="gallery-tab">
+        <button onclick="switchTab('gallery-tab')" class="mobile-nav-btn px-3 py-1.5 rounded-lg bg-emerald-950/70 text-stone-300 font-medium shrink-0 flex items-center gap-1.5" data-tab="gallery-tab">
           <i class="fa-solid fa-camera"></i> Fotók
         </button>
       </div>
     </div>
   </header>
 
-  <!-- Értesítési üzenet sáv (Alert helyett toast) -->
+  <!-- Lebegő értesítő (Toast) -->
   <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 bg-slate-900 text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 border border-slate-700 pointer-events-none">
     <div id="toast-icon" class="text-emerald-400 text-lg"></div>
     <div id="toast-message" class="text-sm font-medium"></div>
@@ -180,44 +172,47 @@
   <!-- FŐ TARTALOMTERÜLET -->
   <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
 
-    <!-- ============================================== -->
-    <!-- 1. FÜL: UDVARTÉRKÉP & CSAPAT SZŰRŐ -->
-    <!-- ============================================== -->
+    <!-- ======================================================= -->
+    <!-- 1. FÜL: TÉRKÉPNÉZET (ÚJ FÜGGŐLEGES BAL->JOBB ELRENDEZÉS) -->
+    <!-- ======================================================= -->
     <section id="map-tab" class="tab-content block">
       
       <!-- Vezérlősáv és szűrők -->
-      <div class="bg-white rounded-3xl p-5 shadow-sm border border-stone-200/80 mb-6">
+      <div class="bg-white rounded-3xl p-5 shadow-sm border border-stone-200/90 mb-6">
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
-            <span class="text-xs font-bold uppercase tracking-wider text-botanic-primary">Interaktív Udvarfelülnézet</span>
-            <h2 class="text-xl sm:text-2xl font-bold font-display text-slate-800">Iskolakerti Ágyástérkép</h2>
-            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Kattints egy ágyásra vagy parcellára a részletes talajtakarási és csapatadatokért!</p>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-xs font-bold uppercase tracking-wider text-botanic-primary">Valós Térbeli Felülnézet</span>
+              <span class="text-[11px] font-semibold bg-stone-100 text-stone-600 px-2 py-0.5 rounded-md border border-stone-200">Balról Jobbra Rendezettség</span>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-bold font-display text-slate-800">Udvari Magaságyások Elrendezése</h2>
+            <p class="text-xs sm:text-sm text-slate-500">Kattints bármelyik parcellára vagy ágyásra a csapatinfók és vetőmag-összetétel megtekintéséhez!</p>
           </div>
           
           <!-- Szűrők -->
           <div class="flex flex-wrap items-center gap-2.5">
             <div class="flex items-center bg-stone-100 rounded-xl px-3 py-1.5 border border-stone-200">
-              <label for="filter-team" class="text-xs font-semibold text-slate-500 mr-2 flex items-center gap-1"><i class="fa-solid fa-users"></i> Csapat:</label>
+              <label for="filter-team" class="text-xs font-semibold text-slate-500 mr-2 flex items-center gap-1"><i class="fa-solid fa-users text-botanic-primary"></i> Csapat:</label>
               <select id="filter-team" onchange="applyFilters()" class="bg-transparent text-xs font-bold text-slate-700 focus:outline-none">
-                <option value="all">Mindegyik csapat (összes)</option>
-                <option value="Kemény magok">Kemény magok</option>
-                <option value="Magágyúsok">Magágyúsok</option>
-                <option value="Gémorr fúrók">Gémorr fúrók</option>
-                <option value="Zöld lándzsások">Zöld lándzsások</option>
-                <option value="Vitorlázó jávaiak">Vitorlázó jávaiak</option>
-                <option value="Mag páncélosok">Mag páncélosok</option>
-                <option value="Hangya-taxik">Hangya-taxik</option>
-                <option value="Szamóca gondozók">Szamócások</option>
+                <option value="all">Minden csapat (Összes)</option>
+                <option value="Szamóca gondozók">Szamóca gondozók (Bal szélső)</option>
+                <option value="Vitorlázó jávaiak">Vitorlázó jávaiak (3. ágyás felül)</option>
+                <option value="Mag páncélosok">Mag páncélosok (3. ágyás közép)</option>
+                <option value="Hangya-taxik">Hangya-taxik (3. ágyás alul)</option>
+                <option value="Gémorr fúrók">Gémorr fúrók (2. ágyás felül)</option>
+                <option value="Zöld lándzsások">Zöld lándzsások (2. ágyás alul)</option>
+                <option value="Magágyúsok">Magágyúsok (1. ágyás)</option>
+                <option value="Kemény magok">Kemény magok (Kis négyzet)</option>
               </select>
             </div>
 
             <div class="flex items-center bg-stone-100 rounded-xl px-3 py-1.5 border border-stone-200">
-              <label for="filter-plant" class="text-xs font-semibold text-slate-500 mr-2 flex items-center gap-1"><i class="fa-solid fa-seedling"></i> Növény:</label>
+              <label for="filter-plant" class="text-xs font-semibold text-slate-500 mr-2 flex items-center gap-1"><i class="fa-solid fa-seedling text-emerald-600"></i> Növény:</label>
               <select id="filter-plant" onchange="applyFilters()" class="bg-transparent text-xs font-bold text-slate-700 focus:outline-none">
-                <option value="all">Minden takarónövény</option>
-                <option value="facélia">Facélia (méhhímes)</option>
-                <option value="rozs">Rozs</option>
+                <option value="all">Minden vetett növény</option>
                 <option value="lóbab">Lóbab</option>
+                <option value="facélia">Facélia</option>
+                <option value="rozs">Rozs</option>
                 <option value="borsó">Borsó</option>
                 <option value="bíborhere">Bíborhere</option>
                 <option value="alexandriai here">Alexandriai here</option>
@@ -230,236 +225,263 @@
               </select>
             </div>
 
-            <button onclick="resetFilters()" class="px-3 py-1.5 bg-stone-200 hover:bg-stone-300 text-slate-700 rounded-xl text-xs font-medium transition" title="Szűrők alaphelyzetbe">
+            <button onclick="resetFilters()" class="px-3 py-2 bg-stone-200 hover:bg-stone-300 text-slate-700 rounded-xl text-xs font-medium transition" title="Szűrők törlése">
               <i class="fa-solid fa-rotate-left"></i>
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Térkép és Adatpanel Grid -->
+      <!-- Térkép és Információs Panel (2 oszlop) -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        <!-- BAL OLDAL: SVG Kerti Rajz (8 oszlop) -->
-        <div class="lg:col-span-7 xl:col-span-8 bg-stone-100 rounded-3xl p-4 sm:p-6 shadow-inner border border-stone-300/80 relative overflow-hidden flex flex-col justify-between">
+        <!-- BAL OLDAL: SVG Grafikus Térkép (8 oszlop) -->
+        <div class="lg:col-span-8 bg-stone-100 rounded-3xl p-4 sm:p-6 shadow-inner border border-stone-300/80 relative flex flex-col justify-between">
           
-          <!-- Kerti környezet dekoráció: fal, fű, kerekek felülnézetből -->
-          <div class="flex justify-between items-center mb-3 text-xs text-stone-500 font-medium border-b border-stone-200/80 pb-2">
-            <span class="flex items-center gap-2"><i class="fa-solid fa-compass text-botanic-primary"></i> Északi betonkerítés felőli oldal</span>
-            <span class="text-[11px] bg-white px-2 py-0.5 rounded-full border border-stone-200 shadow-xs"><span class="inline-block w-2 h-2 rounded-full bg-amber-500 mr-1 animate-pulse"></span>Kattints bármelyik parcellára</span>
+          <!-- Irányjelző fejléc az udvarról -->
+          <div class="flex items-center justify-between text-xs text-stone-500 font-semibold border-b border-stone-200 pb-2 mb-3">
+            <span class="flex items-center gap-1.5">
+              <i class="fa-solid fa-arrow-left text-botanic-primary"></i> Bal oldal: Szamócás &rarr; Jobb oldal: Kis négyzet
+            </span>
+            <span class="text-[11px] bg-white px-2.5 py-1 rounded-full border border-stone-200 text-slate-600 shadow-2xs">
+              <span class="inline-block w-2 h-2 rounded-full bg-amber-500 mr-1.5 animate-pulse"></span>Kattints bármelyik zónára!
+            </span>
           </div>
 
-          <!-- SVG Térkép -->
-          <div class="w-full flex justify-center items-center py-2">
-            <svg id="garden-map-svg" viewBox="0 0 920 620" class="w-full h-auto max-h-[580px] drop-shadow-sm select-none" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.06));">
+          <!-- SVG Térkép: Szamócás (bal) | 3. ágyás (3 zóna) | 2. ágyás (2 zóna) | 1. ágyás (egész) | Kis négyzet (jobb szél) -->
+          <div class="w-full flex justify-center items-center py-2 overflow-x-auto">
+            <svg id="garden-map-svg" viewBox="0 0 1000 640" class="w-full min-w-[720px] max-w-[960px] h-auto drop-shadow-sm select-none">
               <defs>
                 <!-- Fű textúra -->
                 <radialGradient id="grassGrad" cx="50%" cy="50%" r="75%">
-                  <stop offset="0%" stop-color="#84cc16" stop-opacity="0.18" />
+                  <stop offset="0%" stop-color="#84cc16" stop-opacity="0.16" />
                   <stop offset="100%" stop-color="#4d7c0f" stop-opacity="0.25" />
                 </radialGradient>
                 
-                <!-- Hullámos fémlemez textúra minta -->
-                <pattern id="metalPattern" width="16" height="16" patternUnits="userSpaceOnUse">
-                  <path d="M 0 0 L 8 0 L 16 0" stroke="#334155" stroke-width="2" />
-                  <line x1="0" y1="0" x2="0" y2="16" stroke="#475569" stroke-width="1.5" />
-                  <line x1="8" y1="0" x2="8" y2="16" stroke="#1e293b" stroke-width="2" />
-                </pattern>
-                
                 <!-- Termőföld textúra minta -->
-                <pattern id="soilPattern" width="20" height="20" patternUnits="userSpaceOnUse">
-                  <rect width="20" height="20" fill="#6d4c41"/>
-                  <circle cx="4" cy="5" r="1.2" fill="#54382e"/>
-                  <circle cx="14" cy="8" r="1.5" fill="#422a21"/>
-                  <circle cx="10" cy="15" r="1.1" fill="#7a5547"/>
-                  <circle cx="17" cy="16" r="1.3" fill="#36221a"/>
+                <pattern id="soilPattern" width="22" height="22" patternUnits="userSpaceOnUse">
+                  <rect width="22" height="22" fill="#6d4c41"/>
+                  <circle cx="5" cy="5" r="1.3" fill="#54382e"/>
+                  <circle cx="16" cy="9" r="1.6" fill="#3e2723"/>
+                  <circle cx="11" cy="17" r="1.2" fill="#795548"/>
+                  <circle cx="19" cy="18" r="1.4" fill="#3e2723"/>
                 </pattern>
-                
-                <!-- Szamóca föld -->
-                <pattern id="strawberrySoil" width="24" height="24" patternUnits="userSpaceOnUse">
-                  <rect width="24" height="24" fill="#5a3d31"/>
-                  <circle cx="12" cy="12" r="3" fill="#e11d48"/>
-                  <circle cx="12" cy="10" r="1" fill="#15803d"/>
+
+                <!-- Antracit fémlemez textúra -->
+                <pattern id="corrugatedBorder" width="10" height="10" patternUnits="userSpaceOnUse">
+                  <rect width="10" height="10" fill="#334155" />
+                  <line x1="0" y1="0" x2="0" y2="10" stroke="#1e293b" stroke-width="2.5" />
+                  <line x1="5" y1="0" x2="5" y2="10" stroke="#475569" stroke-width="1.5" />
                 </pattern>
               </defs>
 
-              <!-- Udvar alapréteg (Fű és kerítés imitáció) -->
-              <rect x="0" y="0" width="920" height="620" rx="24" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="2" />
-              <!-- Fű pázsit sáv -->
-              <rect x="15" y="55" width="890" height="550" rx="18" fill="url(#grassGrad)" />
+              <!-- Udvar alapréteg (Fű és kerítés) -->
+              <rect x="0" y="0" width="1000" height="640" rx="28" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="2" />
+              <!-- Zöld gyepfelület -->
+              <rect x="18" y="52" width="964" height="570" rx="20" fill="url(#grassGrad)" />
               
-              <!-- Északi kerítés beton elemek -->
-              <g id="concrete-wall" opacity="0.9">
-                <rect x="15" y="15" width="890" height="38" rx="6" fill="#94a3b8" stroke="#64748b" stroke-width="1.5" />
-                <line x1="180" y1="15" x2="180" y2="53" stroke="#475569" stroke-width="2" />
-                <line x1="360" y1="15" x2="360" y2="53" stroke="#475569" stroke-width="2" />
-                <line x1="540" y1="15" x2="540" y2="53" stroke="#475569" stroke-width="2" />
-                <line x1="720" y1="15" x2="720" y2="53" stroke="#475569" stroke-width="2" />
-                <text x="35" y="38" fill="#334155" font-size="12" font-weight="bold" font-family="'Plus Jakarta Sans'">BETONKERÍTÉS FAL (Borostyán futókkal)</text>
+              <!-- Hátsó betonkerítés a fotó alapján -->
+              <g id="concrete-fence">
+                <rect x="18" y="14" width="964" height="34" rx="6" fill="#94a3b8" stroke="#64748b" stroke-width="1.5" />
+                <line x1="220" y1="14" x2="220" y2="48" stroke="#475569" stroke-width="2" />
+                <line x1="420" y1="14" x2="420" y2="48" stroke="#475569" stroke-width="2" />
+                <line x1="620" y1="14" x2="620" y2="48" stroke="#475569" stroke-width="2" />
+                <line x1="820" y1="14" x2="820" y2="48" stroke="#475569" stroke-width="2" />
+                <text x="35" y="36" fill="#1e293b" font-size="12" font-weight="bold" font-family="'Plus Jakarta Sans'">BETONKERÍTÉS (Északi oldal, borostyánfutókkal)</text>
               </g>
 
-              <!-- Udvari dekorációk a fotó alapján: 3 db gumiabroncs ültető a jobb alsó részen -->
-              <g id="tires-decor">
-                <!-- 1. Gumi -->
-                <circle cx="790" cy="360" r="30" fill="#1e293b" stroke="#0f172a" stroke-width="5" />
-                <circle cx="790" cy="360" r="20" fill="#58311d" />
-                <!-- 2. Gumi -->
-                <circle cx="750" cy="450" r="32" fill="#1e293b" stroke="#0f172a" stroke-width="5" />
-                <circle cx="750" cy="450" r="22" fill="#58311d" />
-                <!-- Kis kék dekor gumi hátul -->
-                <circle cx="740" cy="230" r="22" fill="#0284c7" stroke="#0369a1" stroke-width="4" />
-                <circle cx="740" cy="230" r="14" fill="#58311d" />
+              <!-- Udvari gumiabroncsok a fotó alapján (jobb alsó rész felé) -->
+              <g id="yard-tires" opacity="0.85">
+                <circle cx="895" cy="510" r="28" fill="#1e293b" stroke="#0f172a" stroke-width="5" />
+                <circle cx="895" cy="510" r="18" fill="#58311d" />
+                <circle cx="850" cy="570" r="26" fill="#1e293b" stroke="#0f172a" stroke-width="5" />
+                <circle cx="850" cy="570" r="16" fill="#58311d" />
               </g>
 
-              <!-- ============================================== -->
-              <!-- 5. KIS NÉGYZET ALAKÚ ÁGYÁS ("Kemény magok") -->
-              <!-- ============================================== -->
-              <g id="bed-small-square" class="garden-bed-shape" onclick="selectBed('small-square')" data-bed="small-square">
-                <!-- Keret -->
-                <rect x="50" y="80" width="120" height="120" rx="10" fill="#334155" stroke="#1e293b" stroke-width="4" />
-                <!-- Belső talaj -->
-                <rect x="58" y="88" width="104" height="104" rx="6" fill="url(#soilPattern)" class="bed-surface" />
-                <!-- Ikon és felirat -->
-                <text x="110" y="130" text-anchor="middle" fill="#ffffff" font-size="20">🌰</text>
-                <text x="110" y="152" text-anchor="middle" fill="#ffffff" font-weight="700" font-size="12" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.9))">Kemény magok</text>
-                <text x="110" y="170" text-anchor="middle" fill="#dcfce7" font-size="10">5. Kis négyzet</text>
-              </g>
-
-              <!-- ============================================== -->
-              <!-- 4. SZAMÓCÁS ÁGYÁS (Szamócások - ovális / 4. ágyás) -->
-              <!-- ============================================== -->
-              <g id="bed-strawberry" class="garden-bed-shape" onclick="selectBed('strawberry-bed')" data-bed="strawberry-bed">
-                <rect x="200" y="80" width="220" height="110" rx="40" fill="#334155" stroke="#1e293b" stroke-width="4" />
-                <rect x="208" y="88" width="204" height="94" rx="34" fill="url(#soilPattern)" class="bed-surface" />
-                <!-- Szamóca pettyek és növények -->
-                <g fill="#ef4444" opacity="0.9">
-                  <circle cx="240" cy="130" r="6"/> <circle cx="270" cy="115" r="6"/> <circle cx="300" cy="140" r="6"/>
-                  <circle cx="335" cy="118" r="6"/> <circle cx="365" cy="135" r="6"/>
+              <!-- ======================================================== -->
+              <!-- 1. OSZLOP (BAL SZÉL): SZAMÓCÁS ÁGYÁS (Függőleges ovális) -->
+              <!-- ======================================================== -->
+              <g id="group-strawberry" class="garden-bed-group">
+                <!-- Hullámos antracit fém test -->
+                <path d="M 45,150 C 45,95 165,95 165,150 L 165,490 C 165,545 45,545 45,490 Z" 
+                      fill="#334155" stroke="#1e293b" stroke-width="5" />
+                <!-- Belső talaj zóna -->
+                <path id="bed-zone-strawberry" class="garden-bed-shape" onclick="selectZone('strawberry-bed')" data-zone="strawberry-bed"
+                      d="M 53,150 C 53,103 157,103 157,150 L 157,490 C 157,537 53,537 53,490 Z" 
+                      fill="url(#soilPattern)" />
+                <!-- Szamóca növénykék mintája és feliratok -->
+                <g fill="#ef4444">
+                  <circle cx="85" cy="180" r="5" /> <circle cx="125" cy="220" r="5" />
+                  <circle cx="85" cy="280" r="5" /> <circle cx="125" cy="330" r="5" />
+                  <circle cx="85" cy="400" r="5" /> <circle cx="125" cy="450" r="5" />
                 </g>
-                <text x="310" y="132" text-anchor="middle" fill="#ffffff" font-weight="800" font-size="15" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.9))">🍓 4. SZAMÓCÁS</text>
-                <text x="310" y="155" text-anchor="middle" fill="#fecdd3" font-size="11" font-weight="600">Állandó gyümölcságyás</text>
+                <text x="105" y="250" text-anchor="middle" fill="#ffffff" font-size="24">🍓</text>
+                <text x="105" y="278" text-anchor="middle" fill="#ffffff" font-weight="800" font-size="13" filter="drop-shadow(0 1px 3px #000)">SZAMÓCÁS</text>
+                <text x="105" y="296" text-anchor="middle" fill="#fecdd3" font-weight="700" font-size="10">Évelő Ágyás</text>
+                <text x="105" y="580" text-anchor="middle" fill="#334155" font-weight="bold" font-size="12">SZAMÓCÁS</text>
               </g>
 
-              <!-- ============================================== -->
-              <!-- 1. NAGYOBB MAGASÁGYÁS: "Magágyúsok" (1 egész parcella) -->
-              <!-- ============================================== -->
-              <g id="bed-large-1" class="garden-bed-shape" onclick="selectBed('large-1')" data-bed="large-1">
-                <!-- Hullámos ovális fém váz -->
-                <path d="M 60,370 C 60,300 240,300 300,320 C 360,340 400,310 440,310 C 490,310 490,420 440,430 C 370,440 330,400 260,390 C 190,380 60,440 60,370 Z" 
+              <!-- ======================================================== -->
+              <!-- 2. OSZLOP: 3. MAGASÁGYÁS (Függőleges ovális, 3 részre osztva) -->
+              <!-- Felül: Vitorlázó jávaiak | Középen: Mag páncélosok | Alul: Hangya-taxik -->
+              <!-- ======================================================== -->
+              <g id="group-bed-3" class="garden-bed-group">
+                <!-- Külső fém test -->
+                <path d="M 215,150 C 215,95 345,95 345,150 L 345,490 C 345,545 215,545 215,490 Z" 
                       fill="#334155" stroke="#1e293b" stroke-width="5" />
                 
-                <!-- Belső talajréteg -->
-                <path d="M 68,370 C 68,310 236,310 295,328 C 355,346 395,318 433,318 C 480,318 480,412 433,422 C 368,432 328,392 260,382 C 195,372 68,428 68,370 Z" 
-                      fill="url(#soilPattern)" class="bed-surface" />
-                
-                <!-- Merevítő pálcák (a fotó alapján a kanyarulatoknál) -->
-                <line x1="210" y1="325" x2="210" y2="400" stroke="#f97316" stroke-width="3" stroke-dasharray="2 1" />
-                <line x1="375" y1="322" x2="375" y2="415" stroke="#f97316" stroke-width="3" stroke-dasharray="2 1" />
-                
-                <!-- Címke -->
-                <rect x="180" y="345" width="160" height="34" rx="8" fill="#1e293b" opacity="0.85" />
-                <text x="260" y="367" text-anchor="middle" fill="#4ade80" font-weight="700" font-size="14">1. Ágyás: Magágyúsok</text>
-                <text x="260" y="415" text-anchor="middle" fill="#f8fafc" font-size="11" font-weight="600" filter="drop-shadow(0 1px 2px #000)">🌾 Rozs, Facélia, Borsó, Bíbor- és Alex. here</text>
+                <!-- 1. ZÓNA (FELÜL): Vitorlázó jávaiak -->
+                <path id="bed-zone-3-vitorlazo" class="garden-bed-shape" onclick="selectZone('bed-3-vitorlazo')" data-zone="bed-3-vitorlazo"
+                      d="M 223,150 C 223,103 337,103 337,150 L 337,255 L 223,255 Z" 
+                      fill="url(#soilPattern)" />
+                <text x="280" y="175" text-anchor="middle" fill="#ffffff" font-size="16">⛵</text>
+                <text x="280" y="196" text-anchor="middle" fill="#ffffff" font-weight="700" font-size="11" filter="drop-shadow(0 1px 2px #000)">Vitorlázó jávaiak</text>
+                <text x="280" y="214" text-anchor="middle" fill="#dcfce7" font-size="9.5">zab, mustár, retek, pohánka</text>
+
+                <!-- Narancssárga elválasztó pálca 1 (felül és közép között) -->
+                <line x1="220" y1="255" x2="340" y2="255" stroke="#f97316" stroke-width="4.5" />
+                <circle cx="220" cy="255" r="4.5" fill="#ea580c" />
+                <circle cx="340" cy="255" r="4.5" fill="#ea580c" />
+
+                <!-- 2. ZÓNA (KÖZÉPEN): Mag páncélosok -->
+                <rect id="bed-zone-3-pancelos" class="garden-bed-shape" onclick="selectZone('bed-3-pancelos')" data-zone="bed-3-pancelos"
+                      x="223" y="258" width="114" height="120" 
+                      fill="url(#soilPattern)" />
+                <text x="280" y="305" text-anchor="middle" fill="#ffffff" font-size="16">🛡️</text>
+                <text x="280" y="325" text-anchor="middle" fill="#ffffff" font-weight="700" font-size="11" filter="drop-shadow(0 1px 2px #000)">Mag páncélosok</text>
+                <text x="280" y="343" text-anchor="middle" fill="#dcfce7" font-size="9.5">zab, facélia, mustár, retek</text>
+
+                <!-- Narancssárga elválasztó pálca 2 (közép és alsó között) -->
+                <line x1="220" y1="380" x2="340" y2="380" stroke="#f97316" stroke-width="4.5" />
+                <circle cx="220" cy="380" r="4.5" fill="#ea580c" />
+                <circle cx="340" cy="380" r="4.5" fill="#ea580c" />
+
+                <!-- 3. ZÓNA (ALUL): Hangya-taxik -->
+                <path id="bed-zone-3-hangyataxi" class="garden-bed-shape" onclick="selectZone('bed-3-hangyataxi')" data-zone="bed-3-hangyataxi"
+                      d="M 223,382 L 337,382 L 337,490 C 337,537 223,537 223,490 Z" 
+                      fill="url(#soilPattern)" />
+                <text x="280" y="435" text-anchor="middle" fill="#ffffff" font-size="16">🐜</text>
+                <text x="280" y="455" text-anchor="middle" fill="#ffffff" font-weight="700" font-size="11" filter="drop-shadow(0 1px 2px #000)">Hangya-taxik</text>
+                <text x="280" y="473" text-anchor="middle" fill="#dcfce7" font-size="9.5">mustár, retek, rozs, pohánka</text>
+
+                <text x="280" y="580" text-anchor="middle" fill="#334155" font-weight="bold" font-size="12">3. ÁGYÁS (3 részre osztva)</text>
               </g>
 
-              <!-- ============================================== -->
-              <!-- 2. NAGYOBB MAGASÁGYÁS (2 Parcellára osztva) -->
-              <!-- ============================================== -->
-              <!-- Külső test -->
-              <g id="bed-large-2-group">
-                <path d="M 460,170 C 460,110 630,110 680,125 C 730,140 760,120 800,120 C 850,120 850,210 800,220 C 740,230 710,195 650,185 C 590,175 460,230 460,170 Z" 
+              <!-- ======================================================== -->
+              <!-- 3. OSZLOP: 2. MAGASÁGYÁS (Függőleges ovális, 2 részre osztva) -->
+              <!-- Felül: Gémorr fúrók | Alul: Zöld lándzsások -->
+              <!-- ======================================================== -->
+              <g id="group-bed-2" class="garden-bed-group">
+                <!-- Külső fém test -->
+                <path d="M 395,150 C 395,95 525,95 525,150 L 525,490 C 525,545 395,545 395,490 Z" 
                       fill="#334155" stroke="#1e293b" stroke-width="5" />
                 
-                <!-- 1. Parcella: Gémorr fúrók (bal fele) -->
-                <path id="bed-p-gemorr" class="garden-bed-shape" onclick="selectBed('large-2-p1')" data-bed="large-2-p1"
-                      d="M 468,170 C 468,118 590,118 640,135 L 640,198 C 585,185 468,222 468,170 Z" 
-                      fill="url(#soilPattern)" class="bed-surface" />
-                
-                <!-- 2. Parcella: Zöld lándzsások (jobb fele) -->
-                <path id="bed-p-landzsasok" class="garden-bed-shape" onclick="selectBed('large-2-p2')" data-bed="large-2-p2"
-                      d="M 640,135 C 675,145 710,128 792,128 C 840,128 840,202 792,212 C 735,222 705,190 640,185 Z" 
-                      fill="url(#soilPattern)" class="bed-surface" />
-                
-                <!-- Narancs elválasztó pálca a talajban (fénykép mintájára) -->
-                <line x1="640" y1="125" x2="640" y2="200" stroke="#f97316" stroke-width="4.5" />
-                <circle cx="640" cy="125" r="4.5" fill="#ea580c" />
-                <circle cx="640" cy="200" r="4.5" fill="#ea580c" />
+                <!-- 1. ZÓNA (FELÜL): Gémorr fúrók -->
+                <path id="bed-zone-2-gemorr" class="garden-bed-shape" onclick="selectZone('bed-2-gemorr')" data-zone="bed-2-gemorr"
+                      d="M 403,150 C 403,103 517,103 517,150 L 517,315 L 403,315 Z" 
+                      fill="url(#soilPattern)" />
+                <text x="460" y="200" text-anchor="middle" fill="#ffffff" font-size="20">🪶</text>
+                <text x="460" y="226" text-anchor="middle" fill="#ffffff" font-weight="700" font-size="12" filter="drop-shadow(0 1px 2px #000)">Gémorr fúrók</text>
+                <text x="460" y="246" text-anchor="middle" fill="#dcfce7" font-size="10">lóbab, zab, bíborhere</text>
 
-                <!-- Címkék -->
-                <text x="540" y="165" text-anchor="middle" fill="#ffffff" font-weight="700" font-size="12" filter="drop-shadow(0 1px 2px #000)">🪶 Gémorr fúrók</text>
-                <text x="730" y="170" text-anchor="middle" fill="#ffffff" font-weight="700" font-size="12" filter="drop-shadow(0 1px 2px #000)">🌿 Zöld lándzsások</text>
-                <text x="640" y="105" text-anchor="middle" fill="#334155" font-weight="bold" font-size="11">2. ÁGYÁS (2 részre osztva)</text>
+                <!-- Narancssárga elválasztó pálca (2 egyenlő félre osztás) -->
+                <line x1="400" y1="318" x2="520" y2="318" stroke="#f97316" stroke-width="4.5" />
+                <circle cx="400" cy="318" r="4.5" fill="#ea580c" />
+                <circle cx="520" cy="318" r="4.5" fill="#ea580c" />
+
+                <!-- 2. ZÓNA (ALUL): Zöld lándzsások -->
+                <path id="bed-zone-2-landzsas" class="garden-bed-shape" onclick="selectZone('bed-2-landzsas')" data-zone="bed-2-landzsas"
+                      d="M 403,321 L 517,321 L 517,490 C 517,537 403,537 403,490 Z" 
+                      fill="url(#soilPattern)" />
+                <text x="460" y="390" text-anchor="middle" fill="#ffffff" font-size="20">🌿</text>
+                <text x="460" y="416" text-anchor="middle" fill="#ffffff" font-weight="700" font-size="12" filter="drop-shadow(0 1px 2px #000)">Zöld lándzsások</text>
+                <text x="460" y="436" text-anchor="middle" fill="#dcfce7" font-size="10">borsó, baltacim, rozs</text>
+
+                <text x="460" y="580" text-anchor="middle" fill="#334155" font-weight="bold" font-size="12">2. ÁGYÁS (2 részre osztva)</text>
               </g>
 
-              <!-- ============================================== -->
-              <!-- 3. NAGYOBB MAGASÁGYÁS (3 Parcellára osztva) -->
-              <!-- ============================================== -->
-              <g id="bed-large-3-group">
-                <!-- Hullámos fém perem -->
-                <path d="M 400,450 C 400,370 560,370 630,390 C 700,410 750,380 810,380 C 870,380 870,490 810,505 C 740,520 680,470 600,460 C 520,450 400,530 400,450 Z" 
+              <!-- ======================================================== -->
+              <!-- 4. OSZLOP: 1. MAGASÁGYÁS (Függőleges ovális, 1 egészben) -->
+              <!-- Magágyúsok csapata -->
+              <!-- ======================================================== -->
+              <g id="group-bed-1" class="garden-bed-group">
+                <!-- Külső fém test -->
+                <path d="M 575,150 C 575,95 705,95 705,150 L 705,490 C 705,545 575,545 575,490 Z" 
                       fill="#334155" stroke="#1e293b" stroke-width="5" />
                 
-                <!-- 1. Parcella: Vitorlázó jávaiak (bal rész) -->
-                <path id="bed-p-vitorlazo" class="garden-bed-shape" onclick="selectBed('large-3-p1')" data-bed="large-3-p1"
-                      d="M 408,450 C 408,380 520,380 550,395 L 550,470 C 500,465 408,520 408,450 Z" 
+                <!-- Belső talajréteg (1 egységes parcella) -->
+                <path id="bed-zone-1-magagyusok" class="garden-bed-shape" onclick="selectZone('bed-1-magagyusok')" data-zone="bed-1-magagyusok"
+                      d="M 583,150 C 583,103 697,103 697,150 L 697,490 C 697,537 583,537 583,490 Z" 
                       fill="url(#soilPattern)" />
                 
-                <!-- 2. Parcella: Mag páncélosok (középső rész) -->
-                <path id="bed-p-pancelosok" class="garden-bed-shape" onclick="selectBed('large-3-p2')" data-bed="large-3-p2"
-                      d="M 550,395 C 600,410 650,410 690,390 L 690,480 C 640,480 590,465 550,470 Z" 
-                      fill="url(#soilPattern)" />
+                <!-- Belső fém merevítő pálcák (a fotó alapján) -->
+                <line x1="590" y1="260" x2="690" y2="260" stroke="#f97316" stroke-width="2.5" stroke-dasharray="3 2" />
+                <line x1="590" y1="380" x2="690" y2="380" stroke="#f97316" stroke-width="2.5" stroke-dasharray="3 2" />
 
-                <!-- 3. Parcella: Hangya-taxik (jobb rész) -->
-                <path id="bed-p-hangyataxi" class="garden-bed-shape" onclick="selectBed('large-3-p3')" data-bed="large-3-p3"
-                      d="M 690,390 C 740,380 800,385 860,430 C 860,480 810,498 780,500 C 730,505 710,485 690,480 Z" 
-                      fill="url(#soilPattern)" />
+                <text x="640" y="280" text-anchor="middle" fill="#ffffff" font-size="24">🌾</text>
+                <text x="640" y="310" text-anchor="middle" fill="#ffffff" font-weight="800" font-size="13" filter="drop-shadow(0 1px 3px #000)">Magágyúsok</text>
+                <text x="640" y="332" text-anchor="middle" fill="#dcfce7" font-weight="700" font-size="10.5">1 Teljes Magaságyás</text>
+                <text x="640" y="356" text-anchor="middle" fill="#f8fafc" font-size="9.5">rozs, facélia, borsó,</text>
+                <text x="640" y="372" text-anchor="middle" fill="#f8fafc" font-size="9.5">bíborhere, alexandriai here</text>
 
-                <!-- Narancssárga elválasztó cölöpök a 3. ágyásban -->
-                <line x1="550" y1="390" x2="550" y2="475" stroke="#f97316" stroke-width="4" />
-                <line x1="690" y1="385" x2="690" y2="485" stroke="#f97316" stroke-width="4" />
+                <text x="640" y="580" text-anchor="middle" fill="#334155" font-weight="bold" font-size="12">1. ÁGYÁS (1 egész)</text>
+              </g>
 
-                <!-- Feliratok a 3 parcellához -->
-                <text x="475" y="445" text-anchor="middle" fill="#ffffff" font-weight="700" font-size="11" filter="drop-shadow(0 1px 2px #000)">⛵ Vitorlázók</text>
-                <text x="620" y="445" text-anchor="middle" fill="#ffffff" font-weight="700" font-size="11" filter="drop-shadow(0 1px 2px #000)">🛡️ Páncélosok</text>
-                <text x="760" y="445" text-anchor="middle" fill="#ffffff" font-weight="700" font-size="11" filter="drop-shadow(0 1px 2px #000)">🐜 Hangya-taxik</text>
-                <text x="635" y="525" text-anchor="middle" fill="#334155" font-weight="bold" font-size="11">3. ÁGYÁS (3 csapat parcellája)</text>
+              <!-- ======================================================== -->
+              <!-- 5. OSZLOP (JOBB SZÉL): 5. KIS NÉGYZET ALAKÚ ÁGYÁS -->
+              <!-- Kemény magok csapata -->
+              <!-- ======================================================== -->
+              <g id="group-bed-square" class="garden-bed-group">
+                <!-- Fém / fa keret -->
+                <rect x="760" y="220" width="160" height="160" rx="14" fill="#334155" stroke="#1e293b" stroke-width="5" />
+                
+                <!-- Belső talaj zóna -->
+                <rect id="bed-zone-square" class="garden-bed-shape" onclick="selectZone('bed-square-kemenymagok')" data-zone="bed-square-kemenymagok"
+                      x="770" y="230" width="140" height="140" rx="8" fill="url(#soilPattern)" />
+                
+                <text x="840" y="280" text-anchor="middle" fill="#ffffff" font-size="24">🌰</text>
+                <text x="840" y="306" text-anchor="middle" fill="#ffffff" font-weight="800" font-size="12.5" filter="drop-shadow(0 1px 2px #000)">Kemény magok</text>
+                <text x="840" y="326" text-anchor="middle" fill="#dcfce7" font-size="10">lóbab / facélia / rozs</text>
+                <text x="840" y="344" text-anchor="middle" fill="#f8fafc" font-size="9.5">5. Kis négyzet</text>
+
+                <text x="840" y="580" text-anchor="middle" fill="#334155" font-weight="bold" font-size="12">KIS NÉGYZET (Jobb szél)</text>
               </g>
 
             </svg>
           </div>
 
-          <!-- Jelmagyarázat a térkép alján -->
-          <div class="mt-2 bg-white/90 backdrop-blur rounded-2xl p-3 border border-stone-200 text-xs flex flex-wrap items-center justify-between gap-3">
+          <!-- Jelmagyarázat a térkép lábánál -->
+          <div class="mt-3 bg-white/95 backdrop-blur rounded-2xl p-3 border border-stone-200 text-xs flex flex-wrap items-center justify-between gap-3 shadow-2xs">
             <div class="flex items-center gap-4 flex-wrap">
               <span class="font-bold text-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-layer-group text-botanic-primary"></i> Jelmagyarázat:</span>
-              <span class="inline-flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-slate-700 border border-slate-900 inline-block"></span> Antracit hullámlemez</span>
-              <span class="inline-flex items-center gap-1.5"><span class="w-3.5 h-1.5 bg-amber-500 rounded-full inline-block"></span> Narancs osztópálca</span>
-              <span class="inline-flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-md bg-[#6d4c41] inline-block"></span> Élő talajtakarás keverék</span>
-              <span class="inline-flex items-center gap-1.5">🍓 Évelő Szamóca</span>
+              <span class="inline-flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-md bg-[#334155] border border-slate-900 inline-block"></span> Antracit hullámlemez</span>
+              <span class="inline-flex items-center gap-1.5"><span class="w-3.5 h-1.5 bg-orange-500 rounded-full inline-block"></span> Narancs osztópálca</span>
+              <span class="inline-flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-md bg-[#6d4c41] inline-block"></span> Talajtakaró keverék</span>
+              <span class="inline-flex items-center gap-1">🍓 Szamóca</span>
             </div>
-            <span class="text-stone-400 text-[11px]"><i class="fa-solid fa-arrows-up-down-left-right mr-1"></i>Arányos elrendezés</span>
+            <span class="text-stone-400 text-[11px] font-mono">Tájolás: Észak kerítés felé &uarr;</span>
           </div>
 
         </div>
 
-        <!-- JOBB OLDAL: Kiválasztott Ágyás / Parcella Részletező Kártya (4 oszlop) -->
-        <div class="lg:col-span-5 xl:col-span-4 space-y-4">
-          <div id="bed-detail-panel" class="bg-white rounded-3xl p-6 shadow-md border border-stone-200 transition-all">
-            <!-- Dinamikus tartalom betöltése JS-ből -->
+        <!-- JOBB OLDAL: Kiválasztott Zóna Információs Panel (4 oszlop) -->
+        <div class="lg:col-span-4 space-y-4">
+          <div id="zone-detail-panel" class="bg-white rounded-3xl p-6 shadow-md border border-stone-200 transition-all">
+            <!-- Dinamikusan frissülő zóna tartalom -->
           </div>
 
-          <!-- Gyors akció doboz -->
+          <!-- Gyorsműveletek doboz -->
           <div class="bg-gradient-to-br from-botanic-primary to-botanic-dark rounded-3xl p-5 text-white shadow-md">
-            <h3 class="font-bold font-display text-lg mb-1 flex items-center gap-2">
-              <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i> Kutatói Gyorsművelet
+            <h3 class="font-bold font-display text-base mb-1 flex items-center gap-2">
+              <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i> Kutatói Gyorsfunkciók
             </h3>
-            <p class="text-xs text-emerald-100 mb-4">Szeretnél feljegyezni csírázást vagy feltölteni egy ma készített fényképet erről a parcelláról?</p>
-            <div class="grid grid-cols-2 gap-2">
+            <p class="text-xs text-emerald-100 mb-4 leading-relaxed">Rögzítsd a mai csírázási állapotot, talajnedvességet, vagy készíts egy új fotót erről a parcelláról!</p>
+            <div class="grid grid-cols-2 gap-2.5">
               <button onclick="quickActionLog()" class="px-3 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-semibold backdrop-blur border border-white/20 transition flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-pen-to-square"></i> Új Megfigyelés
+                <i class="fa-solid fa-pen-to-square"></i> Új Észlelés
               </button>
               <button onclick="quickActionPhoto()" class="px-3 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-stone-900 text-xs font-bold transition flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-camera"></i> Kép Csatolása
+                <i class="fa-solid fa-camera"></i> Kép Csatolás
               </button>
             </div>
           </div>
@@ -469,48 +491,48 @@
 
     </section>
 
-    <!-- ============================================== -->
-    <!-- 2. FÜL: ADATFELVÉTELEZÉS & MONITORING NAPLÓ -->
-    <!-- ============================================== -->
+    <!-- ======================================================= -->
+    <!-- 2. FÜL: ADATFELVÉTEL & MONITORING NAPLÓ -->
+    <!-- ======================================================= -->
     <section id="monitoring-tab" class="tab-content hidden">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        <!-- Bal oszlop: Új adatfelvételi űrlap -->
-        <div class="lg:col-span-5 bg-white rounded-3xl p-6 shadow-sm border border-stone-200/90">
+        <!-- Megfigyelés űrlap -->
+        <div class="lg:col-span-5 bg-white rounded-3xl p-6 shadow-sm border border-stone-200">
           <div class="flex items-center gap-3 mb-5 border-b border-stone-100 pb-4">
             <div class="w-10 h-10 rounded-xl bg-emerald-100 text-botanic-primary flex items-center justify-center text-lg">
               <i class="fa-solid fa-clipboard-list"></i>
             </div>
             <div>
-              <h3 class="font-bold font-display text-lg text-slate-800">Új Megfigyelési Adatlap</h3>
-              <p class="text-xs text-slate-500">Iskolakerti kutatócsoportok észlelései</p>
+              <h3 class="font-bold font-display text-lg text-slate-800">Kerti Monitoring Adatlap</h3>
+              <p class="text-xs text-slate-500">Iskolai csapatok terepi vizsgálatai</p>
             </div>
           </div>
 
           <form id="monitoring-form" onsubmit="saveMonitoringEntry(event)" class="space-y-4">
             <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Dátum és Időpont</label>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Dátum</label>
               <input type="date" id="log-date" required class="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:ring-2 focus:ring-botanic-primary text-sm">
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Ágyás / Parcella</label>
-                <select id="log-bed" required onchange="syncTeamByBed()" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:ring-2 focus:ring-botanic-primary text-sm bg-white">
-                  <option value="small-square">5. Kis négyzet ágyás</option>
-                  <option value="large-1">1. Magaságyás (Magágyúsok)</option>
-                  <option value="large-2-p1">2. Ágyás - Gémorr fúrók</option>
-                  <option value="large-2-p2">2. Ágyás - Zöld lándzsások</option>
-                  <option value="large-3-p1">3. Ágyás - Vitorlázó jávaiak</option>
-                  <option value="large-3-p2">3. Ágyás - Mag páncélosok</option>
-                  <option value="large-3-p3">3. Ágyás - Hangya-taxik</option>
-                  <option value="strawberry-bed">4. Szamócás ágyás</option>
+                <select id="log-zone-select" required onchange="syncTeamByZoneSelect()" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:ring-2 focus:ring-botanic-primary text-sm bg-white">
+                  <option value="strawberry-bed">Szamócás (Bal szél)</option>
+                  <option value="bed-3-vitorlazo">3. Ágyás - Felül (Vitorlázó jávaiak)</option>
+                  <option value="bed-3-pancelos">3. Ágyás - Közép (Mag páncélosok)</option>
+                  <option value="bed-3-hangyataxi">3. Ágyás - Alul (Hangya-taxik)</option>
+                  <option value="bed-2-gemorr">2. Ágyás - Felül (Gémorr fúrók)</option>
+                  <option value="bed-2-landzsas">2. Ágyás - Alul (Zöld lándzsások)</option>
+                  <option value="bed-1-magagyusok" selected>1. Ágyás (Magágyúsok)</option>
+                  <option value="bed-square-kemenymagok">Kis négyzet ágyás (Kemény magok)</option>
                 </select>
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Művelő Csapat</label>
-                <input type="text" id="log-team" required readonly class="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 bg-stone-100 text-stone-700 font-semibold text-sm">
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Felelős Csapat</label>
+                <input type="text" id="log-team-input" required readonly class="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 bg-stone-100 text-stone-700 font-semibold text-sm">
               </div>
             </div>
 
@@ -518,33 +540,33 @@
               <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Fejlődési állapot</label>
                 <select id="log-stage" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:ring-2 focus:ring-botanic-primary text-sm bg-white">
-                  <option value="Vetve (talajban)">Vetve (talajban)</option>
-                  <option value="Csírázás indult (sziklevél)">Csírázás indult (sziklevél)</option>
-                  <option value="Levélképződés / bokrosodás" selected>Levélképződés / bokrosodás</option>
-                  <option value="Zárt talajtakaró szőnyeg">Zárt talajtakaró szőnyeg</option>
-                  <option value="Bimbós / Virágzó állapot">Bimbós / Virágzó állapot</option>
-                  <option value="Elszáradó / Mulcsolt állapot">Elszáradó / Mulcsolt állapot</option>
+                  <option value="Vetve (mag a talajban)">Vetve (mag a talajban)</option>
+                  <option value="Csírázás / sziklevél">Csírázás / sziklevél</option>
+                  <option value="Bokrosodás / intenzív növekedés" selected>Bokrosodás / intenzív növekedés</option>
+                  <option value="Zárt zöld talajtakaró szőnyeg">Zárt zöld talajtakaró szőnyeg</option>
+                  <option value="Virágzás / beporzók látogatása">Virágzás / beporzók látogatása</option>
+                  <option value="Fagyás utáni mulcsréteg">Fagyás utáni mulcsréteg</option>
                 </select>
               </div>
 
               <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Talajnedvesség</label>
                 <select id="log-moisture" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:ring-2 focus:ring-botanic-primary text-sm bg-white">
-                  <option value="Száraz / Öntözést igényel">Száraz / Öntözést igényel</option>
-                  <option value="Optimális, üde és morzsalékos" selected>Optimális, üde és morzsalékos</option>
-                  <option value="Vizes / Eső utáni nedves">Vizes / Eső utáni nedves</option>
+                  <option value="Száraz / locsolást igényel">Száraz / locsolást igényel</option>
+                  <option value="Optimális, morzsalékos üde talaj" selected>Optimális, morzsalékos üde talaj</option>
+                  <option value="Esőáztatta / nedves talaj">Esőáztatta / nedves talaj</option>
                 </select>
               </div>
             </div>
 
             <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Észlelt élőlények (hasznos / kártevő)</label>
-              <input type="text" id="log-insects" placeholder="Pl. Földigiliszta, futóbogár, beporzó méh, hangyák..." class="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:ring-2 focus:ring-botanic-primary text-sm">
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Megfigyelt állatfajok (hasznos / kártevő)</label>
+              <input type="text" id="log-insects" placeholder="Pl. Földigiliszták, futóbogarak, pókok, méhek..." class="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:ring-2 focus:ring-botanic-primary text-sm">
             </div>
 
             <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Kutatói jegyzetek / Megfigyelés</label>
-              <textarea id="log-notes" rows="3" placeholder="Pl. A lóbab 4 cm magasságú, a facélia finom zöld szőnyeget alkot, a merevítő pálcák mellett dúsabb a hajtás..." class="w-full px-3.5 py-2 rounded-xl border border-stone-200 focus:ring-2 focus:ring-botanic-primary text-sm"></textarea>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Kutatói tapasztalatok & Jegyzetek</label>
+              <textarea id="log-notes" rows="3" placeholder="Pl. A lóbab erőteljesen hajt, a mustár levelei sűrűn záródnak a narancssárga elválasztó pálca mellett..." class="w-full px-3.5 py-2 rounded-xl border border-stone-200 focus:ring-2 focus:ring-botanic-primary text-sm"></textarea>
             </div>
 
             <div class="flex items-center gap-3 pt-2">
@@ -558,25 +580,25 @@
           </form>
         </div>
 
-        <!-- Jobb oszlop: Napló előzmények táblázat és statisztika -->
+        <!-- Napló előzmények táblázata és export -->
         <div class="lg:col-span-7 space-y-4">
-          <div class="bg-white rounded-3xl p-6 shadow-sm border border-stone-200/90 flex flex-col h-full">
+          <div class="bg-white rounded-3xl p-6 shadow-sm border border-stone-200 flex flex-col h-full">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-stone-100 gap-3">
               <div>
-                <h3 class="font-bold font-display text-lg text-slate-800">Korábbi Megfigyelések Naplója</h3>
-                <p class="text-xs text-slate-500">Mentett bejegyzések a böngésző tárhelyén</p>
+                <h3 class="font-bold font-display text-lg text-slate-800">Terepi Megfigyelések Krónikája</h3>
+                <p class="text-xs text-slate-500">Mentett kutatói adatok a böngésződben</p>
               </div>
               <div class="flex items-center gap-2">
-                <button onclick="exportLogsToCSV()" class="px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-slate-700 text-xs font-semibold transition flex items-center gap-1.5 border border-stone-200">
-                  <i class="fa-solid fa-file-csv text-emerald-600"></i> CSV Export
+                <button onclick="exportLogsToCSV()" class="px-3.5 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-slate-700 text-xs font-semibold transition flex items-center gap-1.5 border border-stone-200">
+                  <i class="fa-solid fa-file-csv text-emerald-600"></i> CSV Letöltés
                 </button>
-                <button onclick="resetLogsToDefaults()" class="px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-slate-700 text-xs font-semibold transition flex items-center gap-1.5 border border-stone-200" title="Mintaadatok újratöltése">
-                  <i class="fa-solid fa-arrows-rotate"></i> Alaphelyzet
+                <button onclick="resetLogsToDefaults()" class="px-3.5 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-slate-700 text-xs font-semibold transition flex items-center gap-1.5 border border-stone-200" title="Gyári minta visszaállítása">
+                  <i class="fa-solid fa-rotate-left"></i> Alaphelyzet
                 </button>
               </div>
             </div>
 
-            <!-- Bejegyzések konténere -->
+            <!-- Bejegyzések listája -->
             <div id="logs-container" class="mt-4 space-y-3 max-h-[580px] overflow-y-auto pr-1">
               <!-- JS rendereli -->
             </div>
@@ -586,123 +608,123 @@
       </div>
     </section>
 
-    <!-- ============================================== -->
+    <!-- ======================================================= -->
     <!-- 3. FÜL: TAVASZI ZÖLDSÉG VETÉSTERV -->
-    <!-- ============================================== -->
+    <!-- ======================================================= -->
     <section id="spring-tab" class="tab-content hidden">
-      <div class="bg-white rounded-3xl p-6 shadow-sm border border-stone-200/90 mb-6">
+      <div class="bg-white rounded-3xl p-6 shadow-sm border border-stone-200 mb-6">
         <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
-            <span class="text-xs font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200">Vetésforgó és Talaj-előkészítés</span>
+            <span class="text-xs font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200">Zöldtrágyázás utáni Vetésforgó</span>
             <h2 class="text-xl sm:text-2xl font-bold font-display text-slate-800 mt-1">Tavaszi Zöldség Vetésterv & Növénytársítás</h2>
-            <p class="text-xs sm:text-sm text-slate-500">A takarónövények (zöldtrágya) bedolgozása után ideális tápanyagdús talaj várja a zöldségpalántákat!</p>
+            <p class="text-xs sm:text-sm text-slate-500">A feljavított, nitrogénben és szerves anyagban gazdag talajba tervezd meg a csapat tavaszi terményeit!</p>
           </div>
           <div class="flex items-center gap-2">
             <button onclick="resetSpringPlan()" class="px-3.5 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-slate-700 text-xs font-semibold transition border border-stone-200">
-              <i class="fa-solid fa-trash-can mr-1"></i> Terv Törlése
+              <i class="fa-solid fa-trash-can mr-1"></i> Terv Visszaállítása
             </button>
             <button onclick="saveSpringPlan()" class="px-4 py-2 rounded-xl bg-botanic-primary hover:bg-emerald-700 text-white text-xs font-bold transition shadow-sm">
-              <i class="fa-solid fa-floppy-disk mr-1"></i> Vetésterv Mentése
+              <i class="fa-solid fa-floppy-disk mr-1"></i> Terv Mentése
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Kétoszlopos tervező: Zöldségválasztó eszköztár + Ágyás rácsok -->
+      <!-- Kétoszlopos tervező -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        <!-- Zöldség Kínálat (Kattintással adható a parcellákhoz) -->
-        <div class="lg:col-span-4 bg-stone-50 rounded-3xl p-5 border border-stone-200/90">
-          <h3 class="font-bold font-display text-sm uppercase tracking-wider text-slate-700 mb-3 flex items-center gap-2">
-            <i class="fa-solid fa-basket-shopping text-emerald-600"></i> Telepíthető Zöldségek
+        <!-- Zöldség paletta -->
+        <div class="lg:col-span-4 bg-stone-50 rounded-3xl p-5 border border-stone-200">
+          <h3 class="font-bold font-display text-sm uppercase tracking-wider text-slate-700 mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-basket-shopping text-emerald-600"></i> Ültethető Zöldségek
           </h3>
-          <p class="text-xs text-slate-500 mb-4">Válaszd ki a zöldséget, majd kattints a kívánt ágyás "Hozzáadás" gombjára!</p>
+          <p class="text-xs text-slate-500 mb-4">Válaszd ki a kívánt fajtát, majd kattints az ágyás "Hozzáadás" gombjára!</p>
 
-          <div id="veggie-palette" class="space-y-2.5">
-            <!-- Interaktív Zöldség Csempe lista -->
+          <div id="veggie-palette" class="space-y-2">
+            <!-- JS tölti fel -->
           </div>
 
-          <!-- Növénytársítási kisokos kártya -->
+          <!-- Kerti tipp -->
           <div class="mt-6 bg-emerald-50 rounded-2xl p-4 border border-emerald-200 text-xs text-emerald-950">
             <h4 class="font-bold flex items-center gap-1.5 text-botanic-primary mb-1">
-              <i class="fa-solid fa-lightbulb"></i> Kerti Jóbarátok Szabály:
+              <i class="fa-solid fa-lightbulb"></i> Jó szomszédság elve:
             </h4>
-            <p class="leading-relaxed">A borsó és lóbab nitrogént halmozott fel a talajban, így azok helyére nitrogénigényes növényeket (pl. <strong>káposztafélék, paradicsom, cukkini</strong>) érdemes ültetni!</p>
+            <p class="leading-relaxed">Ahol előveteményként <strong>borsó vagy lóbab</strong> volt, ott a talaj természetes nitrogénnel teli, így a <strong>paradicsom, paprika és cukkini</strong> kifejezetten dúsan fog teremni!</p>
           </div>
         </div>
 
-        <!-- Ágyások Tervező Táblája -->
+        <!-- Ágyások és Parcellák Tervezője (Balról-jobbra sorrendben) -->
         <div class="lg:col-span-8 space-y-4">
           <div id="spring-beds-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Dinamikusan épül fel a 8 ágyás/parcella alapján -->
+            <!-- Dinamikus parcellakártyák -->
           </div>
         </div>
 
       </div>
     </section>
 
-    <!-- ============================================== -->
-    <!-- 4. FÜL: NÖVÉNYHATÁROZÓ & ZÖLDTRÁGYA TUDÁSTÁR -->
-    <!-- ============================================== -->
+    <!-- ======================================================= -->
+    <!-- 4. FÜL: NÖVÉNYHATÁROZÓ ÉS TUDÁSTÁR -->
+    <!-- ======================================================= -->
     <section id="plants-tab" class="tab-content hidden">
-      <div class="bg-white rounded-3xl p-6 shadow-sm border border-stone-200/90 mb-6">
-        <span class="text-xs font-bold uppercase tracking-wider text-botanic-primary">Kerti Botanikai Ismeretek</span>
-        <h2 class="text-xl sm:text-2xl font-bold font-display text-slate-800">A Vetett Takarónövények és Szuperképességeik</h2>
-        <p class="text-xs sm:text-sm text-slate-500 mt-1">Miért éppen ezeket a növényeket vetették a csapatok az őszi-téli talajvédelemhez?</p>
+      <div class="bg-white rounded-3xl p-6 shadow-sm border border-stone-200 mb-6">
+        <span class="text-xs font-bold uppercase tracking-wider text-botanic-primary">Kerti Botanika & Talajökológia</span>
+        <h2 class="text-xl sm:text-2xl font-bold font-display text-slate-800">A Vetett Takarónövények és Funkcióik</h2>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">Ismerd meg, hogyan dolgoznak a magok a talajlazításban, tápanyagmegkötésben és a beporzók támogatásában!</p>
       </div>
 
-      <!-- Kártyák Grid -->
+      <!-- Növénykártyák -->
       <div id="plant-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- JS generálja a részletes leírásokat a takarónövényekről -->
+        <!-- JS generálja -->
       </div>
     </section>
 
-    <!-- ============================================== -->
+    <!-- ======================================================= -->
     <!-- 5. FÜL: KERTI FOTÓGALÉRIA -->
-    <!-- ============================================== -->
+    <!-- ======================================================= -->
     <section id="gallery-tab" class="tab-content hidden">
-      <div class="bg-white rounded-3xl p-6 shadow-sm border border-stone-200/90 mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="bg-white rounded-3xl p-6 shadow-sm border border-stone-200 mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <span class="text-xs font-bold uppercase tracking-wider text-botanic-primary">Vizuális Kerti Krónika</span>
-          <h2 class="text-xl sm:text-2xl font-bold font-display text-slate-800">Fényképek & Növekedési Napló</h2>
-          <p class="text-xs sm:text-sm text-slate-500">Tölts fel saját fotókat a magaságyásokról, csírákról és a kerti munkákról!</p>
+          <span class="text-xs font-bold uppercase tracking-wider text-botanic-primary">Fényképes Kerti Napló</span>
+          <h2 class="text-xl sm:text-2xl font-bold font-display text-slate-800">Magaságyások és Csírák Képekben</h2>
+          <p class="text-xs sm:text-sm text-slate-500">Tölts fel fotót közvetlenül a telefonodról vagy a gépedről a növények fejlődéséről!</p>
         </div>
         <div>
-          <label class="cursor-pointer px-4 py-2.5 rounded-xl bg-botanic-primary hover:bg-emerald-700 text-white font-bold text-xs transition shadow flex items-center gap-2">
+          <label class="cursor-pointer px-4 py-2.5 rounded-xl bg-botanic-primary hover:bg-emerald-700 text-white font-bold text-xs transition shadow-sm flex items-center gap-2">
             <i class="fa-solid fa-cloud-arrow-up text-base"></i> Új Fotó Feltöltése
             <input type="file" id="photo-upload-input" accept="image/*" class="hidden" onchange="handlePhotoUpload(event)">
           </label>
         </div>
       </div>
 
-      <!-- Képgaléria Grid -->
+      <!-- Képek négyzethálója -->
       <div id="photo-gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        <!-- JS rendereli a képeket -->
+        <!-- JS generálja -->
       </div>
     </section>
 
   </main>
 
   <!-- LÁBLÉC -->
-  <footer class="bg-white border-t border-stone-200 mt-12 py-8 text-stone-500 text-xs">
+  <footer class="bg-white border-t border-stone-200 mt-12 py-7 text-stone-500 text-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
       <div class="flex items-center gap-3">
         <div class="w-8 h-8 rounded-lg bg-botanic-primary text-white flex items-center justify-center font-bold">
           <i class="fa-solid fa-leaf"></i>
         </div>
         <div>
-          <span class="font-bold text-slate-700">VegRots Iskolakerti Program</span> &copy; 2026.
-          <p class="text-[11px] text-stone-400">Interaktív ágyástérkép, kutatási monitoring & vetésterv</p>
+          <span class="font-bold text-slate-700">VegRots Iskolakerti Projekt</span> &bull; 2026.
+          <p class="text-[11px] text-stone-400">Interaktív ágyástérkép, kutatási napló és zöldség vetésterv</p>
         </div>
       </div>
       <div class="flex items-center gap-6">
         <a href="https://gergo-somody.github.io/vegrots/index.html" target="_blank" class="hover:text-botanic-primary transition font-medium">Hivatalos Projektoldal</a>
-        <button onclick="openInfoModal()" class="hover:text-botanic-primary transition font-medium">Útmutató</button>
+        <button onclick="openInfoModal()" class="hover:text-botanic-primary transition font-medium">Elrendezési Útmutató</button>
       </div>
     </div>
   </footer>
 
-  <!-- SEGÍTSÉG / INFO MODÁLIS ABLAK -->
+  <!-- SEGÍTSÉG / TÁJÉKOZTATÓ MODAL -->
   <div id="info-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-stone-200 relative animate-in fade-in duration-200">
       <button onclick="closeInfoModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 flex items-center justify-center text-sm">
@@ -713,17 +735,18 @@
         <i class="fa-solid fa-circle-info"></i>
       </div>
 
-      <h3 class="text-xl font-bold font-display text-slate-800 mb-2">Hogyan működik az Iskolakert Térkép?</h3>
+      <h3 class="text-xl font-bold font-display text-slate-800 mb-2">Az Új Ágyáselrendezés Áttekintése</h3>
       <div class="space-y-3 text-xs sm:text-sm text-slate-600 leading-relaxed">
-        <p><strong>1. Udvartérkép:</strong> A felülnézeti rajzon a fotó szerinti 3 darab ovális hullámos magaságyás, az évelő szamócás ágyás és a kis négyzet alakú ágyás látható. A narancssárga vonalak a parcellákat jelzik.</p>
-        <p><strong>2. Csapatok & Növények:</strong> Kattints bármelyik parcellára, hogy megtekintsd, melyik gyerekcsapat mit vetett bele és milyen ökológiai céllal.</p>
-        <p><strong>3. Adatfelvétel:</strong> A gyerekek terepi bejáráskor rögzíthetik a csírázási állapotot, talajnedvességet és észlelt élőlényeket.</p>
-        <p><strong>4. Tavaszi Vetésterv:</strong> A lekerülő takarónövények után megtervezhetitek a tavaszi zöldségek helyét (pl. paradicsom, répa, saláta).</p>
+        <p><strong>Bal oldal legszélén:</strong> Szamócás magaságyás függőlegesen állítva (állandó évelő növényekkel).</p>
+        <p><strong>3. ágyás (függőleges, 3 részre osztva):</strong> Felül a <em>Vitorlázó jávaiak</em>, középen a <em>Mag páncélosok</em>, alul a <em>Hangya-taxik</em>.</p>
+        <p><strong>2. ágyás (függőleges, 2 részre osztva):</strong> Felül a <em>Gémorr fúrók</em>, alul a <em>Zöld lándzsások</em>.</p>
+        <p><strong>1. ágyás:</strong> A <em>Magágyúsok</em> csapata egy egészben műveli a dús pillangós-rozs keverékkel.</p>
+        <p><strong>Jobb szélen:</strong> 5. Kis négyzet alakú ágyás a <em>Kemény magok</em> csapatával.</p>
       </div>
 
       <div class="mt-6 pt-4 border-t border-stone-100 flex justify-end">
         <button onclick="closeInfoModal()" class="px-5 py-2.5 rounded-xl bg-botanic-primary text-white font-bold text-xs hover:bg-emerald-700 transition">
-          Értem, kezdjük!
+          Rendben, áttekintettem
         </button>
       </div>
     </div>
@@ -731,143 +754,158 @@
 
   <!-- JAVASCRIPT LOGIKA -->
   <script>
-    // ==========================================
-    // 1. ÁGYÁS ÉS CSAPAT ADATBÁZIS (A leírás alapján)
-    // ==========================================
-    const BEDS_DATA = {
-      'small-square': {
-        id: 'small-square',
-        title: '5. Kis négyzet alakú ágyás',
-        shape: 'Négyzet alakú kerti fa/fémkeret',
-        team: 'Kemény magok',
-        plants: ['lóbab', 'facélia', 'rozs'],
-        description: 'Kompakt négyzetes ágyás, ahol a növények sűrű, vegyes talajtakaró mikroközösséget alkotnak.',
-        role: 'Nitrogénmegkötés (lóbab) + gyomelnyomás és szervesanyag-képzés (rozs) + talajporhanyítás és virágzás (facélia).'
-      },
-      'large-1': {
-        id: 'large-1',
-        title: '1. Nagyobb magaságyás (Teljes)',
-        shape: 'Hullámos ovális fém magaságyás',
-        team: 'Magágyúsok',
-        plants: ['rozs', 'facélia', 'borsó', 'bíborhere', 'alexandriai here'],
-        description: 'Nagy felületű magaságyás gazdag pillangósvirágú és méhlegelő fajkeverékkel.',
-        role: 'Többrétegű nitrogén-gyűjtés a gyökérbaktériumokkal (borsó, bíborhere, alexandriai here) és sűrű gyökérzetű talajvédelem (rozs).'
-      },
-      'large-2-p1': {
-        id: 'large-2-p1',
-        title: '2. Magaságyás - 1. Parcella',
-        shape: 'Hullámos ovális, északnyugati szekció',
-        team: 'Gémorr fúrók',
-        plants: ['lóbab', 'zab', 'bíborhere'],
-        description: 'A 2. magaságyás narancssárga pálcával elválasztott bal oldali szakasza.',
-        role: 'A lóbab vastag karógyökerei mélyre hatolnak, a bíborhere takarja a talajfelszínt, a zab gyorsan zöldtömeget ad.'
-      },
-      'large-2-p2': {
-        id: 'large-2-p2',
-        title: '2. Magaságyás - 2. Parcella',
-        shape: 'Hullámos ovális, délkeleti szekció',
-        team: 'Zöld lándzsások',
-        plants: ['borsó', 'baltacim', 'rozs'],
-        description: 'A 2. magaságyás jobb oldali szakasza, finom szerkezetű hüvelyesekkel és gabonával.',
-        role: 'A baltacim szárazságtűrő és értékes takarmány/méhlegelő növény, a borsóval együtt dúsítja a talajt nitrogénnel.'
-      },
-      'large-3-p1': {
-        id: 'large-3-p1',
-        title: '3. Magaságyás - 1. Parcella',
-        shape: 'Hullámos ovális, 1. harmad',
-        team: 'Vitorlázó jávaiak',
-        plants: ['zab', 'mustár', 'olajretek', 'pohánka'],
-        description: 'A 3. ágyás első parcellája. Gyors fejlődésű, keresztesvirágúakkal és pohánkával dúsított szakasz.',
-        role: 'A mustár és az olajretek mélyre fúró gyökerei lazítják a tömörödött talajt és riasztják a kártevő fonalférgeket.'
-      },
-      'large-3-p2': {
-        id: 'large-3-p2',
-        title: '3. Magaságyás - 2. Parcella',
-        shape: 'Hullámos ovális, 2. (középső) harmad',
-        team: 'Mag páncélosok',
-        plants: ['zab', 'facélia', 'mustár', 'olajretek'],
-        description: 'A középső védett zóna robusztus talajfertőtlenítő és beporzó-csalogató fajokkal.',
-        role: 'A facélia és a mustár gyönyörű virágtengert és dús gyökérmaradványt biztosít a tavaszi zöldségeknek.'
-      },
-      'large-3-p3': {
-        id: 'large-3-p3',
-        title: '3. Magaságyás - 3. Parcella',
-        shape: 'Hullámos ovális, 3. harmad',
-        team: 'Hangya-taxik',
-        plants: ['mustár', 'olajretek', 'rozs', 'pohánka'],
-        description: 'A 3. ágyás jobb oldali záró parcellája, foszfor-feltáró pohánkával és mélylazító retekkel.',
-        role: 'A pohánka remek foszformobilizáló, a rozs pedig fagyálló zöld szőnyegként védi a talajéletet egész télen.'
-      },
+    // ========================================================
+    // 1. ZÓNÁK ÉS ÁGYÁSOK ADATBÁZISA (BALRÓL JOBBRA SORREND)
+    // ========================================================
+    const ZONES_DATA = {
+      // 1. Bal szél: Szamócás
       'strawberry-bed': {
         id: 'strawberry-bed',
-        title: '4. Ágyás - Szamócás',
-        shape: 'Ovális fém magaságyás',
+        title: 'Szamócás Magaságyás (Bal szél)',
+        bedNumber: 'Szamócás',
+        position: 'Bal oldal legszélén, függőleges ovális test',
         team: 'Szamóca gondozók',
         plants: ['szamóca'],
-        description: 'Évelő gyümölcságyás édes szamócatövekkel, mulccsal fedve a gyommentességért és nedvességmegtartásért.',
-        role: 'Többéves gyümölcstermő folt, folyamatos odafigyelést és tavaszi indázást igénylő iskolakerti kedvenc.'
+        description: 'Évelő gyümölcságyás, amelyben a növények több évig teremnek.',
+        role: 'Állandó talajélet fenntartása, organikus mulcsozás és kora nyári gyümölcshozam.'
+      },
+
+      // 2. Oszlop: 3. Ágyás (Felül: Vitorlázók | Közép: Páncélosok | Alul: Hangyák)
+      'bed-3-vitorlazo': {
+        id: 'bed-3-vitorlazo',
+        title: '3. Ágyás - Felső Zóna',
+        bedNumber: '3. Ágyás (Felső harmad)',
+        position: 'Balról a 2. ágyás, felső zóna',
+        team: 'Vitorlázó jávaiak',
+        plants: ['zab', 'mustár', 'olajretek', 'pohánka'],
+        description: 'Gyors fejlődésű bio-fúró és foszfor-mobilizáló fajkeverék a felső részen.',
+        role: 'A retek és mustár karógyökerei mélyre fúrnak és lazítják a földet, a pohánka feltárja a lekötött foszfort.'
+      },
+      'bed-3-pancelos': {
+        id: 'bed-3-pancelos',
+        title: '3. Ágyás - Középső Zóna',
+        bedNumber: '3. Ágyás (Középső harmad)',
+        position: 'Balról a 2. ágyás, középső zóna',
+        team: 'Mag páncélosok',
+        plants: ['zab', 'facélia', 'mustár', 'olajretek'],
+        description: 'Erőteljes biomasszát képző, beporzó-barát és talajfertőtlenítő szekció.',
+        role: 'A facélia dús gyökérzete morzsalékossá teszi a felső talajréteget, a zab szilárd szervesanyag-vázat ad.'
+      },
+      'bed-3-hangyataxi': {
+        id: 'bed-3-hangyataxi',
+        title: '3. Ágyás - Alsó Zóna',
+        bedNumber: '3. Ágyás (Alsó harmad)',
+        position: 'Balról a 2. ágyás, alsó zóna',
+        team: 'Hangya-taxik',
+        plants: ['mustár', 'olajretek', 'rozs', 'pohánka'],
+        description: 'Fagyálló gabonával és keresztesvirágúakkal védett záró parcelszakasz.',
+        role: 'A rozs fagyálló zöld szőnyegként védi a talaj mikroflóráját a téli kimosódástól és eróziótól.'
+      },
+
+      // 3. Oszlop: 2. Ágyás (Felül: Gémorr fúrók | Alul: Zöld lándzsások)
+      'bed-2-gemorr': {
+        id: 'bed-2-gemorr',
+        title: '2. Ágyás - Felső Fél',
+        bedNumber: '2. Ágyás (Felső zóna)',
+        position: 'Középső ágyás, felső fél',
+        team: 'Gémorr fúrók',
+        plants: ['lóbab', 'zab', 'bíborhere'],
+        description: 'Erőteljes nitrogénkötő és dús szervesanyag-termelő ökológiai keverék.',
+        role: 'A lóbab vastag karógyökerei csatornákat nyitnak a talajban, miközben a bíborhere alulról teljesen befedi a földet.'
+      },
+      'bed-2-landzsas': {
+        id: 'bed-2-landzsas',
+        title: '2. Ágyás - Alsó Fél',
+        bedNumber: '2. Ágyás (Alsó zóna)',
+        position: 'Középső ágyás, alsó fél',
+        team: 'Zöld lándzsások',
+        plants: ['borsó', 'baltacim', 'rozs'],
+        description: 'Szárazságtűrő, mélyre hatoló pillangós növények és védő rozs keveréke.',
+        role: 'A baltacim gyökérgümői és a borsó gazdagítják a talaj nitrogénkészletét a tavaszi palánták számára.'
+      },
+
+      // 4. Oszlop: 1. Ágyás (Magágyúsok - 1 egész)
+      'bed-1-magagyusok': {
+        id: 'bed-1-magagyusok',
+        title: '1. Magaságyás (1 egész ágyás)',
+        bedNumber: '1. Ágyás',
+        position: 'Jobbról a 2. ágyás, teljes ovális test',
+        team: 'Magágyúsok',
+        plants: ['rozs', 'facélia', 'borsó', 'bíborhere', 'alexandriai here'],
+        description: 'Többkomponensű, szuper-diverz takarókeverék a legnagyobb egybefüggő magaságyásban.',
+        role: 'Komplex talajmegújítás: 3 különböző here- és hüvelyesfaj köt nitrogént, miközben a facélia és rozs morzsalékos szerkezetet ad.'
+      },
+
+      // 5. Oszlop: Kis Négyzet (Jobb szél)
+      'bed-square-kemenymagok': {
+        id: 'bed-square-kemenymagok',
+        title: '5. Kis Négyzet Alakú Ágyás',
+        bedNumber: '5. Kis négyzet (Jobb szél)',
+        position: 'Jobb oldali szélső szekció',
+        team: 'Kemény magok',
+        plants: ['lóbab', 'facélia', 'rozs'],
+        description: 'Kompakt négyzetes ágyás a klasszikus "három muskétás" regeneratív keverékkel.',
+        role: 'Gyomelnyomás (rozs), talajporhanyítás (facélia) és mély nitrogéntöltés (lóbab) tökéletes hármasa.'
       }
     };
 
-    // ==========================================
-    // 2. NÖVÉNYHATÁROZÓ TUDÁSBÁZIS
-    // ==========================================
+    // Növényhatározó adatbázis
     const PLANT_DATABASE = [
       {
         name: 'Facélia (Mézontófű)',
         latin: 'Phacelia tanacetifolia',
         icon: '🌸',
-        badge: 'Méhlegelő & Talajporhanyító',
+        badge: 'Méhlegelő & Finomlazító',
         color: 'bg-purple-100 text-purple-800 border-purple-200',
-        desc: 'Lila virágzatú növény, a beporzók abszolút kedvence. Finom, sűrű gyökérzete rendkívül morzsalékossá teszi a talajt. Könnyen elfagy télen, pompás természetes mulcsot képezve.'
+        desc: 'Gyönyörű lila virágú, beporzó-mágnes növény. Rendkívül dús, hajszálvékony gyökérfonata puha, morzsalékos szerkezetűvé teszi az ágyásföldet.'
       },
       {
         name: 'Lóbab',
         latin: 'Vicia faba',
         icon: '🫘',
-        badge: 'Karógyökerű Nitrogénbajnok',
+        badge: 'Nitrogénbajnok Karógyökérrel',
         color: 'bg-amber-100 text-amber-800 border-amber-200',
-        desc: 'Erőteljes szárú, vastag karógyökerű hüvelyes. Gyökérgümőiben szimbiózisban élő baktériumok megkötik a levegő nitrogénjét, amivel ingyen trágyázzák az utána vetett paradicsomot és paprikát.'
+        desc: 'Mélyre fúró karógyökerű óriás. Gyökérgümőiben megköti a légköri nitrogént, és a talaj mélyebb rétegeiből is felhozza a tápanyagokat.'
       },
       {
         name: 'Takarmányrozs',
         latin: 'Secale cereale',
         icon: '🌾',
-        badge: 'Fagyálló Gyomelnyomó',
+        badge: 'Fagyálló Téli Védőpajzs',
         color: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-        desc: 'Kiváló fagyállóságú gabonaféle. Sűrű gyökérfonata megvédi a magaságyás földjét a téli eróziótól, és olyan vegyületeket bocsát ki (allelopátia), amelyek elnyomják a gyomok csírázását.'
+        desc: 'Egész télen zöldell, gyökérzete megakadályozza a tápanyagok kimosódását, miközben természetes anyagokkal gátolja a gyomok kelését.'
       },
       {
-        name: 'Olajretek & Mustár',
-        latin: 'Raphanus sativus / Sinapis alba',
+        name: 'Mustár & Olajretek',
+        latin: 'Sinapis alba / Raphanus sativus',
         icon: '🌱',
-        badge: 'Biológiai Talajfúrók',
+        badge: 'Bio-talajfúrók & Fertőtlenítők',
         color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-        desc: 'Hatalmas, mélyre hatoló gyökereik feltörik a tömörödött talajrétegeket, természetes dréncsatornákat nyitva a levegőnek és víznek. Glükozinolát tartalmuk természetes fonálféreg-riasztó hatású.'
+        desc: 'Karószerű gyökereik feltörik az ágyás keményebb rétegeit, míg illóolajaik természetes védelmet nyújtanak a talajban rejtőző kártevők ellen.'
       },
       {
         name: 'Bíborhere & Alexandriai here',
         latin: 'Trifolium incarnatum / T. alexandrinum',
         icon: '🍀',
-        badge: 'Pillangós Talajtakarók',
+        badge: 'Pillangósvirágú Szőnyeg',
         color: 'bg-rose-100 text-rose-800 border-rose-200',
-        desc: 'Csodás bíborszínű virágot nevelő herefélék. Alacsonyan szétterülnek, megakadályozzák a talaj kiszáradását, miközben gazdagon táplálják a talajéletet szerves nitrogénvegyületekkel.'
+        desc: 'Sűrűn szétterül a földfelszínen, megvédi a talajnedvességet a párolgástól és szerves nitrogénvegyületekkel látja el a kerti mikrobákat.'
       },
       {
         name: 'Pohánka (Hajdina)',
         latin: 'Fagopyrum esculentum',
         icon: '🌿',
-        badge: 'Foszforfeltáró Mester',
+        badge: 'Foszformobilizáló Mester',
         color: 'bg-teal-100 text-teal-800 border-teal-200',
-        desc: 'Gyorsan fejlődő növény, amely képes a talajban lekötött, más növények számára hozzáférhetetlen foszfort felvenni és feldolgozhatóvá tenni az utána következő zöldségfélék számára.'
+        desc: 'Gyorsan növekvő faj, amely feloldja a kötött talajfoszfort, előkészítve a terepet a tavaszi gyökérzöldségek és a paradicsom számára.'
       },
       {
-        name: 'Mezei borsó & Baltacim',
+        name: 'Borsó & Baltacim',
         latin: 'Pisum sativum / Onobrychis viciifolia',
         icon: '🫛',
-        badge: 'Természetes Gümős Tápanyaggyár',
+        badge: 'Szárazságtűrő Tápanyaggyár',
         color: 'bg-lime-100 text-lime-800 border-lime-200',
-        desc: 'A baltacim gyökerei mélyre nyúlnak a szárazság ellen, a borsó pedig buja zöld lombozatot és nitrogéntöbbletet hagy maga után a tavaszi palántázáshoz.'
+        desc: 'A baltacim szárazságtűrő gyökérzettel bír, a borsó pedig rengeteg zöld lombozatot és nitrogént hagy a talajban lebomlás után.'
       },
       {
         name: 'Szamóca (Földieper)',
@@ -875,139 +913,129 @@
         icon: '🍓',
         badge: 'Évelő Gyümölcskincs',
         color: 'bg-red-100 text-red-800 border-red-200',
-        desc: 'Kedvelt csemege az iskolakertben. Tavasszal virágzik, nyár elején terem. Kedveli a magaságyás laza talaját és a komposzttal történő tavaszi feljavítást.'
+        desc: 'A kerti udvar édes kedvence. Kora tavasszal indul növekedésnek, indáival terjed és finom, zamatos bogyókat terem a gyerekeknek.'
       }
     ];
 
-    // ==========================================
-    // 3. TAVASZI ZÖLDSÉG PALETTA & MINTATERV
-    // ==========================================
+    // Zöldségfajták a tavaszi vetéstervhez
     const VEGGIE_OPTIONS = [
-      { id: 'paradicsom', name: 'Bokorparadicsom', icon: '🍅', color: 'bg-red-500' },
-      { id: 'paprika', name: 'Édes paprika', icon: '🫑', color: 'bg-amber-600' },
-      { id: 'retek', name: 'Hónapos retek', icon: '🟣', color: 'bg-purple-600' },
-      { id: 'salata', name: 'Fejes saláta', icon: '🥬', color: 'bg-emerald-600' },
-      { id: 'sargarepa', name: 'Sárgarépa', icon: '🥕', color: 'bg-orange-500' },
-      { id: 'hagyma', name: 'Újhagyma / Dughagyma', icon: '🧅', color: 'bg-yellow-600' },
-      { id: 'cukkini', name: 'Kompakt Cukkini', icon: '🥒', color: 'bg-green-700' },
-      { id: 'karalabe', name: 'Karalábé', icon: '🌱', color: 'bg-lime-600' },
-      { id: 'bazsalikom', name: 'Fűszer bazsalikom', icon: '🌿', color: 'bg-teal-600' }
+      { id: 'paradicsom', name: 'Bokorparadicsom', icon: '🍅' },
+      { id: 'paprika', name: 'Tölteni való paprika', icon: '🫑' },
+      { id: 'salata', name: 'Május királya saláta', icon: '🥬' },
+      { id: 'sargarepa', name: 'Korai sárgarépa', icon: '🥕' },
+      { id: 'retek', name: 'Hónapos retek', icon: '🟣' },
+      { id: 'cukkini', name: 'Kompakt Cukkini', icon: '🥒' },
+      { id: 'karalabe', name: 'Korai fehér karalábé', icon: '🌱' },
+      { id: 'hagyma', name: 'Újhagyma / Dughagyma', icon: '🧅' }
     ];
 
     let currentSelectedVeggie = VEGGIE_OPTIONS[0];
+    let activeZoneId = 'bed-1-magagyusok';
 
-    // ==========================================
-    // 4. ÁLLAPOTOK (STATE & LOCALSTORAGE)
-    // ==========================================
-    let activeBedId = 'large-1';
-    
-    // Alapértelmezett megfigyelési napló adatok
+    // Alapértelmezett napló
     const DEFAULT_LOGS = [
       {
         id: 1,
         date: '2026-10-18',
-        bedId: 'large-1',
-        bedName: '1. Magaságyás',
+        zoneId: 'bed-1-magagyusok',
+        zoneTitle: '1. Magaságyás (Magágyúsok)',
         team: 'Magágyúsok',
-        stage: 'Csírázás indult (sziklevél)',
-        moisture: 'Optimális, üde és morzsalékos',
-        insects: 'Futóbogarak a mulcs alatt',
-        notes: 'A rozs és a facélia szép egyenletesen kelt ki az őszi eső után. A bíborhere apró sziklevelei is látszanak.'
+        stage: 'Csírázás / sziklevél',
+        moisture: 'Optimális, morzsalékos üde talaj',
+        insects: 'Futóbogarak a fémperem mentén',
+        notes: 'A rozs és a borsó egyenletesen kelt a merevítő pálcák közötti zónákban.'
       },
       {
         id: 2,
         date: '2026-10-19',
-        bedId: 'large-2-p1',
-        bedName: '2. Ágyás - 1. Parcella',
+        zoneId: 'bed-2-gemorr',
+        zoneTitle: '2. Ágyás - Felső Fél (Gémorr fúrók)',
         team: 'Gémorr fúrók',
-        stage: 'Csírázás indult (sziklevél)',
-        moisture: 'Optimális, üde és morzsalékos',
-        insects: 'Földigiliszta a merevítőnél',
-        notes: 'A lóbab magvai duzzadtak, 2 tő már áttörte a talaj kérgét. A narancssárga pálcánál mértük a sortávot.'
+        stage: 'Bokrosodás / intenzív növekedés',
+        moisture: 'Optimális, morzsalékos üde talaj',
+        insects: 'Földigiliszta a narancssárga elválasztó pálcánál',
+        notes: 'A lóbab hajtásai elérték az 5 cm magasságot, a zab zöld szőnyeget alkot.'
       },
       {
         id: 3,
         date: '2026-10-20',
-        bedId: 'large-3-p3',
-        bedName: '3. Ágyás - 3. Parcella',
-        team: 'Hangya-taxik',
-        stage: 'Levélképződés / bokrosodás',
-        moisture: 'Vizes / Eső utáni nedves',
-        insects: 'Hangyák a perem fémcsíkján',
-        notes: 'A mustár rendkívül gyorsan növekszik, 3-4 lombleveles állapotban van. Az olajretek is stabilan fejlődik.'
+        zoneId: 'bed-3-vitorlazo',
+        zoneTitle: '3. Ágyás - Felső Zóna (Vitorlázók)',
+        team: 'Vitorlázó jávaiak',
+        stage: 'Bokrosodás / intenzív növekedés',
+        moisture: 'Esőáztatta / nedves talaj',
+        insects: 'Pókok a mustárlevelek között',
+        notes: 'A mustár és az olajretek hatalmas tempóban növekszik a 3. ágyás felső szakaszán.'
       }
     ];
 
-    // Alap galéria (képek helyi leírással és svg/kép placeholders)
+    // Alap fotógaléria
     const DEFAULT_PHOTOS = [
       {
         id: 1,
-        title: 'Hullámlemezes ágyások telepítése',
+        title: 'Függőleges hullámlemezes magaságyások',
         date: '2026-10-15',
         team: 'Összes csapat',
-        bedTitle: 'Kerti áttekintés',
+        zoneName: 'Kerti Áttekintés',
         url: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=700&q=80',
-        caption: 'Az antracitszürke ívelt ágyások feltöltve termőfölddel és komposzttal.'
+        caption: 'A 3 nagy ovális ágyás és a szamócás telepítése a betonkerítés előtt.'
       },
       {
         id: 2,
-        title: 'Kikelt a facélia szőnyeg',
+        title: 'Lóbab és rozs kelése',
         date: '2026-10-18',
         team: 'Kemény magok',
-        bedTitle: '5. Kis négyzet ágyás',
+        zoneName: '5. Kis négyzet ágyás',
         url: 'https://images.unsplash.com/photo-1592417817098-8f3d6910985c?auto=format&fit=crop&w=700&q=80',
-        caption: 'A csipkés zöld levelek már sűrűn takarják a talajt a kis ágyásban.'
+        caption: 'Az 5. kis ágyásban remekül indult meg a lóbab és rozs magkeverék.'
       },
       {
         id: 3,
-        title: 'Szamócatövek őszi gondozása',
+        title: 'Szamócatövek őszi tisztítása',
         date: '2026-10-19',
         team: 'Szamóca gondozók',
-        bedTitle: '4. Szamócás ágyás',
+        zoneName: 'Szamócás ágyás (Bal szél)',
         url: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=700&q=80',
-        caption: 'Gyomlálás és őszi levélritkítás a szamócasorok között.'
+        caption: 'Az indák visszavágása és a talaj előkészítése a tavaszi bogyókhoz.'
       }
     ];
 
-    // ==========================================
-    // 5. INICIALIZÁLÁS ÉS EVENTEK
-    // ==========================================
+    // ========================================================
+    // 2. BETÖLTÉS ÉS FÜLEK KEZELÉSE
+    // ========================================================
     window.onload = function() {
-      // Dátum mező inicializálása a mai napra
       const today = new Date().toISOString().split('T')[0];
       const logDateElem = document.getElementById('log-date');
       if (logDateElem) logDateElem.value = today;
 
-      // Adatok betöltése
       initLogs();
       initPhotos();
       renderSpringPlan();
       renderPlantCards();
       renderVeggiePalette();
 
-      // Első ágyás kiválasztása
-      selectBed('large-1');
-      syncTeamByBed();
+      // Elsőként az 1. ágyás (Magágyúsok) kiválasztása
+      selectZone('bed-1-magagyusok');
+      syncTeamByZoneSelect();
     };
 
-    // Fülváltó navigáció
     function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
       const activeEl = document.getElementById(tabId);
       if (activeEl) activeEl.classList.remove('hidden');
 
-      // Asztali gombok állapota
+      // Asztali gombok
       document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.classList.remove('bg-botanic-primary', 'text-white', 'shadow-sm');
         btn.classList.add('text-stone-300', 'hover:text-white', 'hover:bg-emerald-900/60');
       });
-      const currentNavBtn = document.getElementById(`nav-${tabId}`);
-      if (currentNavBtn) {
-        currentNavBtn.classList.add('bg-botanic-primary', 'text-white', 'shadow-sm');
-        currentNavBtn.classList.remove('text-stone-300', 'hover:text-white', 'hover:bg-emerald-900/60');
+      const navBtn = document.getElementById(`nav-${tabId}`);
+      if (navBtn) {
+        navBtn.classList.add('bg-botanic-primary', 'text-white', 'shadow-sm');
+        navBtn.classList.remove('text-stone-300', 'hover:text-white', 'hover:bg-emerald-900/60');
       }
 
-      // Mobil gombok állapota
+      // Mobil gombok
       document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
         if (btn.getAttribute('data-tab') === tabId) {
           btn.classList.add('bg-botanic-primary', 'text-white');
@@ -1019,43 +1047,41 @@
       });
     }
 
-    // ==========================================
-    // 6. ÁGYÁS KIVÁLASZTÁS ÉS TÉRKÉP INTERAKCIÓ
-    // ==========================================
-    function selectBed(bedId) {
-      if (!BEDS_DATA[bedId]) return;
-      activeBedId = bedId;
+    // ========================================================
+    // 3. TÉRZÓNA KIVÁLASZTÁS ÉS INFORMÁCIÓS PANEL
+    // ========================================================
+    function selectZone(zoneId) {
+      if (!ZONES_DATA[zoneId]) return;
+      activeZoneId = zoneId;
 
-      // SVG kiemelés frissítése
+      // SVG kiemelés
       document.querySelectorAll('.garden-bed-shape').forEach(el => {
-        el.classList.remove('active-bed');
+        el.classList.remove('active-zone');
       });
-      
-      const targetElement = document.querySelector(`[data-bed="${bedId}"]`);
-      if (targetElement) {
-        targetElement.classList.add('active-bed');
+      const activeSvg = document.querySelector(`[data-zone="${zoneId}"]`);
+      if (activeSvg) {
+        activeSvg.classList.add('active-zone');
       }
 
-      // Részletező kártya felépítése
-      const data = BEDS_DATA[bedId];
-      const panel = document.getElementById('bed-detail-panel');
+      // Panel tartalom összeállítása
+      const data = ZONES_DATA[zoneId];
+      const panel = document.getElementById('zone-detail-panel');
 
-      // Növény badge-ek generálása
-      const plantBadgesHtml = data.plants.map(p => {
-        return `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                  <i class="fa-solid fa-seedling text-emerald-600"></i> ${capitalizeFirstLetter(p)}
-                </span>`;
-      }).join('');
+      const badges = data.plants.map(p => `
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+          <i class="fa-solid fa-seedling text-emerald-600"></i> ${capitalizeFirstLetter(p)}
+        </span>
+      `).join('');
 
       panel.innerHTML = `
         <div class="space-y-4 animate-in fade-in duration-200">
           <div class="flex items-start justify-between border-b border-stone-100 pb-3">
             <div>
-              <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-botanic-pale text-botanic-primary border border-emerald-300/40 mb-1">
-                Kiválasztott Parcella
+              <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-botanic-pale text-botanic-primary border border-emerald-300/40 mb-1">
+                ${data.bedNumber}
               </span>
-              <h3 class="text-xl font-bold font-display text-slate-800">${data.title}</h3>
-              <p class="text-xs text-stone-500 font-medium">${data.shape}</p>
+              <h3 class="text-xl font-bold font-display text-slate-800 leading-snug">${data.title}</h3>
+              <p class="text-xs text-stone-500 font-medium">${data.position}</p>
             </div>
             <div class="text-2xl text-emerald-600 bg-emerald-50 w-11 h-11 rounded-2xl flex items-center justify-center border border-emerald-100">
               <i class="fa-solid fa-shapes"></i>
@@ -1067,11 +1093,11 @@
             <div>
               <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Felelős Gyerekcsapat</span>
               <span class="text-base font-bold text-slate-800 flex items-center gap-1.5">
-                <i class="fa-solid fa-users-gear text-botanic-primary"></i> ${data.team}
+                <i class="fa-solid fa-users text-botanic-primary"></i> ${data.team}
               </span>
             </div>
             <span class="text-xs font-bold px-2.5 py-1 rounded-xl bg-white text-emerald-800 border border-emerald-200 shadow-2xs">
-              Aktív Parcellagazda
+              Aktív Parcella
             </span>
           </div>
 
@@ -1079,117 +1105,112 @@
           <div>
             <span class="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-2">Vetett Takarónövények:</span>
             <div class="flex flex-wrap gap-1.5">
-              ${plantBadgesHtml}
+              ${badges}
             </div>
           </div>
 
-          <!-- Szerep és talajhatás -->
+          <!-- Talajhatás és ökológiai funkció -->
           <div class="bg-stone-50 p-3.5 rounded-2xl border border-stone-200/90 text-xs text-slate-600 space-y-1.5">
-            <div class="font-bold text-slate-800 flex items-center gap-1 text-xs">
-              <i class="fa-solid fa-dna text-botanic-primary"></i> Ökológiai Hatás a Talajra:
+            <div class="font-bold text-slate-800 flex items-center gap-1.5 text-xs">
+              <i class="fa-solid fa-dna text-botanic-primary"></i> Ökológiai Talajhatás:
             </div>
             <p class="leading-relaxed">${data.role}</p>
           </div>
 
-          <!-- Részletes leírás -->
+          <!-- Leírás -->
           <p class="text-xs text-slate-500 italic">${data.description}</p>
         </div>
       `;
 
-      // Űrlap szinkronizálása ha nyitva van
-      const logBedSelect = document.getElementById('log-bed');
-      if (logBedSelect) {
-        logBedSelect.value = bedId;
-        syncTeamByBed();
+      // Form mező szinkron
+      const select = document.getElementById('log-zone-select');
+      if (select) {
+        select.value = zoneId;
+        syncTeamByZoneSelect();
       }
     }
 
-    // Szűrők alkalmazása a térképen
+    // Szűrési logika
     function applyFilters() {
       const selectedTeam = document.getElementById('filter-team').value;
       const selectedPlant = document.getElementById('filter-plant').value.toLowerCase();
 
       let matchedCount = 0;
 
-      for (const [key, data] of Object.entries(BEDS_DATA)) {
-        const svgEl = document.querySelector(`[data-bed="${key}"]`);
+      for (const [key, data] of Object.entries(ZONES_DATA)) {
+        const svgEl = document.querySelector(`[data-zone="${key}"]`);
         if (!svgEl) continue;
 
-        let matchTeam = (selectedTeam === 'all' || data.team === selectedTeam);
-        let matchPlant = (selectedPlant === 'all' || data.plants.some(p => p.toLowerCase().includes(selectedPlant)));
+        const matchTeam = (selectedTeam === 'all' || data.team === selectedTeam);
+        const matchPlant = (selectedPlant === 'all' || data.plants.some(p => p.toLowerCase().includes(selectedPlant)));
 
         if (matchTeam && matchPlant) {
-          svgEl.style.opacity = '1';
-          svgEl.style.filter = 'drop-shadow(0 0 8px #22c55e)';
+          svgEl.classList.remove('dimmed-zone');
+          svgEl.classList.add('highlight-filter');
           matchedCount++;
         } else {
-          svgEl.style.opacity = '0.22';
-          svgEl.style.filter = 'grayscale(80%)';
+          svgEl.classList.add('dimmed-zone');
+          svgEl.classList.remove('highlight-filter');
         }
       }
 
-      showToast(`${matchedCount} ágyás / parcella felel meg a szűrésnek.`, 'fa-solid fa-filter');
+      showToast(`${matchedCount} ágyászóna felel meg a szűrésnek.`, 'fa-solid fa-filter');
     }
 
     function resetFilters() {
       document.getElementById('filter-team').value = 'all';
       document.getElementById('filter-plant').value = 'all';
-      for (const key of Object.keys(BEDS_DATA)) {
-        const svgEl = document.querySelector(`[data-bed="${key}"]`);
-        if (svgEl) {
-          svgEl.style.opacity = '1';
-          svgEl.style.filter = '';
-        }
-      }
+      document.querySelectorAll('.garden-bed-shape').forEach(el => {
+        el.classList.remove('dimmed-zone', 'highlight-filter');
+      });
+      selectZone(activeZoneId);
       showToast('Szűrők alaphelyzetbe állítva.', 'fa-solid fa-rotate-left');
     }
 
-    // ==========================================
-    // 7. MONITORING NAPLÓ KEZELÉSE
-    // ==========================================
-    function syncTeamByBed() {
-      const bedKey = document.getElementById('log-bed').value;
-      const teamInput = document.getElementById('log-team');
-      if (BEDS_DATA[bedKey]) {
-        teamInput.value = BEDS_DATA[bedKey].team;
+    // ========================================================
+    // 4. NAPLÓZÁS ÉS CSV EXPORT
+    // ========================================================
+    function syncTeamByZoneSelect() {
+      const zoneKey = document.getElementById('log-zone-select').value;
+      const teamInput = document.getElementById('log-team-input');
+      if (ZONES_DATA[zoneKey]) {
+        teamInput.value = ZONES_DATA[zoneKey].team;
       }
     }
 
     function initLogs() {
-      const stored = localStorage.getItem('vegrots_garden_logs');
+      const stored = localStorage.getItem('vegrots_v2_logs');
       if (!stored) {
-        localStorage.setItem('vegrots_garden_logs', JSON.stringify(DEFAULT_LOGS));
+        localStorage.setItem('vegrots_v2_logs', JSON.stringify(DEFAULT_LOGS));
       }
       renderLogs();
     }
 
     function renderLogs() {
       const container = document.getElementById('logs-container');
-      const logs = JSON.parse(localStorage.getItem('vegrots_garden_logs') || '[]');
+      const logs = JSON.parse(localStorage.getItem('vegrots_v2_logs') || '[]');
 
       if (logs.length === 0) {
         container.innerHTML = `
           <div class="text-center py-12 text-stone-400">
             <i class="fa-regular fa-clipboard text-4xl mb-2"></i>
-            <p class="text-sm">Még nincsenek feljegyzett adatok.</p>
+            <p class="text-sm">Még nem rögzítettetek megfigyelést.</p>
           </div>
         `;
         return;
       }
 
-      // Időrendben visszafelé
-      const sorted = [...logs].reverse();
-
-      container.innerHTML = sorted.map(log => `
-        <div class="bg-stone-50 hover:bg-emerald-50/30 transition p-4 rounded-2xl border border-stone-200/90 text-xs space-y-2">
+      const reversed = [...logs].reverse();
+      container.innerHTML = reversed.map(log => `
+        <div class="bg-stone-50 hover:bg-emerald-50/40 transition p-4 rounded-2xl border border-stone-200/90 text-xs space-y-2">
           <div class="flex items-center justify-between border-b border-stone-200/60 pb-2">
             <div class="flex items-center gap-2">
-              <span class="font-bold text-slate-800 text-sm">${log.bedName}</span>
+              <span class="font-bold text-slate-800 text-sm">${log.zoneTitle}</span>
               <span class="bg-white px-2 py-0.5 rounded-md border border-stone-200 font-semibold text-botanic-primary">${log.team}</span>
             </div>
             <div class="flex items-center gap-2 text-stone-500">
               <span><i class="fa-regular fa-calendar mr-1"></i>${log.date}</span>
-              <button onclick="deleteLogEntry(${log.id})" class="text-stone-400 hover:text-red-500 transition ml-2 p-1" title="Bejegyzés törlése">
+              <button onclick="deleteLogEntry(${log.id})" class="text-stone-400 hover:text-red-500 ml-2" title="Törlés">
                 <i class="fa-solid fa-trash-can"></i>
               </button>
             </div>
@@ -1202,12 +1223,12 @@
 
           ${log.insects ? `
             <div class="text-stone-600 bg-white/80 p-2 rounded-xl border border-stone-200/60">
-              <strong class="text-emerald-700"><i class="fa-solid fa-bug mr-1"></i>Észlelt élőlények:</strong> ${log.insects}
+              <strong class="text-emerald-700"><i class="fa-solid fa-bug mr-1"></i>Észlelt fajok:</strong> ${log.insects}
             </div>
           ` : ''}
 
           ${log.notes ? `
-            <p class="text-slate-700 pt-1 font-sans italic bg-white/50 p-2 rounded-xl border border-stone-100">${log.notes}</p>
+            <p class="text-slate-700 pt-1 italic bg-white/50 p-2 rounded-xl border border-stone-100">${log.notes}</p>
           ` : ''}
         </div>
       `).join('');
@@ -1215,35 +1236,35 @@
 
     function saveMonitoringEntry(e) {
       e.preventDefault();
-      const bedKey = document.getElementById('log-bed').value;
-      const bedInfo = BEDS_DATA[bedKey];
+      const zoneKey = document.getElementById('log-zone-select').value;
+      const zoneInfo = ZONES_DATA[zoneKey];
 
       const newEntry = {
         id: Date.now(),
         date: document.getElementById('log-date').value,
-        bedId: bedKey,
-        bedName: bedInfo ? bedInfo.title : 'Ismeretlen ágyás',
-        team: document.getElementById('log-team').value,
+        zoneId: zoneKey,
+        zoneTitle: zoneInfo ? zoneInfo.title : 'Ismeretlen parcella',
+        team: document.getElementById('log-team-input').value,
         stage: document.getElementById('log-stage').value,
         moisture: document.getElementById('log-moisture').value,
         insects: document.getElementById('log-insects').value.trim(),
         notes: document.getElementById('log-notes').value.trim()
       };
 
-      const logs = JSON.parse(localStorage.getItem('vegrots_garden_logs') || '[]');
+      const logs = JSON.parse(localStorage.getItem('vegrots_v2_logs') || '[]');
       logs.push(newEntry);
-      localStorage.setItem('vegrots_garden_logs', JSON.stringify(logs));
+      localStorage.setItem('vegrots_v2_logs', JSON.stringify(logs));
 
       renderLogs();
-      showToast('Új megfigyelés sikeresen elmentve!', 'fa-solid fa-circle-check');
+      showToast('Új észlelés sikeresen elmentve a naplóba!', 'fa-solid fa-circle-check');
       document.getElementById('log-insects').value = '';
       document.getElementById('log-notes').value = '';
     }
 
     function deleteLogEntry(id) {
-      let logs = JSON.parse(localStorage.getItem('vegrots_garden_logs') || '[]');
-      logs = logs.filter(item => item.id !== id);
-      localStorage.setItem('vegrots_garden_logs', JSON.stringify(logs));
+      let logs = JSON.parse(localStorage.getItem('vegrots_v2_logs') || '[]');
+      logs = logs.filter(l => l.id !== id);
+      localStorage.setItem('vegrots_v2_logs', JSON.stringify(logs));
       renderLogs();
       showToast('Bejegyzés törölve.', 'fa-solid fa-trash');
     }
@@ -1255,76 +1276,75 @@
     }
 
     function resetLogsToDefaults() {
-      localStorage.setItem('vegrots_garden_logs', JSON.stringify(DEFAULT_LOGS));
+      localStorage.setItem('vegrots_v2_logs', JSON.stringify(DEFAULT_LOGS));
       renderLogs();
-      showToast('Alapértelmezett naplóbejegyzések visszaállítva.', 'fa-solid fa-arrows-rotate');
+      showToast('Alapértelmezett bejegyzések visszaállítva.', 'fa-solid fa-rotate-left');
     }
 
     function exportLogsToCSV() {
-      const logs = JSON.parse(localStorage.getItem('vegrots_garden_logs') || '[]');
+      const logs = JSON.parse(localStorage.getItem('vegrots_v2_logs') || '[]');
       if (logs.length === 0) {
-        showToast('Nincs exportálható adat!', 'fa-solid fa-triangle-exclamation');
+        showToast('Nincs mentett adat az exportáláshoz!', 'fa-solid fa-circle-exclamation');
         return;
       }
 
-      let csv = "Dátum;Ágyás;Csapat;Állapot;Talajnedvesség;Észlelt élőlények;Megjegyzés\n";
+      let csv = "Dátum;Parcella;Csapat;Állapot;Talajnedvesség;Észlelt fajok;Jegyzet\n";
       logs.forEach(l => {
-        csv += `"${l.date}";"${l.bedName}";"${l.team}";"${l.stage}";"${l.moisture}";"${l.insects.replace(/"/g, '""')}";"${l.notes.replace(/"/g, '""')}"\n`;
+        csv += `"${l.date}";"${l.zoneTitle}";"${l.team}";"${l.stage}";"${l.moisture}";"${l.insects.replace(/"/g, '""')}";"${l.notes.replace(/"/g, '""')}"\n`;
       });
 
       const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.setAttribute("href", url);
-      link.setAttribute("download", `iskolakert_adatfelvetel_${new Date().toISOString().split('T')[0]}.csv`);
+      link.setAttribute("download", `iskolakert_monitoring_${new Date().toISOString().split('T')[0]}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      showToast('CSV fájl letöltése megkezdődött!', 'fa-solid fa-file-arrow-down');
+      showToast('CSV fájl letöltve!', 'fa-solid fa-file-arrow-down');
     }
 
-    // ==========================================
-    // 8. TAVASZI ZÖLDSÉG VETÉSTERV
-    // ==========================================
+    // ========================================================
+    // 5. TAVASZI ZÖLDSÉG VETÉSTERV
+    // ========================================================
     function renderVeggiePalette() {
-      const palette = document.getElementById('veggie-palette');
-      palette.innerHTML = VEGGIE_OPTIONS.map((veg, index) => {
-        const isSelected = veg.id === currentSelectedVeggie.id;
+      const container = document.getElementById('veggie-palette');
+      container.innerHTML = VEGGIE_OPTIONS.map(v => {
+        const isSelected = v.id === currentSelectedVeggie.id;
         return `
-          <div onclick="selectVeggieToPlant('${veg.id}')" 
-               class="cursor-pointer flex items-center justify-between p-2.5 rounded-2xl border transition-all ${isSelected ? 'bg-emerald-100 border-botanic-primary ring-2 ring-emerald-500/30' : 'bg-white border-stone-200 hover:border-emerald-300'}">
+          <div onclick="selectVeggieToPlant('${v.id}')" 
+               class="cursor-pointer flex items-center justify-between p-2.5 rounded-2xl border transition-all ${isSelected ? 'bg-emerald-100 border-botanic-primary ring-2 ring-emerald-500/20' : 'bg-white border-stone-200 hover:border-emerald-300'}">
             <div class="flex items-center gap-3">
-              <span class="text-xl w-8 h-8 rounded-xl bg-stone-100 flex items-center justify-center">${veg.icon}</span>
-              <span class="text-xs font-bold text-slate-800">${veg.name}</span>
+              <span class="text-xl w-8 h-8 rounded-xl bg-stone-100 flex items-center justify-center">${v.icon}</span>
+              <span class="text-xs font-bold text-slate-800">${v.name}</span>
             </div>
-            <span class="text-[11px] font-semibold text-slate-400">Kijelölés</span>
+            <span class="text-[11px] font-semibold text-slate-400">Kiválasztás</span>
           </div>
         `;
       }).join('');
     }
 
-    function selectVeggieToPlant(veggieId) {
-      const found = VEGGIE_OPTIONS.find(v => v.id === veggieId);
+    function selectVeggieToPlant(id) {
+      const found = VEGGIE_OPTIONS.find(item => item.id === id);
       if (found) {
         currentSelectedVeggie = found;
         renderVeggiePalette();
-        showToast(`Kijelölve: ${found.name}`, 'fa-solid fa-seedling');
+        showToast(`Kiválasztva: ${found.name}`, 'fa-solid fa-seedling');
       }
     }
 
     function getSpringPlan() {
-      const saved = localStorage.getItem('vegrots_spring_plan');
+      const saved = localStorage.getItem('vegrots_v2_plan');
       if (saved) return JSON.parse(saved);
-      // Alap javasolt terv
       return {
-        'small-square': ['paradicsom', 'bazsalikom'],
-        'large-1': ['karalabe', 'salata', 'hagyma'],
-        'large-2-p1': ['cukkini', 'sargarepa'],
-        'large-2-p2': ['retek', 'salata'],
-        'large-3-p1': ['paradicsom', 'paprika'],
-        'large-3-p2': ['karalabe', 'hagyma'],
-        'large-3-p3': ['sargarepa', 'retek'],
-        'strawberry-bed': ['szamóca']
+        'strawberry-bed': ['szamóca'],
+        'bed-3-vitorlazo': ['paradicsom', 'paprika'],
+        'bed-3-pancelos': ['karalabe', 'hagyma'],
+        'bed-3-hangyataxi': ['sargarepa', 'retek'],
+        'bed-2-gemorr': ['cukkini', 'salata'],
+        'bed-2-landzsas': ['sargarepa', 'retek'],
+        'bed-1-magagyusok': ['karalabe', 'salata', 'hagyma'],
+        'bed-square-kemenymagok': ['paradicsom', 'retek']
       };
     }
 
@@ -1332,43 +1352,42 @@
       const plan = getSpringPlan();
       const container = document.getElementById('spring-beds-container');
 
-      container.innerHTML = Object.entries(BEDS_DATA).map(([key, data]) => {
-        const plantedIds = plan[key] || [];
-        const plantedVeggies = plantedIds.map(id => {
-          const v = VEGGIE_OPTIONS.find(item => item.id === id);
+      container.innerHTML = Object.entries(ZONES_DATA).map(([key, data]) => {
+        const currentPlants = plan[key] || [];
+        const badgesHtml = currentPlants.map(pId => {
+          if (pId === 'szamóca') {
+            return `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-red-50 text-red-700 text-xs font-bold border border-red-200">
+                      🍓 Állandó Szamócatövek
+                    </span>`;
+          }
+          const v = VEGGIE_OPTIONS.find(veg => veg.id === pId);
           if (v) {
             return `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-white text-slate-800 text-xs font-bold shadow-2xs border border-stone-200">
                       ${v.icon} ${v.name}
-                      <button onclick="removeVeggieFromBed('${key}', '${v.id}')" class="text-stone-400 hover:text-red-500 ml-1">×</button>
-                    </span>`;
-          }
-          if (id === 'szamóca') {
-            return `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-red-50 text-red-700 text-xs font-bold border border-red-200">
-                      🍓 Évelő Szamóca (Állandó)
+                      <button onclick="removeVeggieFromPlan('${key}', '${v.id}')" class="text-stone-400 hover:text-red-500 ml-1">×</button>
                     </span>`;
           }
           return '';
         }).join('');
 
         return `
-          <div class="bg-white rounded-3xl p-4 sm:p-5 border border-stone-200/90 shadow-sm flex flex-col justify-between">
+          <div class="bg-white rounded-3xl p-5 border border-stone-200 shadow-sm flex flex-col justify-between">
             <div>
-              <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center justify-between mb-1.5">
                 <span class="text-[11px] font-bold uppercase tracking-wider text-botanic-primary">${data.team}</span>
-                <span class="text-[11px] text-stone-400 font-mono">#${key}</span>
+                <span class="text-[11px] text-stone-400 font-mono">${data.bedNumber}</span>
               </div>
               <h4 class="font-bold text-sm text-slate-800 mb-1">${data.title}</h4>
               <p class="text-[11px] text-stone-500 mb-3"><span class="font-semibold text-stone-600">Elővetemény:</span> ${data.plants.join(', ')}</p>
 
-              <!-- Beültetett tavaszi növények kártyái -->
-              <div class="bg-stone-50 p-2.5 rounded-2xl border border-stone-200/70 min-h-[50px] flex flex-wrap gap-1.5 items-center">
-                ${plantedVeggies.length > 0 ? plantedVeggies : '<span class="text-xs text-stone-400 italic">Még nincs tavaszi növény hozzáadva...</span>'}
+              <div class="bg-stone-50 p-2.5 rounded-2xl border border-stone-200/80 min-h-[48px] flex flex-wrap gap-1.5 items-center">
+                ${badgesHtml.length > 0 ? badgesHtml : '<span class="text-xs text-stone-400 italic">Még nincs hozzáadott zöldség...</span>'}
               </div>
             </div>
 
             <div class="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between">
-              <span class="text-[11px] text-stone-400">Kijelölt zöldség hozzáadása:</span>
-              <button onclick="addCurrentVeggieToBed('${key}')" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition flex items-center gap-1 shadow-2xs">
+              <span class="text-[11px] text-stone-400">Kijelölt zöldség berakása:</span>
+              <button onclick="addCurrentVeggieToZone('${key}')" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition flex items-center gap-1 shadow-2xs">
                 <i class="fa-solid fa-plus"></i> Hozzáadás
               </button>
             </div>
@@ -1377,90 +1396,87 @@
       }).join('');
     }
 
-    function addCurrentVeggieToBed(bedKey) {
-      if (bedKey === 'strawberry-bed') {
-        showToast('A 4. ágyásban állandó szamócatövek vannak, oda nem tervezünk vetésforgót!', 'fa-solid fa-circle-exclamation');
+    function addCurrentVeggieToZone(zoneKey) {
+      if (zoneKey === 'strawberry-bed') {
+        showToast('A szamócás ágyásba nem tehető új tavaszi zöldség!', 'fa-solid fa-circle-exclamation');
         return;
       }
       const plan = getSpringPlan();
-      if (!plan[bedKey]) plan[bedKey] = [];
-      if (!plan[bedKey].includes(currentSelectedVeggie.id)) {
-        plan[bedKey].push(currentSelectedVeggie.id);
-        localStorage.setItem('vegrots_spring_plan', JSON.stringify(plan));
+      if (!plan[zoneKey]) plan[zoneKey] = [];
+      if (!plan[zoneKey].includes(currentSelectedVeggie.id)) {
+        plan[zoneKey].push(currentSelectedVeggie.id);
+        localStorage.setItem('vegrots_v2_plan', JSON.stringify(plan));
         renderSpringPlan();
         showToast(`${currentSelectedVeggie.name} hozzáadva a tervhez!`, 'fa-solid fa-check');
       } else {
-        showToast('Ez a növény már szerepel ebben az ágyásban!', 'fa-solid fa-info');
+        showToast('Ez a zöldség már szerepel ennél a parcellánál!', 'fa-solid fa-info');
       }
     }
 
-    function removeVeggieFromBed(bedKey, veggieId) {
+    function removeVeggieFromPlan(zoneKey, veggieId) {
       const plan = getSpringPlan();
-      if (plan[bedKey]) {
-        plan[bedKey] = plan[bedKey].filter(id => id !== veggieId);
-        localStorage.setItem('vegrots_spring_plan', JSON.stringify(plan));
+      if (plan[zoneKey]) {
+        plan[zoneKey] = plan[zoneKey].filter(id => id !== veggieId);
+        localStorage.setItem('vegrots_v2_plan', JSON.stringify(plan));
         renderSpringPlan();
         showToast('Zöldség eltávolítva a parcellából.', 'fa-solid fa-trash');
       }
     }
 
     function resetSpringPlan() {
-      localStorage.removeItem('vegrots_spring_plan');
+      localStorage.removeItem('vegrots_v2_plan');
       renderSpringPlan();
-      showToast('A vetésterv törölve / visszaállítva az alapértékekre.', 'fa-solid fa-rotate-left');
+      showToast('Vetésterv visszaállítva az alapértelmezettre.', 'fa-solid fa-rotate-left');
     }
 
     function saveSpringPlan() {
-      showToast('Tavaszi vetésterv sikeresen rögzítve a memóriában!', 'fa-solid fa-floppy-disk');
+      showToast('Tavaszi vetésterv sikeresen elmentve!', 'fa-solid fa-floppy-disk');
     }
 
-    // ==========================================
-    // 9. NÖVÉNYHATÁROZÓ RENDERELÉS
-    // ==========================================
+    // ========================================================
+    // 6. NÖVÉNYHATÁROZÓ ÉS GALÉRIA
+    // ========================================================
     function renderPlantCards() {
-      const grid = document.getElementById('plant-cards-grid');
-      grid.innerHTML = PLANT_DATABASE.map(plant => `
-        <div class="bg-white rounded-3xl p-6 border border-stone-200/90 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+      const container = document.getElementById('plant-cards-grid');
+      container.innerHTML = PLANT_DATABASE.map(p => `
+        <div class="bg-white rounded-3xl p-6 border border-stone-200 shadow-sm hover:shadow-md transition flex flex-col justify-between">
           <div>
             <div class="flex items-center justify-between mb-3">
-              <span class="text-3xl">${plant.icon}</span>
-              <span class="text-[11px] font-bold px-2.5 py-1 rounded-full ${plant.color} border">
-                ${plant.badge}
+              <span class="text-3xl">${p.icon}</span>
+              <span class="text-[11px] font-bold px-2.5 py-1 rounded-full ${p.color} border">
+                ${p.badge}
               </span>
             </div>
-            <h3 class="text-lg font-bold font-display text-slate-800">${plant.name}</h3>
-            <p class="text-xs text-stone-400 italic font-mono mb-3">${plant.latin}</p>
-            <p class="text-xs text-slate-600 leading-relaxed">${plant.desc}</p>
+            <h3 class="text-lg font-bold font-display text-slate-800">${p.name}</h3>
+            <p class="text-xs text-stone-400 italic font-mono mb-3">${p.latin}</p>
+            <p class="text-xs text-slate-600 leading-relaxed">${p.desc}</p>
           </div>
           <div class="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between text-[11px] text-botanic-primary font-bold">
-            <span>Ökológiai Funkció</span>
+            <span>Ökológiai szerep</span>
             <i class="fa-solid fa-shield-halved"></i>
           </div>
         </div>
       `).join('');
     }
 
-    // ==========================================
-    // 10. KERTI FÉNYKÉP GALÉRIA
-    // ==========================================
     function initPhotos() {
-      const stored = localStorage.getItem('vegrots_garden_photos');
+      const stored = localStorage.getItem('vegrots_v2_photos');
       if (!stored) {
-        localStorage.setItem('vegrots_garden_photos', JSON.stringify(DEFAULT_PHOTOS));
+        localStorage.setItem('vegrots_v2_photos', JSON.stringify(DEFAULT_PHOTOS));
       }
       renderPhotos();
     }
 
     function renderPhotos() {
       const container = document.getElementById('photo-gallery-grid');
-      const photos = JSON.parse(localStorage.getItem('vegrots_garden_photos') || '[]');
+      const photos = JSON.parse(localStorage.getItem('vegrots_v2_photos') || '[]');
 
       container.innerHTML = photos.map(photo => `
         <div class="bg-white rounded-3xl overflow-hidden border border-stone-200 shadow-sm hover:shadow-md transition flex flex-col">
           <div class="h-48 w-full bg-stone-100 relative overflow-hidden">
-            <img src="${photo.url}" alt="${photo.title}" class="w-full h-full object-cover transition-transform duration-300 hover:scale-105" onerror="this.src='https://placehold.co/600x400/2f3542/ffffff?text=Kerti+Fot%C3%B3'">
+            <img src="${photo.url}" alt="${photo.title}" class="w-full h-full object-cover transition-transform duration-300 hover:scale-105" onerror="this.src='https://placehold.co/600x400/2f3542/ffffff?text=Kerti+K%C3%A9p'">
             <span class="absolute top-3 left-3 bg-stone-900/70 backdrop-blur text-white text-[10px] font-bold px-2.5 py-1 rounded-lg">
-              ${photo.bedTitle}
+              ${photo.zoneName}
             </span>
           </div>
           <div class="p-4 flex-1 flex flex-col justify-between">
@@ -1488,44 +1504,45 @@
 
       const reader = new FileReader();
       reader.onload = function(event) {
+        const zoneInfo = ZONES_DATA[activeZoneId];
         const newPhoto = {
           id: Date.now(),
           title: file.name.replace(/\.[^/.]+$/, ""),
           date: new Date().toISOString().split('T')[0],
-          team: BEDS_DATA[activeBedId] ? BEDS_DATA[activeBedId].team : 'Iskolakert',
-          bedTitle: BEDS_DATA[activeBedId] ? BEDS_DATA[activeBedId].title : 'Magaságyás',
+          team: zoneInfo ? zoneInfo.team : 'Iskolakerti csapat',
+          zoneName: zoneInfo ? zoneInfo.title : 'Magaságyás',
           url: event.target.result,
-          caption: 'Terepi fénykép a magaságyás állapotáról és a fejlődő növényekről.'
+          caption: 'Terepi fotó a magaságyás és a hajtások állapotáról.'
         };
 
-        const photos = JSON.parse(localStorage.getItem('vegrots_garden_photos') || '[]');
+        const photos = JSON.parse(localStorage.getItem('vegrots_v2_photos') || '[]');
         photos.unshift(newPhoto);
-        localStorage.setItem('vegrots_garden_photos', JSON.stringify(photos));
+        localStorage.setItem('vegrots_v2_photos', JSON.stringify(photos));
         renderPhotos();
-        showToast('Fénykép sikeresen feltöltve és hozzáadva a kerti albumhoz!', 'fa-solid fa-image');
+        showToast('Kerti fénykép sikeresen feltöltve!', 'fa-solid fa-image');
       };
       reader.readAsDataURL(file);
     }
 
     function deletePhoto(id) {
-      let photos = JSON.parse(localStorage.getItem('vegrots_garden_photos') || '[]');
+      let photos = JSON.parse(localStorage.getItem('vegrots_v2_photos') || '[]');
       photos = photos.filter(p => p.id !== id);
-      localStorage.setItem('vegrots_garden_photos', JSON.stringify(photos));
+      localStorage.setItem('vegrots_v2_photos', JSON.stringify(photos));
       renderPhotos();
-      showToast('Fénykép törölve.', 'fa-solid fa-trash');
+      showToast('Kép törölve.', 'fa-solid fa-trash');
     }
 
-    // ==========================================
-    // 11. GYORS MŰVELETEK & SEGÉDFUNKCIÓK
-    // ==========================================
+    // ========================================================
+    // 7. GYORSFUNKCIÓK & TOAST
+    // ========================================================
     function quickActionLog() {
       switchTab('monitoring-tab');
-      const select = document.getElementById('log-bed');
+      const select = document.getElementById('log-zone-select');
       if (select) {
-        select.value = activeBedId;
-        syncTeamByBed();
+        select.value = activeZoneId;
+        syncTeamByZoneSelect();
       }
-      showToast(`Adatlap előkészítve: ${BEDS_DATA[activeBedId].title}`, 'fa-solid fa-pen');
+      showToast(`Adatlap előkészítve: ${ZONES_DATA[activeZoneId].title}`, 'fa-solid fa-pen');
     }
 
     function quickActionPhoto() {
@@ -1537,8 +1554,7 @@
       return string.charAt(0).toUpperCase() + string.slice(1);
     }
 
-    // Toast üzenet megjelenítő
-    let toastTimeout;
+    let toastTimer;
     function showToast(message, iconClass = 'fa-solid fa-check') {
       const toast = document.getElementById('toast');
       const toastMessage = document.getElementById('toast-message');
@@ -1547,11 +1563,11 @@
       toastMessage.textContent = message;
       toastIcon.className = `${iconClass} text-emerald-400 text-lg`;
 
-      clearTimeout(toastTimeout);
+      clearTimeout(toastTimer);
       toast.classList.remove('translate-y-24', 'opacity-0');
       toast.classList.add('translate-y-0', 'opacity-100');
 
-      toastTimeout = setTimeout(() => {
+      toastTimer = setTimeout(() => {
         toast.classList.remove('translate-y-0', 'opacity-100');
         toast.classList.add('translate-y-24', 'opacity-0');
       }, 3500);
