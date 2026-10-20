@@ -1118,7 +1118,34 @@ function updateTeamBaseline() {
 }
 
 teamSelector.addEventListener('change', () => {
-  location.reload(); // Tiszta lappal indul a választott csapat
+  // Dinamikusan átváltunk a kiválasztott csapat valódi 2026-os keverékére és szabályaira
+  gameState.currentYear = 1;
+  gameState.soilHealth = 100;
+  gameState.totalYield = 0;
+  gameState.history = [];
+  gameState.currentPlan = { early: [], summer: [], winter: [] };
+
+  // Frissítjük a baseline sávot és a kezdő nitrogént
+  updateTeamBaseline();
+
+  // Reseteljük a slotokat
+  slotBoxes.forEach(box => renderSlotItems(box, box.dataset.slot));
+  checkReadiness();
+  updateTimelineRibbons();
+
+  // Frissítjük az év feliratot
+  document.getElementById('currentYearHeading').textContent = `1. Év: Tervezzétek meg az ágyást!`;
+  document.getElementById('precoverInfo').innerHTML = `Elővetemény: <strong>${baseCoverName.textContent}</strong>`;
+  
+  // Visszaállítjuk az év-lépéseket
+  document.getElementById('stepYear1').className = 'year-step active';
+  document.getElementById('stepYear2').className = 'year-step';
+  document.getElementById('stepYear3').className = 'year-step';
+
+  const entry = document.createElement('div');
+  entry.className = 'log-entry log-purple';
+  entry.innerHTML = `🚩 Átváltottatok a(z) <strong>${teamSelector.value}</strong> csapat parcellájára! Kezdő keverék és szabályok betöltve.`;
+  chronicleLog.prepend(entry);
 });
 
 // 2. KÁRTYÁK KIRAKÁSA ÉS SZŰRÉSE
@@ -1174,24 +1201,41 @@ function renderPalette() {
     });
     card.addEventListener('dragend', () => card.classList.remove('is-dragging'));
 
-    // Kattintásos gyors hozzáadás mobilon
+    // Kattintásos hozzáadás az éppen kijelölt (aktív) szezonhoz
     card.addEventListener('click', () => {
-      // Automatikus okos slot-célzás
-      if (crop.frostProof && crop.earlyOk && gameState.currentPlan.early.length === 0) {
-        addCropToSlot('early', crop.id);
-      } else if (!crop.earlyOk || crop.demand === 'heavy') {
-        addCropToSlot('summer', crop.id);
-      } else {
-        addCropToSlot('winter', crop.id);
-      }
+      addCropToSlot(activeSlot, crop.id);
     });
 
     cropPalette.appendChild(card);
   });
 }
 
-// 3. MÓDVÁLTÁS (FŐNÖVÉNY vs TAKARÓNÖVÉNY KEVERÉK)
+// 3. AKTÍV SZEZON KIJELÖLÉSE ÉS MÓDVÁLTÁS
+let activeSlot = 'early'; // Alapértelmezetten a Kora tavasz aktív
+
+function setActiveSlot(slotName) {
+  activeSlot = slotName;
+  slotBoxes.forEach(b => {
+    if (b.dataset.slot === slotName) {
+      b.style.borderColor = 'var(--green)';
+      b.style.boxShadow = '0 0 15px var(--green-glow)';
+    } else {
+      b.style.borderColor = 'var(--border)';
+      b.style.boxShadow = 'none';
+    }
+  });
+}
+
+// Kezdő aktív slot kiemelése
+setActiveSlot('early');
+
 slotBoxes.forEach(box => {
+  // Ha a dobozra kattintanak, az válik a célterületté (aktívvá)
+  box.addEventListener('click', (e) => {
+    if (!e.target.classList.contains('chip-remove') && !e.target.classList.contains('mode-btn')) {
+      setActiveSlot(box.dataset.slot);
+    }
+  });
   const modeBtns = box.querySelectorAll('.mode-btn');
   modeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1293,8 +1337,6 @@ function renderSlotItems(box, slotType) {
     const bonus = count >= 3 ? '+25 pont (Szuper-keverék!)' : (count === 2 ? '+10 pont' : (count === 1 ? 'Alap' : '0'));
     footerStatus.innerHTML = `<span>Keverék: ${count} faj</span><span style="color:var(--green); font-weight:700;">${bonus}</span>`;
   }
-}
-
   updateTimelineRibbons();
 }
 
