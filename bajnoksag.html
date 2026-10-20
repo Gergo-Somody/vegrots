@@ -440,6 +440,167 @@
     .challenge-card strong { color: #f1f5f9; font-size: 0.88rem; }
     .challenge-card p { font-size: 0.78rem; color: var(--text-muted); }
     .podium-badges { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+  
+    /* --- GYEREKBARÁT ÉVSZAK- ÉS HŐMÉRSÉKLET VIZUALIZÁCIÓ STÍLUSOK --- */
+    .season-timeline-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    }
+
+    .timeline-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .timeline-title-group h3 { font-size: 1.05rem; font-weight: 800; margin: 4px 0 2px; }
+    .timeline-title-group p { font-size: 0.8rem; color: var(--text-muted); }
+
+    .temp-legend {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .t-pill {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+    .t-frost { background: rgba(56, 189, 248, 0.15); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.3); }
+    .t-ideal { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .t-hot { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+    .annual-calendar-wrapper {
+      background: #0b1120;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow-x: auto;
+    }
+
+    .temp-chart-container {
+      width: 100%;
+      min-width: 700px;
+      height: 120px;
+      background: #090d16;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .temp-chart-container svg { width: 100%; height: 100%; display: block; }
+
+    .calendar-months-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      min-width: 700px;
+      gap: 4px;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 6px;
+    }
+    .month-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(30, 41, 59, 0.4);
+      padding: 4px 2px;
+      border-radius: 6px;
+      text-align: center;
+    }
+    .month-col .m-name { font-size: 0.72rem; font-weight: 800; color: #f1f5f9; }
+    .month-col .m-temp { font-size: 0.68rem; font-weight: 700; color: var(--text-muted); }
+
+    /* CSÍKOK / SZALAGOK */
+    .crop-ribbons-track {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 700px;
+      padding: 6px 0;
+    }
+    .track-row {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      align-items: center;
+      gap: 10px;
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 8px;
+      padding: 6px 10px;
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+    .track-label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); }
+    .track-content {
+      position: relative;
+      height: 34px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+    .track-empty-hint {
+      font-size: 0.72rem;
+      color: rgba(148, 163, 184, 0.4);
+      padding-left: 12px;
+      font-style: italic;
+    }
+
+    /* DINAMIKUS NÖVÉNY CSÍKOK */
+    .crop-ribbon {
+      position: absolute;
+      top: 3px;
+      bottom: 3px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #0f172a;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .crop-ribbon.ribbon-green { background: linear-gradient(90deg, #10b981 0%, #34d399 100%); color: #022c22; }
+    .crop-ribbon.ribbon-amber { background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%); color: #451a03; }
+    .crop-ribbon.ribbon-blue { background: linear-gradient(90deg, #38bdf8 0%, #7dd3fc 100%); color: #082f49; }
+    .crop-ribbon.ribbon-danger {
+      background: linear-gradient(90deg, #ef4444 0%, #f87171 100%) !important;
+      color: #ffffff !important;
+      animation: ribbon-pulse 1.5s infinite;
+    }
+    @keyframes ribbon-pulse {
+      0%, 100% { box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
+      50% { box-shadow: 0 0 18px rgba(239, 68, 68, 0.95); transform: scale(1.01); }
+    }
+
+    .timeline-alert-bar {
+      background: rgba(30, 41, 59, 0.5);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .timeline-alert-bar.alert-danger { background: rgba(239, 68, 68, 0.2); color: #fca5a5; font-weight: 700; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .timeline-alert-bar.alert-success { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.4); }
+
   </style>
 </head>
 <body>
@@ -525,6 +686,128 @@
       <div class="year-badge">3</div>
       <span>3. Év (2029)</span>
     </div>
+
+
+  <!-- INTERAKTÍV ÉVSZAK- ÉS HŐMÉRSÉKLETI SÁV (10 ÉVESEKNEK DIDAKTIKAI VIZUALIZÁCIÓ) -->
+  <section class="season-timeline-panel">
+    <div class="timeline-panel-header">
+      <div class="timeline-title-group">
+        <span class="badge" style="background:rgba(56,189,248,0.15); color:var(--blue);">Gyerekbarát Idővonal & Hőmérséklet Térkép</span>
+        <h3>📅 Egy Kerti Év Futószalagja (Februártól a Következő Tavaszig)</h3>
+        <p>Nézzétek a színes hőmérséklet-görbét! Látjátok, a növényetek sávja beleér-e a fagyba vagy a kánikulába?</p>
+      </div>
+      <div class="temp-legend">
+        <span class="t-pill t-frost">❄️ Fagyos (< 10°C)</span>
+        <span class="t-pill t-ideal">🌱 Kellemes (10–20°C)</span>
+        <span class="t-pill t-hot">🔥 Kánikula (20°C+)</span>
+      </div>
+    </div>
+
+    <!-- HŐMÉRSÉKLETI GÖRBE + HÓNAPOK SÁVJA -->
+    <div class="annual-calendar-wrapper">
+      
+      <!-- SVG Hőmérsékleti Görbe és Hőövezetek -->
+      <div class="temp-chart-container">
+        <svg id="tempChartSvg" viewBox="0 0 1200 130" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="tempZoneGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#ef4444" stop-opacity="0.35"/>
+              <stop offset="45%" stop-color="#10b981" stop-opacity="0.3"/>
+              <stop offset="85%" stop-color="#38bdf8" stop-opacity="0.35"/>
+            </linearGradient>
+            <linearGradient id="tempLineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#38bdf8"/>
+              <stop offset="30%" stop-color="#10b981"/>
+              <stop offset="55%" stop-color="#ef4444"/>
+              <stop offset="75%" stop-color="#f59e0b"/>
+              <stop offset="100%" stop-color="#38bdf8"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Vízszintes Segédvonalak és Hő-övezetek -->
+          <rect x="0" y="0" width="1200" height="45" fill="rgba(239, 68, 68, 0.08)"/>
+          <rect x="0" y="45" width="1200" height="45" fill="rgba(16, 185, 129, 0.08)"/>
+          <rect x="0" y="90" width="1200" height="40" fill="rgba(56, 189, 248, 0.12)"/>
+
+          <line x1="0" y1="45" x2="1200" y2="45" stroke="rgba(239,68,68,0.3)" stroke-dasharray="4,4"/>
+          <text x="12" y="38" fill="#f87171" font-size="11" font-weight="700">🔥 20°C felett (Kánikula)</text>
+
+          <line x1="0" y1="90" x2="1200" y2="90" stroke="rgba(56,189,248,0.3)" stroke-dasharray="4,4"/>
+          <text x="12" y="82" fill="#34d399" font-size="11" font-weight="700">🌱 10–20°C (Ideális növés)</text>
+          <text x="12" y="118" fill="#7dd3fc" font-size="11" font-weight="700">❄️ 10°C alatt (Fagyveszélyes zóna!)</text>
+
+          <!-- Rábapatona éves átlaghőmérsékleti görbéje Feb -> Jan -->
+          <!-- Pontok: Feb:3°C(108), Már:8°C(96), Ápr:13°C(78), Máj:18°C(55), Jún:22°C(35), Júl:25°C(20), Aug:24°C(25), Sze:18°C(55), Okt:12°C(82), Nov:6°C(100), Dec:2°C(112), Jan:1°C(115) -->
+          <path id="tempAreaPath" d="M 50,108 C 150,96 250,78 350,55 C 450,35 550,20 650,25 C 750,55 850,82 950,100 C 1050,112 1150,115 1150,130 L 50,130 Z" fill="url(#tempZoneGrad)"/>
+          <path id="tempLinePath" d="M 50,108 C 150,96 250,78 350,55 C 450,35 550,20 650,25 C 750,55 850,82 950,100 C 1050,112 1150,115 1150,115" fill="none" stroke="url(#tempLineGrad)" stroke-width="4" stroke-linecap="round"/>
+
+          <!-- Hőmérséklet pontok és címkék -->
+          <circle cx="50" cy="108" r="4" fill="#38bdf8"/>
+          <circle cx="150" cy="96" r="4" fill="#38bdf8"/>
+          <circle cx="250" cy="78" r="4" fill="#10b981"/>
+          <circle cx="350" cy="55" r="4" fill="#10b981"/>
+          <circle cx="450" cy="35" r="4" fill="#ef4444"/>
+          <circle cx="550" cy="20" r="5" fill="#ef4444"/>
+          <text x="550" y="13" fill="#ef4444" font-size="11" font-weight="800" text-anchor="middle">25°C (Júliusi csúcs!)</text>
+          <circle cx="650" cy="25" r="4" fill="#ef4444"/>
+          <circle cx="750" cy="55" r="4" fill="#10b981"/>
+          <circle cx="850" cy="82" r="4" fill="#10b981"/>
+          <circle cx="950" cy="100" r="4" fill="#38bdf8"/>
+          <circle cx="1050" cy="112" r="4" fill="#38bdf8"/>
+          <circle cx="1150" cy="115" r="4" fill="#38bdf8"/>
+        </svg>
+      </div>
+
+      <!-- 12 HÓNAPOS RÁCS -->
+      <div class="calendar-months-grid">
+        <div class="month-col" data-m="0"><span class="m-name">FEB. 15</span><span class="m-temp">3°C</span></div>
+        <div class="month-col" data-m="1"><span class="m-name">MÁRC.</span><span class="m-temp">8°C</span></div>
+        <div class="month-col" data-m="2"><span class="m-name">ÁPR.</span><span class="m-temp">13°C</span></div>
+        <div class="month-col" data-m="3"><span class="m-name">MÁJ.</span><span class="m-temp">18°C</span></div>
+        <div class="month-col" data-m="4"><span class="m-name">JÚN.</span><span class="m-temp">22°C</span></div>
+        <div class="month-col" data-m="5"><span class="m-name">JÚL.</span><span class="m-temp">25°C</span></div>
+        <div class="month-col" data-m="6"><span class="m-name">AUG.</span><span class="m-temp">24°C</span></div>
+        <div class="month-col" data-m="7"><span class="m-name">SZEP.</span><span class="m-temp">18°C</span></div>
+        <div class="month-col" data-m="8"><span class="m-name">OKT.</span><span class="m-temp">12°C</span></div>
+        <div class="month-col" data-m="9"><span class="m-name">NOV.</span><span class="m-temp">6°C</span></div>
+        <div class="month-col" data-m="10"><span class="m-name">DEC.</span><span class="m-temp">2°C</span></div>
+        <div class="month-col" data-m="11"><span class="m-name">JAN.</span><span class="m-temp">1°C</span></div>
+      </div>
+
+      <!-- DINAMIKUS NÖVÉNY-CSÍKOK / SZALAGOK SÁVJA -->
+      <div class="crop-ribbons-track" id="cropRibbonsTrack">
+        <!-- 1. Kora tavaszi sáv -->
+        <div class="track-row" id="rowEarly">
+          <div class="track-label">1. Kora tavasz:</div>
+          <div class="track-content" id="trackEarlyContent">
+            <span class="track-empty-hint">Nincs növény kiválasztva</span>
+          </div>
+        </div>
+
+        <!-- 2. Nyári főkultúra sáv -->
+        <div class="track-row" id="rowSummer">
+          <div class="track-label">2. Nyári idény:</div>
+          <div class="track-content" id="trackSummerContent">
+            <span class="track-empty-hint">Nincs növény kiválasztva</span>
+          </div>
+        </div>
+
+        <!-- 3. Téli takaró sáv -->
+        <div class="track-row" id="rowWinter">
+          <div class="track-label">3. Téli takaró:</div>
+          <div class="track-content" id="trackWinterContent">
+            <span class="track-empty-hint">Nincs növény kiválasztva</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIZUÁLIS ÜTKÖZÉS ÉS FIGYELMEZTETŐ SÁV -->
+      <div class="timeline-alert-bar" id="timelineAlertBar">
+        <span>💡 TIPP: A zöld csíkok a növények földben töltött heteit mutatják. Figyeld, hol ér véget az egyik, és hol kezdődik a másik!</span>
+      </div>
+
+    </div>
+  </section>
   </div>
 
   <!-- FŐ JÁTÉKTÉR -->
@@ -1012,6 +1295,9 @@ function renderSlotItems(box, slotType) {
   }
 }
 
+  updateTimelineRibbons();
+}
+
 function checkReadiness() {
   const earlyCount = gameState.currentPlan.early.length;
   const summerCount = gameState.currentPlan.summer.length;
@@ -1292,6 +1578,159 @@ btnDoneMaster.addEventListener('click', () => {
 // INICIALIZÁLÁS
 updateTeamBaseline();
 renderPalette();
+
+
+// --- GYEREKBARÁT IDŐVONAL & HŐMÉRSÉKLET SZALAGOK FRISSÍTÉSE ---
+function updateTimelineRibbons() {
+  const plan = gameState.currentPlan;
+  const trackEarly = document.getElementById('trackEarlyContent');
+  const trackSummer = document.getElementById('trackSummerContent');
+  const trackWinter = document.getElementById('trackWinterContent');
+  const alertBar = document.getElementById('timelineAlertBar');
+
+  trackEarly.innerHTML = '';
+  trackSummer.innerHTML = '';
+  trackWinter.innerHTML = '';
+
+  let hasConflict = false;
+  let conflictMsg = '';
+
+  // 1. KORA TAVASZI SÁV (Kezdés: Február 15 = 0%)
+  let earlyEndDay = 0;
+  if (plan.early.length === 0) {
+    trackEarly.innerHTML = '<span class="track-empty-hint">Válassz kora tavaszi növényt!</span>';
+  } else {
+    plan.early.forEach(c => {
+      const days = c.days || 60;
+      earlyEndDay = days;
+      const widthPct = Math.min(45, (days / 365) * 100);
+      const isDangerous = !c.frostProof || !c.earlyOk;
+
+      const ribbon = document.createElement('div');
+      ribbon.className = `crop-ribbon ${isDangerous ? 'ribbon-danger' : 'ribbon-blue'}`;
+      ribbon.style.left = '0%';
+      ribbon.style.width = `${Math.max(12, widthPct)}%`;
+      ribbon.innerHTML = `
+        <span>${c.icon} ${c.name} (${days} nap)</span>
+        <span>${isDangerous ? '🥶 KIFAGY!' : '❄️ Bírja a hideget'}</span>
+      `;
+      trackEarly.appendChild(ribbon);
+
+      if (isDangerous) {
+        hasConflict = true;
+        conflictMsg = `🚨 VIGYÁZAT! A(z) ${c.name} kék sávja a fagyos időszakban (február-március) van. 10°C alatt azonnal elpusztul!`;
+      }
+    });
+  }
+
+  // 2. NYÁRI FŐKULTÚRA SÁV
+  // Kezdés: Ha a kora tavaszi korán véget ér (pl. retek 35 nap = márc. végén), akkor május 15-kor (kb. 24%) kezdünk.
+  // De ha a kora tavaszi hosszú volt (pl. sárgarépa 100 nap = máj. vége/jún. eleje = kb. 28%), akkor csúszik a nyár!
+  if (plan.summer.length === 0) {
+    trackSummer.innerHTML = '<span class="track-empty-hint">Válassz nyári főkultúrát!</span>';
+  } else {
+    plan.summer.forEach(c => {
+      // Normál nyári palántázás: május 15 (~24% a 365 napból)
+      let startPct = 24.5;
+      let startDay = 90; // május közepe
+
+      if (earlyEndDay > 90) {
+        // Tavaszi répa ütközés: a nyári növény csak júniusban tud indulni!
+        startDay = earlyEndDay;
+        startPct = (startDay / 365) * 100;
+      }
+
+      const days = c.days || 90;
+      const widthPct = (days / 365) * 100;
+      const isBolting = (c.id === 'retek' || c.id === 'spenot');
+      const isTooLate = (startDay > 90 && c.days >= 110);
+
+      const ribbon = document.createElement('div');
+      ribbon.className = `crop-ribbon ${(isBolting || isTooLate) ? 'ribbon-danger' : 'ribbon-amber'}`;
+      ribbon.style.left = `${startPct}%`;
+      ribbon.style.width = `${Math.min(100 - startPct, Math.max(14, widthPct))}%`;
+
+      let statusText = '☀️ Főidényben terem';
+      if (isBolting) statusText = '🔥 HŐSOKK & FELMAGZIK!';
+      if (isTooLate) statusText = '⏳ Nem érik be őszig!';
+
+      ribbon.innerHTML = `
+        <span>${c.icon} ${c.name} (${days} nap)</span>
+        <span>${statusText}</span>
+      `;
+      trackSummer.appendChild(ribbon);
+
+      if (isBolting) {
+        hasConflict = true;
+        conflictMsg = `🚨 VIGYÁZAT! A(z) ${c.name} sávja a piros kánikula övezetbe esik (25°C). Nem nevel termést, azonnal felmagzik!`;
+      } else if (isTooLate) {
+        hasConflict = true;
+        conflictMsg = `⚠️ CSÚSZÁS! A tavaszi ágyás túl sokáig volt foglalt, a(z) ${c.name} nem fér bele a hidegek előtt!`;
+      }
+    });
+  }
+
+  // 3. TÉLI TAKARÓ SÁV (Kezdés: Szeptember 15 = kb. 58%, tart a következő tavaszig = 100%)
+  const winterBox = document.querySelector('.season-box[data-slot="winter"]');
+  const isWinterCover = winterBox && winterBox.dataset.mode === 'cover';
+
+  if (plan.winter.length === 0) {
+    trackWinter.innerHTML = '<span class="track-empty-hint">Válassz téli takarást!</span>';
+  } else {
+    if (isWinterCover) {
+      // Takarónövény keverék
+      const ribbon = document.createElement('div');
+      ribbon.className = 'crop-ribbon ribbon-green';
+      ribbon.style.left = '58%';
+      ribbon.style.width = '42%';
+
+      const names = plan.winter.map(c => c.name).join(' + ');
+      const hasPohanka = plan.winter.some(c => c.id === 'pohanka');
+
+      ribbon.innerHTML = `
+        <span>🌱 Téli takaró: ${names}</span>
+        <span>${hasPohanka ? '🍂 Pohánka elfagy!' : '🛡️ Védi a talajt tavaszig'}</span>
+      `;
+      trackWinter.appendChild(ribbon);
+
+      if (hasPohanka) {
+        conflictMsg = conflictMsg || `🍂 MEGJEGYZÉS: A pohánka az első őszi fagyban elpusztul, a többi növény viszi tovább a talajvédelmet.`;
+      }
+    } else {
+      // Téli zöldség mód
+      plan.winter.forEach(c => {
+        const isFrostDead = !c.frostProof;
+        const ribbon = document.createElement('div');
+        ribbon.className = `crop-ribbon ${isFrostDead ? 'ribbon-danger' : 'ribbon-blue'}`;
+        ribbon.style.left = '58%';
+        ribbon.style.width = '35%';
+        ribbon.innerHTML = `
+          <span>${c.icon} ${c.name}</span>
+          <span>${isFrostDead ? '🥶 KIFAGY NOVEMBERBEN!' : '❄️ Fagytűrő téli szüret'}</span>
+        `;
+        trackWinter.appendChild(ribbon);
+
+        if (isFrostDead) {
+          hasConflict = true;
+          conflictMsg = `🥶 FAGYVESZÉLY! A(z) ${c.name} fagyérzékeny, a kék téli zónában (0°C alatt) elpusztul!`;
+        }
+      });
+    }
+  }
+
+  // FIGYELMEZTETŐ SÁV FRISSÍTÉSE
+  if (hasConflict) {
+    alertBar.className = 'timeline-alert-bar alert-danger';
+    alertBar.innerHTML = conflictMsg;
+  } else if (plan.early.length > 0 && plan.summer.length > 0 && plan.winter.length > 0) {
+    alertBar.className = 'timeline-alert-bar alert-success';
+    alertBar.innerHTML = `✨ GYÖNYÖRŰ VETÉSTERV! A növények tenyészideje pontosan követi a hőmérséklet-görbét, nincs ütközés és nincs fagyveszély!`;
+  } else {
+    alertBar.className = 'timeline-alert-bar';
+    alertBar.innerHTML = `💡 TIPP: A színes szalagok mutatják a vetéstől a betakarításig tartó időt. Látjátok, hogyan követik egymást a szezonok?`;
+  }
+}
+
 </script>
 
 </body>
