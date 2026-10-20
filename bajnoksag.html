@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VegRots – 3 Éves Kerti Vetésforgó Bajnokság</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #131b2e;
+      --card-hover: #1e293b;
+      --border: rgba(148, 163, 184, 0.18);
+      --green: #10b981;
+      --green-glow: rgba(16, 185, 129, 0.25);
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --blue: #38bdf8;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+    /* FEJLÉC */
+    header {
+      background: linear-gradient(135deg, #131b2e 0%, #0b1120 100%);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .header-left h1 { font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+    .header-left p { color: var(--text-muted); font-size: 0.9rem; }
+    .badge {
+      display: inline-block;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--green);
+      font-size: 0.75rem;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .team-select-box { display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.3); padding: 8px 14px; border-radius: 10px; border: 1px solid var(--border); }
+    .team-select-box select {
+      background: transparent;
+      color: var(--green);
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border: none;
+      outline: none;
+      cursor: pointer;
+    }
+    .team-select-box select option { background: #0f172a; color: white; }
+
+    /* MŰSZERFAL & METRIKÁK */
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .stat-card span { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
+    .stat-card strong { font-size: 1.8rem; font-weight: 800; }
+    .stat-card .bar-bg { width: 100%; height: 8px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; margin-top: 4px; }
+    .stat-card .bar-fill { height: 100%; width: 100%; background: var(--green); transition: width 0.4s ease, background 0.4s ease; }
+
+    /* IDŐVONAL */
+    .timeline-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--card-bg);
+      padding: 14px 24px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      gap: 12px;
+    }
+    .year-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      opacity: 0.5;
+      transition: all 0.3s;
+    }
+    .year-step.active { color: var(--text); opacity: 1; transform: scale(1.05); }
+    .year-step.completed { color: var(--green); opacity: 0.9; }
+    .year-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+    }
+    .year-step.active .year-badge { background: var(--green); color: #052e16; }
+    .year-step.completed .year-badge { background: rgba(16,185,129,0.2); color: var(--green); }
+
+    /* FŐ JÁTÉKTÉR */
+    .game-arena {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 960px) { .game-arena { grid-template-columns: 1fr; } }
+
+    /* KÁRTYATÁR */
+    .palette-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .palette-box h3 { font-size: 1rem; font-weight: 700; display: flex; align-items: center; justify-content: space-between; }
+    .cards-stack { display: flex; flex-direction: column; gap: 8px; max-height: 520px; overflow-y: auto; padding-right: 4px; }
+    .cards-stack::-webkit-scrollbar { width: 5px; }
+    .cards-stack::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .crop-card {
+      background: #1a2438;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: grab;
+      user-select: none;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .crop-card:hover { transform: translateY(-2px); border-color: var(--green); background: var(--card-hover); }
+    .crop-card:active { cursor: grabbing; }
+    .crop-card.is-dragging { opacity: 0.35; transform: scale(0.95); }
+    .crop-icon { font-size: 1.8rem; line-height: 1; }
+    .crop-body { display: flex; flex-direction: column; flex: 1; }
+    .crop-title { font-weight: 700; font-size: 0.9rem; }
+    .crop-meta { font-size: 0.75rem; color: var(--text-muted); display: flex; gap: 6px; margin-top: 2px; }
+    .tag { padding: 1px 6px; border-radius: 4px; font-weight: 600; font-size: 0.7rem; }
+    .tag-heavy { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    .tag-giver { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .tag-light { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+    .tag-cover { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+
+    /* ÁGYÁS TERVEZŐ ZÓNA */
+    .planner-zone {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .planner-header { display: flex; justify-content: space-between; align-items: center; }
+    .season-slots { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 600px) { .season-slots { grid-template-columns: 1fr; } }
+
+    .season-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: border-color 0.2s, background 0.2s;
+      min-height: 160px;
+    }
+    .season-card.drag-over { border-color: var(--green); background: var(--green-glow); }
+    .season-card-header { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); }
+    .slot-content { flex: 1; display: flex; align-items: center; justify-content: center; }
+    .slot-placeholder { color: var(--text-muted); font-size: 0.85rem; text-align: center; }
+
+    /* DÖNTÉS & VISSZAJELZÉS GOMB */
+    .actions-bar { display: flex; gap: 12px; align-items: center; justify-content: flex-end; margin-top: 8px; }
+    .btn {
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: 0.95rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary { background: var(--green); color: #022c22; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 14px var(--green-glow); }
+    .btn-primary:disabled { background: #334155; color: #64748b; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-secondary { background: #1e293b; color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: #334155; }
+
+    /* KRÓNIKA / NAPLÓ */
+    .chronicle {
+      background: #0b1120;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 0.85rem;
+      max-height: 140px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .log-entry { padding: 4px 8px; border-radius: 6px; }
+    .log-success { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    .log-danger { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+    .log-info { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+
+    /* DÖNTŐ MODAL */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
+      display: none; align-items: center; justify-content: center; z-index: 999; padding: 20px;
+    }
+    .modal-box {
+      background: var(--card-bg);
+      border: 2px solid var(--green);
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 550px;
+      width: 100%;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    }
+    .modal-box h2 { font-size: 1.8rem; color: var(--green); }
+    .podium-badges { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin: 10px 0; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  
+  <!-- FEJLÉC -->
+  <header>
+    <div class="header-left">
+      <span class="badge">VegRots Oktatói Modul • microbes4athu</span>
+      <h1>🌱 3 Éves Kerti Vetésforgó Bajnokság</h1>
+      <p>Tervezzétek meg az ágyás 3 évét! Figyeljetek a fagyra, a kártevőkre és a talajéletre!</p>
+    </div>
+
+    <div class="team-select-box">
+      <span>Csapat:</span>
+      <select id="teamSelector">
+        <option value="Magágyúsok">1. Ágyás – Magágyúsok</option>
+        <option value="Gémorr fúrók">2. Ágyás Felül – Gémorr fúrók</option>
+        <option value="Zöld lándzsások">2. Ágyás Alul – Zöld lándzsások</option>
+        <option value="Vitorlázó jávaiak">3. Ágyás Felül – Vitorlázó jávaiak</option>
+        <option value="Mag páncélosok">3. Ágyás Közép – Mag páncélosok</option>
+        <option value="Hangya-taxik">3. Ágyás Alul – Hangya-taxik</option>
+        <option value="Kemény magok">Kis Négyzet – Kemény magok</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- MŰSZERFAL -->
+  <div class="dashboard">
+    <div class="stat-card">
+      <span>TALAJ-MIKROBIOM ÉLET</span>
+      <strong id="valSoil">100 pont</strong>
+      <div class="bar-bg"><div class="bar-fill" id="barSoil" style="width: 100%;"></div></div>
+    </div>
+    <div class="stat-card">
+      <span>ÖSSZESÍTETT TERMÉSHOZAM</span>
+      <strong id="valYield" style="color: var(--amber);">0 kosár</strong>
+      <div class="bar-bg"><div class="bar-fill" id="barYield" style="width: 0%; background: var(--amber);"></div></div>
+    </div>
+    <div class="stat-card">
+      <span>TALAJ NITROGÉNKÉSZLET</span>
+      <strong id="valNitrogen" style="color: var(--blue);">+3 N (Gazdag)</strong>
+      <div class="bar-bg"><div class="bar-fill" id="barNitrogen" style="width: 80%; background: var(--blue);"></div></div>
+    </div>
+    <div class="stat-card">
+      <span>BAJNOKI ÖSSZPONTSZÁM</span>
+      <strong id="valTotalScore" style="color: var(--green);">100 pont</strong>
+      <span style="font-size:0.75rem;">Talajélet + Betakarított termés</span>
+    </div>
+  </div>
+
+  <!-- IDŐVONAL -->
+  <div class="timeline-bar">
+    <div class="year-step active" id="stepYear1">
+      <div class="year-badge">1</div>
+      <span>1. Év (2026/27)</span>
+    </div>
+    <div style="flex:1; height:2px; background:var(--border);"></div>
+    <div class="year-step" id="stepYear2">
+      <div class="year-badge">2</div>
+      <span>2. Év (2027/28)</span>
+    </div>
+    <div style="flex:1; height:2px; background:var(--border);"></div>
+    <div class="year-step" id="stepYear3">
+      <div class="year-badge">3</div>
+      <span>3. Év (2028/29)</span>
+    </div>
+  </div>
+
+  <!-- FŐ JÁTÉKTÉR -->
+  <div class="game-arena">
+    
+    <!-- BAL OLDAL: NÖVÉNYTÁR -->
+    <div class="palette-box">
+      <h3>
+        <span>Mag- és Palántatár</span>
+        <span style="font-size: 0.75rem; color: var(--green);">Húzd az ágyásba!</span>
+      </h3>
+      <div class="cards-stack" id="cropPalette">
+        <!-- JS tölti fel -->
+      </div>
+    </div>
+
+    <!-- JOBB OLDAL: AKTUÁLIS ÉVI TERVEZŐ -->
+    <div class="planner-zone">
+      <div class="planner-header">
+        <div>
+          <h2 id="currentYearHeading">1. Év: Tervezzétek meg az ágyást!</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem;" id="precoverInfo">
+            Elővetemény: <strong>7 fajtás őszi takarónövény keverék</strong> (a tegnapi vetésből)
+          </p>
+        </div>
+        <button class="btn btn-secondary" id="btnResetSlot" title="Zónák kiürítése">🔄 Törlés</button>
+      </div>
+
+      <div class="season-slots">
+        <!-- Tavaszi / Nyári Slot -->
+        <div class="season-card" id="springSlot" data-season="spring">
+          <div class="season-card-header">
+            <span>☀️ TAVASZ / NYÁR (Április–Augusztus)</span>
+            <small>Főkultúra / Zöldség</small>
+          </div>
+          <div class="slot-content">
+            <div class="slot-placeholder">Húzz ide egy zöldséget vagy főkultúrát!</div>
+          </div>
+        </div>
+
+        <!-- Őszi / Téli Slot -->
+        <div class="season-card" id="winterSlot" data-season="winter">
+          <div class="season-card-header">
+            <span>❄️ ŐSZ / TÉL (Szeptember–Február)</span>
+            <small>Takarónövény / Mulcs</small>
+          </div>
+          <div class="slot-content">
+            <div class="slot-placeholder">Húzz ide egy téli takarónövényt!</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Eseménynapló -->
+      <div class="chronicle" id="chronicleLog">
+        <div class="log-entry log-info">📌 A verseny elindult! Válasszatok tavaszi terményt és téli takarást!</div>
+      </div>
+
+      <!-- Lépés gomb -->
+      <div class="actions-bar">
+        <button class="btn btn-primary" id="btnCommitYear" disabled>
+          ✅ Év Lezárása & Szimuláció Futtatása ➔
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- VÉGSŐ KIÉRTÉKELŐ MODAL -->
+<div class="modal-overlay" id="endGameModal">
+  <div class="modal-box">
+    <span style="font-size:3rem;">🏆</span>
+    <h2 id="modalTeamName">Csapat Neve</h2>
+    <p>Gratulálunk! Sikeresen végigvittétek a 3 éves regeneratív vetésforgót Rábapatonán!</p>
+    
+    <div style="background:#090d16; padding:16px; border-radius:12px; margin: 10px 0;">
+      <div style="font-size:0.9rem; color:var(--text-muted);">Végső Talajélet: <strong id="modalSoil" style="color:var(--green);">0</strong></div>
+      <div style="font-size:0.9rem; color:var(--text-muted);">Betakarított termény: <strong id="modalYield" style="color:var(--amber);">0</strong></div>
+      <div style="font-size:1.4rem; font-weight:800; margin-top:8px;">Összpontszám: <span id="modalTotal" style="color:var(--green);">0</span></div>
+    </div>
+
+    <div class="podium-badges" id="modalAwards">
+      <!-- Kiosztott díjak -->
+    </div>
+
+    <button class="btn btn-primary" onclick="location.reload()" style="justify-content:center;">Új Verseny Indítása</button>
+  </div>
+</div>
+
+<script>
+// NÖVÉNYADATBÁZIS
+const CROPS = [
+  { id: 'paradicsom', name: 'Paradicsom', icon: '🍅', family: 'solanaceae', demand: 'heavy', cost: 3, frostRisk: true, type: 'crop', yield: 45, desc: 'Nagyétkű (-3 N), fagyérzékeny (május)' },
+  { id: 'paprika',    name: 'Paprika',    icon: '🫑', family: 'solanaceae', demand: 'heavy', cost: 3, frostRisk: true, type: 'crop', yield: 40, desc: 'Nagyétkű (-3 N), melegigényes' },
+  { id: 'cukkini',    name: 'Cukkini',    icon: '🥒', family: 'cucurbitaceae', demand: 'heavy', cost: 3, frostRisk: true, type: 'crop', yield: 50, desc: 'Óriási étkű (-3 N), sok vizet kér' },
+  { id: 'borso',      name: 'Zöldborsó',  icon: '🌱', family: 'fabaceae', demand: 'giver', cost: -2, frostRisk: false, type: 'crop', yield: 25, desc: 'Nitrogéngyár (+2 N), kora tavaszi' },
+  { id: 'repa',       name: 'Sárgarépa',  icon: '🥕', family: 'apiaceae', demand: 'medium', cost: 1, frostRisk: false, type: 'crop', yield: 35, desc: 'Közepes étkű (-1 N), lazítja a mélyréteget' },
+  { id: 'hagyma',     name: 'Dughagyma',  icon: '🧅', family: 'amaryllidaceae', demand: 'light', cost: 1, frostRisk: false, type: 'crop', yield: 25, desc: 'Védőnövény (-1 N), elűzi a répalegyet' },
+  { id: 'rozs',       name: 'Őszi rozs',  icon: '🌾', family: 'poaceae', demand: 'cover', cost: -1, frostKill: false, type: 'cover', soilBonus: 25, desc: 'Áttelelő gyökérzet, véd az eróziótól' },
+  { id: 'facelia',    name: 'Facélia',    icon: '🌸', family: 'boraginaceae', demand: 'cover', cost: 0, frostKill: true,  type: 'cover', soilBonus: 20, desc: 'Kifagyó bio-mulcs, beporzó-mágnes' },
+  { id: 'biborhere',  name: 'Bíborhere',  icon: '☘️', family: 'fabaceae', demand: 'cover', cost: -2, frostKill: false, type: 'cover', soilBonus: 30, desc: 'Nitrogénkötő takaró, gazdag talaj' },
+  { id: 'ures',       name: 'Csupasz föld',icon: '🟫', family: 'none', demand: 'none', cost: 0, frostKill: false, type: 'cover', soilBonus: -30, desc: 'Hiba! Kiszárad, erózió és gyomosodás' }
+];
+
+// JÁTÉK ÁLLAPOT
+let gameState = {
+  currentYear: 1,
+  soilHealth: 100,
+  totalYield: 0,
+  nitrogen: 3, // Kezdő nitrogén a tegnapi takarónövényekből
+  history: [], // [{ year: 1, spring: id, winter: id }]
+  selectedSpring: null,
+  selectedWinter: null
+};
+
+// ELEMEK
+const cropPalette = document.getElementById('cropPalette');
+const springSlot = document.getElementById('springSlot');
+const winterSlot = document.getElementById('winterSlot');
+const btnCommit = document.getElementById('btnCommitYear');
+const btnReset = document.getElementById('btnResetSlot');
+const chronicleLog = document.getElementById('chronicleLog');
+const teamSelector = document.getElementById('teamSelector');
+
+// KÁRTYÁK GENERALÁLÁSA
+function renderPalette() {
+  cropPalette.innerHTML = '';
+  CROPS.forEach(crop => {
+    const card = document.createElement('div');
+    card.className = 'crop-card';
+    card.draggable = true;
+    card.dataset.id = crop.id;
+
+    let tagClass = 'tag-light';
+    let tagText = 'Közepes étkű';
+    if (crop.demand === 'heavy') { tagClass = 'tag-heavy'; tagText = 'Nagyétkű'; }
+    if (crop.demand === 'giver') { tagClass = 'tag-giver'; tagText = 'Nitrogéngyár'; }
+    if (crop.demand === 'cover') { tagClass = 'tag-cover'; tagText = 'Takarónövény'; }
+    if (crop.id === 'ures') { tagClass = 'tag-heavy'; tagText = 'Veszélyes'; }
+
+    card.innerHTML = `
+      <div class="crop-icon">${crop.icon}</div>
+      <div class="crop-body">
+        <div class="crop-title">${crop.name}</div>
+        <div class="crop-meta">
+          <span class="tag ${tagClass}">${tagText}</span>
+          <span>${crop.family}</span>
+        </div>
+      </div>
+    `;
+
+    // Drag Start / End
+    card.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', crop.id);
+      card.classList.add('is-dragging');
+    });
+    card.addEventListener('dragend', () => card.classList.remove('is-dragging'));
+
+    // Kattintásos választás mobilon / tableten
+    card.addEventListener('click', () => {
+      if (crop.type === 'crop' || crop.demand === 'giver') {
+        setCropToSlot('spring', crop.id);
+      } else {
+        setCropToSlot('winter', crop.id);
+      }
+    });
+
+    cropPalette.appendChild(card);
+  });
+}
+
+// DRAG & DROP ZÓNÁK KEZELÉSE
+[springSlot, winterSlot].forEach(slot => {
+  slot.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    slot.classList.add('drag-over');
+  });
+  slot.addEventListener('dragleave', () => slot.classList.remove('drag-over'));
+  slot.addEventListener('drop', (e) => {
+    e.preventDefault();
+    slot.classList.remove('drag-over');
+    const cropId = e.dataTransfer.getData('text/plain');
+    const season = slot.dataset.season;
+    setCropToSlot(season, cropId);
+  });
+});
+
+function setCropToSlot(season, cropId) {
+  const crop = CROPS.find(c => c.id === cropId);
+  if (!crop) return;
+
+  if (season === 'spring') {
+    gameState.selectedSpring = crop;
+    renderSlotContent(springSlot, crop);
+  } else {
+    gameState.selectedWinter = crop;
+    renderSlotContent(winterSlot, crop);
+  }
+
+  checkCommitReadiness();
+}
+
+function renderSlotContent(slotElement, crop) {
+  const content = slotElement.querySelector('.slot-content');
+  content.innerHTML = `
+    <div class="crop-card" style="width:100%; cursor:pointer;" title="Kattints az eltávolításhoz">
+      <div class="crop-icon">${crop.icon}</div>
+      <div class="crop-body">
+        <div class="crop-title">${crop.name}</div>
+        <div class="crop-meta">${crop.desc}</div>
+      </div>
+      <span style="color:var(--red); font-size:1.1rem;">✖</span>
+    </div>
+  `;
+
+  content.querySelector('.crop-card').addEventListener('click', () => {
+    if (slotElement.dataset.season === 'spring') gameState.selectedSpring = null;
+    else gameState.selectedWinter = null;
+    content.innerHTML = `<div class="slot-placeholder">Húzz ide egy lapkát!</div>`;
+    checkCommitReadiness();
+  });
+}
+
+function checkCommitReadiness() {
+  btnCommit.disabled = !(gameState.selectedSpring && gameState.selectedWinter);
+}
+
+btnReset.addEventListener('click', () => {
+  gameState.selectedSpring = null;
+  gameState.selectedWinter = null;
+  springSlot.querySelector('.slot-content').innerHTML = `<div class="slot-placeholder">Húzz ide egy zöldséget vagy főkultúrát!</div>`;
+  winterSlot.querySelector('.slot-content').innerHTML = `<div class="slot-placeholder">Húzz ide egy téli takarónövényt!</div>`;
+  checkCommitReadiness();
+});
+
+// ÉV SZIMULÁLÁSA ÉS PONTOZÁS
+btnCommit.addEventListener('click', () => {
+  if (!gameState.selectedSpring || !gameState.selectedWinter) return;
+
+  const spring = gameState.selectedSpring;
+  const winter = gameState.selectedWinter;
+  const year = gameState.currentYear;
+  let logs = [];
+
+  // 1. KÁRTEVŐ SZABÁLY (Család-ismétlődés)
+  let pestAttack = false;
+  if (gameState.history.length > 0) {
+    const prevSpring = CROPS.find(c => c.id === gameState.history[gameState.history.length - 1].spring);
+    if (prevSpring && prevSpring.family === spring.family && spring.family !== 'none') {
+      pestAttack = true;
+      gameState.soilHealth -= 25;
+      logs.push({ type: 'danger', text: `🚨 KÁRTEVŐ CSAPDA! Két egymást követő évben volt ${spring.family} növény. Felszaporodtak a talajkártevők (-25 pont)!` });
+    }
+  }
+
+  // 2. TÁPANYAGMÉRLEG & NITROGÉN
+  gameState.nitrogen -= spring.cost;
+  if (gameState.nitrogen < 0) {
+    gameState.soilHealth -= 15;
+    const yieldGain = Math.round(spring.yield * 0.4);
+    gameState.totalYield += yieldGain;
+    logs.push({ type: 'danger', text: `⚠️ Kimerült a talaj nitrogénkészlete! A(z) ${spring.name} alig termett (+${yieldGain} kosár, -15 talajpont).` });
+  } else {
+    gameState.totalYield += spring.yield;
+    logs.push({ type: 'success', text: `🧺 Bőséges szüret! A(z) ${spring.name} pompásan termett (+${spring.yield} kosár termés).` });
+  }
+
+  // 3. TÉLI TAKARÁS HATÁSA
+  if (winter.id === 'ures') {
+    gameState.soilHealth -= 30;
+    gameState.nitrogen = Math.max(0, gameState.nitrogen - 2);
+    logs.push({ type: 'danger', text: `💨 Csupaszon hagyott talaj télen! A szél és fagy tönkretette a mikrobiomot (-30 talajpont).` });
+  } else {
+    gameState.soilHealth += winter.soilBonus;
+    gameState.nitrogen += (winter.cost * -1); // Pillangós tölt
+    if (winter.frostKill) {
+      logs.push({ type: 'info', text: `❄️ A(z) ${winter.name} télen elfagyott, tavaszra puha, gazdag bio-mulcsot képezett (+${winter.soilBonus} pont).` });
+    } else {
+      logs.push({ type: 'success', text: `🌱 A(z) ${winter.name} áttelelt, élő gyökérzettel védte a talajéletet a tavaszig (+${winter.soilBonus} pont).` });
+    }
+  }
+
+  // Korlátok
+  gameState.soilHealth = Math.max(10, Math.min(150, gameState.soilHealth));
+  gameState.nitrogen = Math.max(0, Math.min(6, gameState.nitrogen));
+
+  // Történet mentése
+  gameState.history.push({ year: year, spring: spring.id, winter: winter.id });
+  
+  // UI Naplózás
+  logs.forEach(l => {
+    const d = document.createElement('div');
+    d.className = `log-entry log-${l.type}`;
+    d.textContent = `[${year}. Év] ${l.text}`;
+    chronicleLog.prepend(d);
+  });
+
+  updateDashboard();
+
+  // ÉV LÉPTETÉS
+  if (gameState.currentYear < 3) {
+    document.getElementById(`stepYear${gameState.currentYear}`).classList.remove('active');
+    document.getElementById(`stepYear${gameState.currentYear}`).classList.add('completed');
+    gameState.currentYear++;
+    document.getElementById(`stepYear${gameState.currentYear}`).classList.add('active');
+    
+    document.getElementById('currentYearHeading').textContent = `${gameState.currentYear}. Év: Tervezzétek a következő kört!`;
+    document.getElementById('precoverInfo').innerHTML = `Előző kultúra: <strong>${spring.name}</strong> ➔ Téli takaró: <strong>${winter.name}</strong>`;
+    
+    btnReset.click();
+  } else {
+    // 3. ÉV VÉGE
+    document.getElementById(`stepYear3`).classList.remove('active');
+    document.getElementById(`stepYear3`).classList.add('completed');
+    showGameOver();
+  }
+});
+
+function updateDashboard() {
+  document.getElementById('valSoil').textContent = `${gameState.soilHealth} pont`;
+  document.getElementById('barSoil').style.width = `${Math.min(100, (gameState.soilHealth / 150) * 100)}%`;
+
+  document.getElementById('valYield').textContent = `${gameState.totalYield} kosár`;
+  document.getElementById('barYield').style.width = `${Math.min(100, (gameState.totalYield / 140) * 100)}%`;
+
+  const nLabels = ['0 (Kimerült)', '+1 (Kevés)', '+2 (Megfelelő)', '+3 (Optimális)', '+4 (Gazdag)', '+5 (Kiváló)', '+6 (Dús)'];
+  document.getElementById('valNitrogen').textContent = nLabels[gameState.nitrogen] || `+${gameState.nitrogen} N`;
+  document.getElementById('barNitrogen').style.width = `${(gameState.nitrogen / 6) * 100}%`;
+
+  const total = gameState.soilHealth + gameState.totalYield;
+  document.getElementById('valTotalScore').textContent = `${total} pont`;
+}
+
+function showGameOver() {
+  const modal = document.getElementById('endGameModal');
+  const team = teamSelector.value;
+  const total = gameState.soilHealth + gameState.totalYield;
+
+  document.getElementById('modalTeamName').textContent = `${team} csapata`;
+  document.getElementById('modalSoil').textContent = `${gameState.soilHealth} pont`;
+  document.getElementById('modalYield').textContent = `${gameState.totalYield} kosár`;
+  document.getElementById('modalTotal').textContent = `${total} pont`;
+
+  const awardsBox = document.getElementById('modalAwards');
+  awardsBox.innerHTML = '';
+
+  if (gameState.soilHealth >= 110) {
+    awardsBox.innerHTML += `<div class="badge" style="background:#065f46; color:#34d399; font-size:0.9rem; padding:8px 14px;">🏅 Arany Gomba Talajdoktor Díj</div>`;
+  }
+  if (gameState.totalYield >= 90) {
+    awardsBox.innerHTML += `<div class="badge" style="background:#78350f; color:#fde68a; font-size:0.9rem; padding:8px 14px;">🧺 Bőségszaru Terméskirály Díj</div>`;
+  }
+  if (!gameState.history.some(h => h.winter === 'ures')) {
+    awardsBox.innerHTML += `<div class="badge" style="background:#1e3a8a; color:#93c5fd; font-size:0.9rem; padding:8px 14px;">🛡️ 100% Talajvédő Bajnok</div>`;
+  }
+
+  modal.style.display = 'flex';
+}
+
+// INICIALIZÁLÁS
+renderPalette();
+updateDashboard();
+</script>
+
+</body>
+</html>
