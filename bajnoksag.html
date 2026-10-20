@@ -1269,6 +1269,7 @@ const BED_NEIGHBORS = {
 };
 
 // ÉV MENTÉSE AZ APPS SCRIPTBE (POST)
+// ÉV MENTÉSE AZ APPS SCRIPTBE (Hibabiztos POST)
 async function syncYearToSpreadsheet() {
   const currentTeam = teamSelector.value;
   const payload = {
@@ -1280,6 +1281,22 @@ async function syncYearToSpreadsheet() {
     yield: gameState.totalYield,
     soil: gameState.soilHealth
   };
+
+  try {
+    // text/plain küldése kötelező, hogy az Apps Script átengedje és a postData megmaradjon!
+    const response = await fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+      body: JSON.stringify(payload)
+    });
+    
+    console.log("✅ Sikeres kérés elküldve az Apps Scriptnek!");
+  } catch (err) {
+    console.error("❌ Hiba az adatok küldésekor:", err);
+  }
+}
 
   try {
     await fetch(APPS_SCRIPT_URL, {
