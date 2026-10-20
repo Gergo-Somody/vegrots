@@ -601,6 +601,95 @@
     .timeline-alert-bar.alert-danger { background: rgba(239, 68, 68, 0.2); color: #fca5a5; font-weight: 700; border: 1px solid rgba(239, 68, 68, 0.4); }
     .timeline-alert-bar.alert-success { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.4); }
 
+  
+    /* --- VÉGSŐ KIÉRTÉKELŐ ÉS EXPORT MODAL STÍLUSOK --- */
+    .modal-box.summary-theme {
+      max-width: 680px;
+      max-height: 92vh;
+      overflow-y: auto;
+      text-align: left;
+      padding: 22px 26px;
+      gap: 12px;
+    }
+    .modal-box.summary-theme::-webkit-scrollbar { width: 6px; }
+    .modal-box.summary-theme::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .final-timeline-wrapper {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .final-history-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .history-year-row {
+      background: #090d16;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 8px 12px;
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      align-items: center;
+      gap: 12px;
+    }
+    @media (max-width: 640px) {
+      .history-year-row { grid-template-columns: 1fr; gap: 6px; }
+    }
+
+    .year-tag {
+      font-weight: 800;
+      font-size: 0.8rem;
+      color: var(--green);
+      background: rgba(16, 185, 129, 0.12);
+      padding: 4px 8px;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .seasons-summary-flow {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+      font-size: 0.78rem;
+    }
+
+    .flow-badge {
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .flow-early { background: rgba(56, 189, 248, 0.15); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.3); }
+    .flow-summer { background: rgba(245, 158, 11, 0.15); color: #fde68a; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .flow-winter { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .flow-danger { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
+
+    .modal-actions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    @media print {
+      body * { visibility: hidden; }
+      #endGameModal, #endGameModal * { visibility: visible; }
+      #endGameModal { position: absolute; left: 0; top: 0; width: 100%; background: #ffffff !important; color: #000000 !important; }
+      .modal-box { border: none !important; box-shadow: none !important; color: #000000 !important; }
+      .modal-actions-grid { display: none !important; }
+    }
+
   </style>
 </head>
 <body>
@@ -964,21 +1053,64 @@
 </div>
 
 <!-- VÉGSŐ KIÉRTÉKELŐ MODAL -->
+<!-- VÉGSŐ KIÉRTÉKELŐ ÉS 3 ÉVES IDŐSOR MODAL -->
 <div class="modal-overlay" id="endGameModal">
-  <div class="modal-box">
-    <span style="font-size:2.8rem;">🏆</span>
-    <h2 id="modalTeamName">Csapat Neve</h2>
-    <p id="modalResultSummary" style="font-size:0.9rem; color:var(--text-muted);">Gratulálunk! Sikeresen végigvittétek a 3 éves regeneratív vetésforgót Rábapatonán!</p>
-    
-    <div style="background:#090d16; padding:14px; border-radius:12px; margin: 8px 0;">
-      <div style="font-size:0.85rem; color:var(--text-muted);">Végső Talajélet: <strong id="modalSoil" style="color:var(--green);">0</strong></div>
-      <div style="font-size:0.85rem; color:var(--text-muted);">Betakarított termény: <strong id="modalYield" style="color:var(--amber);">0</strong></div>
-      <div style="font-size:1.3rem; font-weight:800; margin-top:6px;">Összpontszám: <span id="modalTotal" style="color:var(--green);">0</span></div>
+  <div class="modal-box summary-theme">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span style="font-size:2.5rem;" id="modalTrophyIcon">🏆</span>
+      <span class="badge" style="background:rgba(56,189,248,0.15); color:var(--blue);">microbes4athu • Rábapatona</span>
     </div>
 
-    <div class="podium-badges" id="modalAwards"></div>
+    <h2 id="modalTeamName" style="font-size:1.6rem; color:var(--green); margin-top:-6px;">Csapat Neve</h2>
+    <p id="modalResultSummary" style="font-size:0.85rem; color:var(--text-muted); line-height:1.4;">
+      Gratulálunk! Sikeresen végigvittétek a 3 éves regeneratív vetésforgót Rábapatonán!
+    </p>
+    
+    <!-- FŐ METRIKÁK -->
+    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; background:#090d16; padding:12px; border-radius:12px;">
+      <div>
+        <div style="font-size:0.75rem; color:var(--text-muted);">Végső Talajélet</div>
+        <strong id="modalSoil" style="color:var(--green); font-size:1.15rem;">0 pont</strong>
+      </div>
+      <div>
+        <div style="font-size:0.75rem; color:var(--text-muted);">Betakarított termés</div>
+        <strong id="modalYield" style="color:var(--amber); font-size:1.15rem;">0 kosár</strong>
+      </div>
+      <div>
+        <div style="font-size:0.75rem; color:var(--text-muted);">Bajnoki Összpontszám</div>
+        <strong id="modalTotal" style="color:var(--green); font-size:1.15rem;">0 pont</strong>
+      </div>
+    </div>
 
-    <button class="btn btn-primary" onclick="location.reload()" style="justify-content:center; margin-top:8px;">Új Verseny Indítása</button>
+    <div class="podium-badges" id="modalAwards" style="margin:2px 0;"></div>
+
+    <!-- 3 ÉVES RÉSZLETES VETÉSI IDŐSOR -->
+    <div class="final-timeline-wrapper">
+      <div style="font-size:0.85rem; font-weight:800; color:#f1f5f9; display:flex; justify-content:space-between; margin-bottom:6px;">
+        <span>📜 A 3 Éves Vetésforgó Teljes Idősora</span>
+        <small style="color:var(--blue);">Iskolakerti Napló Krónika</small>
+      </div>
+
+      <div class="final-history-cards" id="modalHistoryList">
+        <!-- JS generálja a 3 év kártyáit -->
+      </div>
+    </div>
+
+    <!-- MŰVELETI GOMBOK (EXPORT / MÁSOLÁS / NYOMTATÁS / ÚJRA) -->
+    <div class="modal-actions-grid">
+      <button class="btn btn-secondary" id="btnCopyReport" title="Másolás vágólapra füzetbe ragasztáshoz vagy Kréta üzenethez">
+        📋 Idősor Másolása
+      </button>
+      <button class="btn btn-secondary" id="btnDownloadReport" title="Letöltés szöveges jegyzőkönyvként (.txt)">
+        💾 Letöltés (.txt)
+      </button>
+      <button class="btn btn-secondary" onclick="window.print()" title="Nyomtatás kerti füzetbe">
+        🖨️ Nyomtatás
+      </button>
+      <button class="btn btn-primary" onclick="location.reload()" style="justify-content:center;">
+        🔄 Új Bajnokság
+      </button>
+    </div>
   </div>
 </div>
 
@@ -986,53 +1118,53 @@
 // CSAPATOK VALÓS 0. ÉVI INDULÓ ADATBÁZISA (Rábapatona Október 2026)
 const TEAM_BASELINES = {
   'Magágyúsok': {
-    name: 'Dús rozs + facélia + bíborhere + borsó + alexandriai here',
+    name: 'Dús rozs + lóbab + borsó + lucerna',
     families: ['poaceae', 'fabaceae'],
-    nitrogen: 5,
+    nitrogen: 3,
     restrictions: ['Borsó és lóbab tilos 1. év kora tavasszal! (Pillangós fáradtság)'],
     bonuses: ['Pillangós túlsúly: Paradicsomnak, kukoricának ideális tavaszi indítás!']
   },
   'Gémorr fúrók': {
-    name: 'Bíborhere + zab + lóbab',
-    families: ['fabaceae', 'polygonaceae'],
-    nitrogen: 4,
-    restrictions: ['Borsó tilos 1. évben! (Pillangós elővetemény)'],
-    bonuses: ['Pillangós túlsúly, Paradicsomnak, kukoricának ideális tavaszi indítás!']
+    name: 'Bíborhere + mustár + lóbab + pohánka',
+    families: ['fabaceae', 'brassicaceae', 'polygonaceae'],
+    nitrogen: 2,
+    restrictions: ['Retek, káposzta és borsó tilos 1. évben! (Keresztes + Pillangós elővetemény)'],
+    bonuses: ['Foszformozgósítás a mustárból, erős talajlazítás.']
   },
   'Zöld lándzsások': {
-    name: 'Rozs + baltacim + borsó',
+    name: 'Rozs + facélia + bükköny + borsó',
     families: ['poaceae', 'boraginaceae', 'fabaceae'],
-    nitrogen: 4,
+    nitrogen: 2,
     restrictions: ['Borsó tilos 1. év kora tavasszal!'],
-    bonuses: ['Pillangós túlsúly, Paradicsomnak, kukoricának ideális tavaszi indítás!']
+    bonuses: ['Facélia gyökérágy: Tökféléknek és hagymának kiváló.']
   },
   'Vitorlázó jávaiak': {
-    name: 'Zab + mustár + olajretek + pohánka',
-    families: ['brassicaceae', 'poaceae', 'polygonaceae'],
-    nitrogen: 2,
-    restrictions: ['Retek tilos kora tavasszal'],
-    bonuses: ['Kiváló talajlazítás, foszforfeltárás!']
+    name: 'Lóbab + bükköny + zab + facélia',
+    families: ['fabaceae', 'poaceae', 'boraginaceae'],
+    nitrogen: 3,
+    restrictions: ['Borsó és bab tilos kora tavasszal!'],
+    bonuses: ['Maximális nitrogéntartalék a nyári nagyétkűeknek!']
   },
   'Mag páncélosok': {
-    name: 'Zab + facélia + mustár + olajretek',
-    families: ['poaceae', 'boraginaceae', 'brassicaceae'],
+    name: 'Rozs + facélia + alexandriai here + olajretek',
+    families: ['poaceae', 'boraginaceae', 'fabaceae', 'brassicaceae'],
     nitrogen: 2,
-    restrictions: ['Retek tilos 1. év kora tavasszal!'],
+    restrictions: ['Retek és borsó tilos 1. év kora tavasszal!'],
     bonuses: ['Olajretek karógyökér-fúrás: Gyökérzöldségeknek laza mélyréteg.']
   },
   'Hangya-taxik': {
-    name: 'Mustár + olajretek + pohánka + rozs',
-    families: ['poaceae', 'polygonaceae', 'brassicaceae'],
+    name: 'Bíborhere + bükköny + pohánka + mustár',
+    families: ['fabaceae', 'polygonaceae', 'brassicaceae'],
     nitrogen: 2,
-    restrictions: ['Keresztesek (retek, káposzta) tilos!'],
+    restrictions: ['Keresztesek (retek, káposzta) és borsó tilos!'],
     bonuses: ['Gyors szervesanyag-képzés és beporzó-bázis.']
   },
   'Kemény magok': {
-    name: 'Lóbab + facélia + rozs',
-    families: ['boraginaceae', 'poaceae', 'fabaceae'],
-    nitrogen: 3,
-    restrictions: ['Borsó tilos kora tavasszal!'],
-    bonuses: ['Mélyre hatoló karógyökér a kis négyzetben.']
+    name: 'Facélia + rozs + mustár + lucerna',
+    families: ['boraginaceae', 'poaceae', 'brassicaceae', 'fabaceae'],
+    nitrogen: 2,
+    restrictions: ['Keresztesek és borsó tilos kora tavasszal!'],
+    bonuses: ['Mélyre hatoló lucerna karógyökér a kis négyzetben.']
   }
 };
 
@@ -1041,7 +1173,7 @@ const CROPS = [
   // ZÖLDSÉGEK (FŐNÖVÉNYEK)
   { id: 'retek',       name: 'Hónapos retek',  icon: '🌱', family: 'brassicaceae', type: 'crop', demand: 'light', cost: 1, days: 35, frostProof: true,  earlyOk: true,  yield: 20, soilBonus: 0,  desc: '30-40 nap • Fagytűrő (Feb. 15-től)' },
   { id: 'borso',       name: 'Kerti borsó',    icon: '🫛', family: 'fabaceae',     type: 'crop', demand: 'giver', cost: -2, days: 70, frostProof: true,  earlyOk: true,  yield: 30, soilBonus: 10, desc: '65-75 nap • Fagytűrő (+2 N nitrogéngyár)' },
-  { id: 'hagyma',      name: 'Dughagyma',      icon: '🧅', family: 'amaryllidaceae', type: 'crop', demand: 'light', cost: 1, days: 90, frostProof: true, earlyOk: true,  yield: 25, soilBonus: 0,  desc: '80-100 nap • Fagytűrő, elűzi a kártevőket' },
+  { id: 'hagyma',      name: 'Zöldhagyma (Dughagyma)', icon: '🧅', family: 'amaryllidaceae', type: 'crop', demand: 'light', cost: 1, days: 60, frostProof: true, earlyOk: true,  yield: 25, soilBonus: 0,  desc: '50-60 nap • Májusra leterem, utána szabad a hely a paradicsomnak!' },
   { id: 'spenot',      name: 'Kora spenót',    icon: '🍃', family: 'amaranthaceae', type: 'crop', demand: 'light', cost: 1, days: 45, frostProof: true,  earlyOk: true,  yield: 20, soilBonus: 0,  desc: '40-50 nap • Hidegtűrő kora tavaszi/őszi' },
   { id: 'paradicsom',  name: 'Paradicsom',     icon: '🍅', family: 'solanaceae',   type: 'crop', demand: 'heavy', cost: 3, days: 120, frostProof: false, earlyOk: false, yield: 50, soilBonus: 0,  desc: '110-130 nap • KIFAGY MÁJUS ELŐTT! (-3 N)' },
   { id: 'paprika',     name: 'Paprika',        icon: '🫑', family: 'solanaceae',   type: 'crop', demand: 'heavy', cost: 3, days: 130, frostProof: false, earlyOk: false, yield: 45, soilBonus: 0,  desc: '120-140 nap • Melegigényes, fagyérzékeny (-3 N)' },
@@ -1388,8 +1520,8 @@ btnCommit.addEventListener('click', () => {
     } else {
       // 1.2 Elővetemény / család ismétlődés kora tavasszal
       if (prevFamilies.includes(crop.family) && crop.family !== 'none') {
-        gameState.soilHealth -= 25;
-        logs.push({ type: 'danger', text: `🚨 KÁRTEVŐ ÉS FONÁLFÉREG VESZÉLY! A(z) ${crop.name} előtt azonos növénycsalád (${crop.family}) volt a parcellában (-25 talajpont)!` });
+        gameState.soilHealth -= 30;
+        logs.push({ type: 'danger', text: `🚨 KÁRTEVŐ ÉS FONÁLFÉREG VESZÉLY! A(z) ${crop.name} előtt azonos család (${crop.family}) volt a parcellában! A gyökérzet kirothadt: 0 kosár termés (-30 talajpont)!` });
       } else {
         const y = crop.yield || 0;
         gameState.totalYield += y;
@@ -1571,35 +1703,158 @@ function updateDashboard() {
 function showGameOver(isBankrupt = false) {
   const modal = document.getElementById('endGameModal');
   const team = teamSelector.value;
-  const total = gameState.soilHealth + gameState.totalYield;
+  const base = TEAM_BASELINES[team] || TEAM_BASELINES['Magágyúsok'];
+
+  // 1. TALAJCSŐD ESETÉN A VÉGSŐ PONT 0 ÉS KIESÉS!
+  const rawTotal = (gameState.soilHealth || 0) + (gameState.totalYield || 0);
+  const total = isBankrupt ? 0 : rawTotal;
 
   document.getElementById('modalTeamName').textContent = `${team} csapata`;
   document.getElementById('modalSoil').textContent = `${gameState.soilHealth} pont`;
   document.getElementById('modalYield').textContent = `${gameState.totalYield} kosár`;
-  document.getElementById('modalTotal').textContent = `${total} pont`;
+  document.getElementById('modalTotal').textContent = isBankrupt ? '0 pont (Kiesett)' : `${total} pont`;
 
   const summary = document.getElementById('modalResultSummary');
   const awardsBox = document.getElementById('modalAwards');
+  const trophyIcon = document.getElementById('modalTrophyIcon');
   awardsBox.innerHTML = '';
 
   if (isBankrupt) {
-    summary.textContent = "💥 TALAJCSŐD! A parcellátok talajélete összeomlott a takarónövények hiánya és a kizsigerelés miatt. A talaj megkeményedett, a mikrobák elpusztultak.";
-    awardsBox.innerHTML = `<div class="badge" style="background:#7f1d1d; color:#fca5a5; font-size:0.85rem; padding:6px 12px;">⚠️ Talajkimerülési Figyelmeztetés</div>`;
+    trophyIcon.textContent = '💥';
+    summary.innerHTML = `<span style="color:#f87171; font-weight:800;">TALAJCSŐD MIATT KIESETT A CSAPAT!</span><br>A parcella talajélete összeomlott (15 pont alá esett) a takarónövények hiánya és a kizsigerelés miatt. Halott talajon nem lehet gazdálkodni, a végső pontszám érvénytelen (0 pont).`;
+    awardsBox.innerHTML = `<div class="badge" style="background:#7f1d1d; color:#fca5a5; font-size:0.8rem; padding:6px 12px;">⚠️ Diszkvalifikálva: Talajcsőd</div>`;
   } else {
-    summary.textContent = "Gratulálunk! Sikeresen végigvittétek a 3 éves regeneratív vetésforgót Rábapatonán!";
+    trophyIcon.textContent = '🏆';
+    summary.textContent = "Gratulálunk! Sikeresen végigvittétek a 3 éves regeneratív vetésforgót Rábapatonán! Íme a teljes szakmai jegyzőkönyv:";
+    
     if (gameState.soilHealth >= 120) {
-      awardsBox.innerHTML += `<div class="badge" style="background:#065f46; color:#34d399; font-size:0.85rem; padding:6px 12px;">🏅 Arany Gomba Talajdoktor Díj</div>`;
+      awardsBox.innerHTML += `<div class="badge" style="background:#065f46; color:#34d399; font-size:0.8rem; padding:6px 10px;">🏅 Arany Gomba Talajdoktor Díj</div>`;
     }
-    if (gameState.totalYield >= 130) {
-      awardsBox.innerHTML += `<div class="badge" style="background:#78350f; color:#fde68a; font-size:0.85rem; padding:6px 12px;">🧺 Bőségszaru Maxi-Kosár Bajnok</div>`;
+    if (gameState.totalYield >= 120) {
+      awardsBox.innerHTML += `<div class="badge" style="background:#78350f; color:#fde68a; font-size:0.8rem; padding:6px 10px;">🧺 Bőségszaru Maxi-Kosár Bajnok</div>`;
     }
-    if (gameState.soilHealth >= 90 && gameState.totalYield >= 100) {
-      awardsBox.innerHTML += `<div class="badge" style="background:#1e3a8a; color:#93c5fd; font-size:0.85rem; padding:6px 12px;">🌍 100% Regeneratív Mester</div>`;
+    if (gameState.soilHealth >= 90 && gameState.totalYield >= 90) {
+      awardsBox.innerHTML += `<div class="badge" style="background:#1e3a8a; color:#93c5fd; font-size:0.8rem; padding:6px 10px;">🌍 100% Regeneratív Mester</div>`;
+    }
+    if (awardsBox.innerHTML === '') {
+      awardsBox.innerHTML = `<div class="badge" style="background:#334155; color:#cbd5e1; font-size:0.8rem; padding:6px 10px;">🌱 Sikeres Kerti Gyakornok</div>`;
     }
   }
 
+  // 2. 3 ÉVES RÉSZLETES VETÉSI IDŐSOR GENERÁLÁSA
+  const historyList = document.getElementById('modalHistoryList');
+  historyList.innerHTML = '';
+
+  // 0. ÉV (Induló októberi állapot)
+  const row0 = document.createElement('div');
+  row0.className = 'history-year-row';
+  row0.innerHTML = `
+    <div class="year-tag" style="background:rgba(56,189,248,0.15); color:var(--blue);">0. Év (2026)</div>
+    <div class="seasons-summary-flow">
+      <span style="color:var(--text-muted); font-size:0.75rem;">Induló vetés:</span>
+      <span class="flow-badge flow-winter">🌾 ${base.name}</span>
+    </div>
+  `;
+  historyList.appendChild(row0);
+
+  // 1-3. ÉVEK
+  gameState.history.forEach((h, idx) => {
+    const yRow = document.createElement('div');
+    yRow.className = 'history-year-row';
+
+    const earlyStr = h.early && h.early.length > 0 ? h.early.map(c => `${c.icon} ${c.name}`).join(', ') : 'Üres';
+    const summerStr = h.summer && h.summer.length > 0 ? h.summer.map(c => `${c.icon} ${c.name}`).join(', ') : 'Üres';
+    
+    let winterStr = 'Üres';
+    let isWinterCover = true;
+    if (h.winter && h.winter.length > 0) {
+      isWinterCover = h.winter[0].type === 'cover';
+      winterStr = h.winter.map(c => `${c.icon} ${c.name}`).join(' + ');
+    }
+
+    yRow.innerHTML = `
+      <div class="year-tag">${idx + 1}. Év (${2027 + idx})</div>
+      <div class="seasons-summary-flow">
+        <span class="flow-badge flow-early" title="Kora tavasz">🌱 ${earlyStr}</span>
+        <span style="color:var(--text-muted);">➔</span>
+        <span class="flow-badge flow-summer" title="Nyári főkultúra">☀️ ${summerStr}</span>
+        <span style="color:var(--text-muted);">➔</span>
+        <span class="flow-badge ${isWinterCover ? 'flow-winter' : 'flow-danger'}" title="Téli szakasz">❄️ ${winterStr}</span>
+      </div>
+    `;
+    historyList.appendChild(yRow);
+  });
+
   modal.style.display = 'flex';
 }
+
+// 3. EXPORT ÉS MÁSOLÁS FUNKCIÓK
+function generateTextReport() {
+  const team = teamSelector.value;
+  const base = TEAM_BASELINES[team] || TEAM_BASELINES['Magágyúsok'];
+  const total = gameState.soilHealth <= 15 ? 0 : (gameState.soilHealth + gameState.totalYield);
+
+  let text = `========================================================\n`;
+  text += `🌿 VEGROTS ISKOLAKERTI BAJNOKSÁG - 3 ÉVES JEGYZŐKÖNYV\n`;
+  text += `Helyszín: Rábapatona Ökokert • microbes4athu projekt\n`;
+  text += `Csapat: ${team}\n`;
+  text += `Végső Talaj-Mikrobiom Élet: ${gameState.soilHealth} pont\n`;
+  text += `Betakarított Termés: ${gameState.totalYield} kosár\n`;
+  text += `Bajnoki Összpontszám: ${total} pont ${gameState.soilHealth <= 15 ? '(TALAJCSŐD MIATT KIESETT)' : ''}\n`;
+  text += `========================================================\n\n`;
+
+  text += `[0. Év - 2026 Ősz / Kiindulási Takarónövényzet]:\n`;
+  text += `  • Keverék: ${base.name}\n\n`;
+
+  gameState.history.forEach((h, idx) => {
+    const early = h.early.map(c => `${c.name} (${c.days} nap)`).join(', ') || 'Semmi';
+    const summer = h.summer.map(c => `${c.name} (${c.days} nap)`).join(', ') || 'Semmi';
+    const winter = h.winter.map(c => c.name).join(' + ') || 'Semmi';
+
+    text += `[${idx + 1}. Év - ${2027 + idx}]:\n`;
+    text += `  1. Kora tavasz (Feb 15 - Ápr): ${early}\n`;
+    text += `  2. Nyári főkultúra (Máj - Aug): ${summer}\n`;
+    text += `  3. Téli szakasz (Szept - Feb): ${winter}\n\n`;
+  });
+
+  text += `Megjegyzés: A jegyzőkönyv az Agronómiai és Talajtani szabályrendszer alapján hitelesített.\n`;
+  return text;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Gombok eseménykezelői
+  const btnCopy = document.getElementById('btnCopyReport');
+  const btnDownload = document.getElementById('btnDownloadReport');
+
+  if (btnCopy) {
+    btnCopy.addEventListener('click', () => {
+      const report = generateTextReport();
+      navigator.clipboard.writeText(report).then(() => {
+        btnCopy.textContent = '✅ Másolva!';
+        setTimeout(() => { btnCopy.textContent = '📋 Idősor Másolása'; }, 2500);
+      }).catch(err => {
+        alert('Nem sikerült vágólapra másolni, kérlek használd a letöltés gombot!');
+      });
+    });
+  }
+
+  if (btnDownload) {
+    btnDownload.addEventListener('click', () => {
+      const report = generateTextReport();
+      const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const teamClean = teamSelector.value.replace(/\s+/g, '_');
+      a.href = url;
+      a.download = `vegrots_vetesforgo_${teamClean}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  }
+});
+
 
 // TITKOS MESTER MODAL
 const btnMasterChallenge = document.getElementById('btnOpenMasterChallenge');
