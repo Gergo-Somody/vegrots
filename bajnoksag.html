@@ -73,42 +73,42 @@
       cursor: pointer;
     }
     .team-select-box select option { background: #0f172a; color: white; }
-/* KAMRA VIZUALIZÁCIÓ */
-.pantry-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: 10px;
-  background: #090d16;
-  padding: 14px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  margin-top: 8px;
-}
-.pantry-slot {
-  background: rgba(30, 41, 59, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  padding: 10px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.pantry-slot strong { font-size: 1.1rem; color: #fde68a; }
-.pantry-slot span { font-size: 0.72rem; color: var(--text-muted); }
-.pantry-status-badge {
-  font-size: 0.8rem;
-  font-weight: 800;
-  padding: 6px 12px;
-  border-radius: 8px;
-  text-align: center;
-  margin-top: 6px;
-}
 
-/* LÁNCOLAT JELZŐK */
-.synergy-tag-strong { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid var(--red); padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.7rem; }
-.synergy-tag-weak { background: rgba(245, 158, 11, 0.2); color: #fde68a; border: 1px solid var(--amber); padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.7rem; }
-.synergy-tag-ok { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid var(--green); padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.7rem; }
+    .pantry-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+      background: #090d16;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      margin-top: 8px;
+    }
+    .pantry-slot {
+      background: rgba(30, 41, 59, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .pantry-slot strong { font-size: 1.1rem; color: #fde68a; }
+    .pantry-slot span { font-size: 0.72rem; color: var(--text-muted); }
+    .pantry-status-badge {
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 6px 12px;
+      border-radius: 8px;
+      text-align: center;
+      margin-top: 6px;
+    }
+
+    .synergy-tag-strong { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid var(--red); padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.7rem; }
+    .synergy-tag-weak { background: rgba(245, 158, 11, 0.2); color: #fde68a; border: 1px solid var(--amber); padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.7rem; }
+    .synergy-tag-ok { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid var(--green); padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.7rem; }
+
     .btn-master-challenge {
       background: linear-gradient(135deg, #7e22ce 0%, #a855f7 100%);
       color: #ffffff;
@@ -164,7 +164,6 @@
       font-weight: 700;
     }
 
-    /* MŰSZERFAL */
     .dashboard {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
@@ -184,7 +183,6 @@
     .stat-card .bar-bg { width: 100%; height: 7px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; margin-top: 3px; }
     .stat-card .bar-fill { height: 100%; width: 100%; background: var(--green); transition: width 0.4s ease, background 0.4s ease; }
 
-    /* IDŐVONAL */
     .timeline-bar {
       display: flex;
       align-items: center;
@@ -220,7 +218,6 @@
     .year-step.active .year-badge { background: var(--green); color: #052e16; font-weight: 800; }
     .year-step.completed .year-badge { background: rgba(16,185,129,0.2); color: var(--green); }
 
-    /* FŐ JÁTÉKTÉR */
     .game-arena {
       display: grid;
       grid-template-columns: 360px 1fr;
@@ -283,7 +280,6 @@
     .tag-frost { background: rgba(239, 68, 68, 0.15); color: #fca5a5; }
     .tag-frostproof { background: rgba(56, 189, 248, 0.15); color: #7dd3fc; }
 
-    /* ÁGYÁS TERVEZŐ ZÓNA */
     .planner-zone {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -389,7 +385,6 @@
       border-top: 1px solid rgba(255,255,255,0.06);
     }
 
-    /* KÁRTEVŐ ÉS KÓROKOZÓ FIGYELMEZTETŐ KÁRTYA STÍLUS */
     .pest-warning-badge {
       background: rgba(239, 68, 68, 0.15);
       border: 1.5px dashed var(--red);
@@ -448,7 +443,6 @@
     .log-info { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
     .log-purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
 
-    /* HŐMÉRSÉKLETI SÁV & IDŐVONAL */
     .season-timeline-panel {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -593,7 +587,6 @@
     .timeline-alert-bar.alert-danger { background: rgba(239, 68, 68, 0.2); color: #fca5a5; font-weight: 700; border: 1px solid rgba(239, 68, 68, 0.4); }
     .timeline-alert-bar.alert-success { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.4); }
 
-    /* MODALOK ÉS ÖSSZESÍTŐK */
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px);
       display: none; align-items: center; justify-content: center; z-index: 999; padding: 16px;
@@ -622,7 +615,6 @@
     }
     .modal-close-btn { position: absolute; top: 12px; right: 14px; background: transparent; border: none; color: var(--text-muted); font-size: 1.4rem; cursor: pointer; }
 
-    /* SIRALMAS KÖZÖSSÉGI VÁLSÁG-BANNER */
     .crisis-shock-banner {
       background: linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(185, 28, 28, 0.35) 100%);
       border: 2px solid var(--red);
@@ -640,7 +632,6 @@
     .crisis-shock-banner h3 { color: #fca5a5; font-size: 1.15rem; display: flex; align-items: center; gap: 8px; }
     .crisis-shock-banner p { font-size: 0.85rem; color: #fecaca; line-height: 1.4; }
 
-    /* 7 PARCELLÁS TÁBLÁZAT */
     .garden-matrix-table {
       width: 100%;
       border-collapse: collapse;
@@ -709,7 +700,6 @@
 
 <div class="container">
   
-  <!-- FEJLÉC -->
   <header>
     <div class="header-left">
       <span class="badge">VegRots Iskolakerti Rendszer • microbes4athu</span>
@@ -737,7 +727,6 @@
     </div>
   </header>
 
-  <!-- STATIKUS 0. ÉV: JELENLEGI VETÉS ÉS ELŐVETEMÉNY HATÁS -->
   <div class="baseline-banner" id="baselineBanner">
     <div>
       <span>Induló állapot (2026. októberi vetés): </span>
@@ -746,7 +735,6 @@
     <div class="baseline-tags" id="baseTags"></div>
   </div>
 
-  <!-- MŰSZERFAL -->
   <div class="dashboard">
     <div class="stat-card">
       <span>TALAJ-MIKROBIOM ÉLET</span>
@@ -770,7 +758,6 @@
     </div>
   </div>
 
-  <!-- IDŐVONAL -->
   <div class="timeline-bar">
     <div class="year-step active" id="stepYear1">
       <div class="year-badge">1</div>
@@ -788,7 +775,6 @@
     </div>
   </div>
 
-  <!-- INTERAKTÍV ÉVSZAK- ÉS HŐMÉRSÉKLETI SÁV -->
   <section class="season-timeline-panel">
     <div class="timeline-panel-header">
       <div class="timeline-title-group">
@@ -803,7 +789,6 @@
       </div>
     </div>
 
-    <!-- HŐMÉRSÉKLETI GÖRBE + HÓNAPOK SÁVJA -->
     <div class="annual-calendar-wrapper">
       <div class="temp-chart-container">
         <svg id="tempChartSvg" viewBox="0 0 1200 130" preserveAspectRatio="none">
@@ -896,10 +881,7 @@
     </div>
   </section>
 
-  <!-- FŐ JÁTÉKTÉR -->
   <div class="game-arena">
-    
-    <!-- BAL OLDAL: NÖVÉNYTÁR -->
     <div class="palette-box">
       <h3>
         <span>Mag- és Palántatár</span>
@@ -912,7 +894,6 @@
       <div class="cards-stack" id="cropPalette"></div>
     </div>
 
-    <!-- JOBB OLDAL: 3 SZEZONÁLIS BEVITELI HELY -->
     <div class="planner-zone">
       <div class="planner-header">
         <div>
@@ -926,7 +907,6 @@
 
       <div class="season-slots-grid">
         
-        <!-- 1. KORA TAVASZ -->
         <div class="season-box" id="slotEarlySpring" data-slot="early" data-mode="crop">
           <div class="season-header">
             <div class="season-title">
@@ -948,7 +928,6 @@
           </div>
         </div>
 
-        <!-- 2. NYÁRI FŐKULTÚRA -->
         <div class="season-box" id="slotSummer" data-slot="summer" data-mode="crop">
           <div class="season-header">
             <div class="season-title">
@@ -970,7 +949,6 @@
           </div>
         </div>
 
-        <!-- 3. ŐSZ / TÉL -->
         <div class="season-box" id="slotWinter" data-slot="winter" data-mode="cover">
           <div class="season-header">
             <div class="season-title">
@@ -994,7 +972,6 @@
 
       </div>
 
-      <!-- KÁRTEVŐ ÉS VESZÉLY PANEL -->
       <div id="pestAlertBox" style="display:none;"></div>
 
       <div class="chronicle" id="chronicleLog">
@@ -1012,7 +989,6 @@
 
 </div>
 
-<!-- TITKOS MESTER KIHÍVÁS MODAL -->
 <div class="modal-overlay" id="masterChallengeModal">
   <div class="modal-box master-theme">
     <button class="modal-close-btn" id="btnCloseMasterModal">✖</button>
@@ -1047,7 +1023,6 @@
   </div>
 </div>
 
-<!-- VÉGSŐ KIÉRTÉKELŐ, 7 PARCELLÁS TÉRKÉP ÉS VÁLSÁG MODAL -->
 <div class="modal-overlay" id="endGameModal">
   <div class="modal-box summary-theme">
     <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1058,7 +1033,6 @@
     <h2 id="modalTeamName" style="font-size:1.6rem; color:var(--green); margin-top:-6px;">Csapat Neve</h2>
     <p id="modalResultSummary" style="font-size:0.85rem; color:var(--text-muted); line-height:1.4;"></p>
     
-    <!-- METRIKÁK -->
     <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; background:#090d16; padding:12px; border-radius:12px;">
       <div>
         <div style="font-size:0.75rem; color:var(--text-muted);">Végső Talajélet</div>
@@ -1073,44 +1047,44 @@
         <strong id="modalTotal" style="color:var(--green); font-size:1.15rem;">0 pont</strong>
       </div>
     </div>
-<!-- KÖZÖS ISKOLAKERTI ÉLÉSKAMRA ÉS KIEGYENLÍTETTSÉG -->
-<div class="final-timeline-wrapper">
-  <div style="font-size:0.85rem; font-weight:800; color:#f1f5f9; display:flex; justify-content:space-between;">
-    <span>🧺 Rábapatonai Közös Iskolakerti Éléskamra</span>
-    <small style="color:var(--green);">Közösségi Tápérték & Önellátás</small>
-  </div>
 
-  <div class="pantry-grid" id="pantrySlotsGrid">
-    <div class="pantry-slot">
-      <span>🍅 Terméshozók</span>
-      <strong id="pantryFruit">0 db</strong>
-      <span>Paradicsom, Cukkini</span>
-    </div>
-    <div class="pantry-slot">
-      <span>🥕 Gyökérzöldségek</span>
-      <strong id="pantryRoot">0 db</strong>
-      <span>Répa, Retek</span>
-    </div>
-    <div class="pantry-slot">
-      <span>🫘 Fehérjebázis</span>
-      <strong id="pantryLegume">0 db</strong>
-      <span>Borsó, Bokorbab</span>
-    </div>
-    <div class="pantry-slot">
-      <span>🧅 Ízesítők & Zöldek</span>
-      <strong id="pantryAlliums">0 db</strong>
-      <span>Zöldhagyma, Spenót</span>
-    </div>
-    <div class="pantry-slot">
-      <span>🌽 Gabona / Kalóriadús</span>
-      <strong id="pantryGrain">0 db</strong>
-      <span>Csemegekukorica</span>
-    </div>
-  </div>
+    <div class="final-timeline-wrapper">
+      <div style="font-size:0.85rem; font-weight:800; color:#f1f5f9; display:flex; justify-content:space-between;">
+        <span>🧺 Rábapatonai Közös Iskolakerti Éléskamra</span>
+        <small style="color:var(--green);">Közösségi Tápérték & Önellátás</small>
+      </div>
 
-  <div id="pantryBalanceStatus" class="pantry-status-badge"></div>
-</div>
-    <!-- DRÁMAI SIRALMAS KÖZÖSSÉGI VÁLSÁG BANNER -->
+      <div class="pantry-grid" id="pantrySlotsGrid">
+        <div class="pantry-slot">
+          <span>🍅 Terméshozók</span>
+          <strong id="pantryFruit">0 db</strong>
+          <span>Paradicsom, Cukkini</span>
+        </div>
+        <div class="pantry-slot">
+          <span>🥕 Gyökérzöldségek</span>
+          <strong id="pantryRoot">0 db</strong>
+          <span>Répa, Retek</span>
+        </div>
+        <div class="pantry-slot">
+          <span>🫘 Fehérjebázis</span>
+          <strong id="pantryLegume">0 db</strong>
+          <span>Borsó, Bokorbab</span>
+        </div>
+        <div class="pantry-slot">
+          <span>🧅 Ízesítők & Zöldek</span>
+          <strong id="pantryAlliums">0 db</strong>
+          <span>Zöldhagyma, Spenót</span>
+        </div>
+        <div class="pantry-slot">
+          <span>🌽 Gabona / Kalóriadús</span>
+          <strong id="pantryGrain">0 db</strong>
+          <span>Csemegekukorica</span>
+        </div>
+      </div>
+
+      <div id="pantryBalanceStatus" class="pantry-status-badge"></div>
+    </div>
+
     <div class="crisis-shock-banner" id="crisisShockBanner" style="display:none;">
       <h3>🚨 SIRALMAS KÖZÖSSÉGI EREDMÉNY: ÖSSZEOMLÓ ISKOLAKERT!</h3>
       <p>
@@ -1125,7 +1099,6 @@
 
     <div class="podium-badges" id="modalAwards" style="margin:2px 0;"></div>
 
-    <!-- 7 PARCELLÁS ISKOLAKERTI KÖZÖS TÉRKÉP -->
     <div class="final-timeline-wrapper">
       <div style="font-size:0.85rem; font-weight:800; color:#f1f5f9; display:flex; justify-content:space-between; margin-bottom:4px;">
         <span>🗺️ Rábapatonai 7 Ágyás Szinergia és Kártevő Mátrix</span>
@@ -1146,7 +1119,6 @@
       </table>
     </div>
 
-    <!-- 3 ÉVES VETÉSI IDŐSOR -->
     <div class="final-timeline-wrapper">
       <div style="font-size:0.85rem; font-weight:800; color:#f1f5f9; display:flex; justify-content:space-between; margin-bottom:6px;">
         <span>📜 A Saját Parcellátok 3 Éves Idősora</span>
@@ -1167,7 +1139,6 @@
 </div>
 
 <script>
-// CSAPATOK VALÓS 0. ÉVI INDULÓ ADATBÁZISA
 const TEAM_BASELINES = {
   'Magágyúsok': {
     name: 'Dús rozs + facélia + borsó + bíborhere + alexandriai here',
@@ -1220,7 +1191,6 @@ const TEAM_BASELINES = {
   }
 };
 
-// BOTANIKAI CSALÁDOK ÉS KÁRTEVŐIK
 const FAMILY_PESTS = {
   solanaceae: { icon: '🐛', name: 'Burgonyabogár & Fitoftóra', desc: 'A talajban áttelelt lárvák lerágják a hajtásokat!' },
   brassicaceae: { icon: '🦟', name: 'Földibolha & Gyökérgolyva', desc: 'Szitává rágott levelek és megvastagodott golyvás gyökér!' },
@@ -1230,7 +1200,6 @@ const FAMILY_PESTS = {
   apiaceae: { icon: '🪱', name: 'Sárgarépalégy & Fonálférgek', desc: 'Fekete járatok a gyökértestben!' }
 };
 
-// NÖVÉNYTÁR
 const CROPS = [
   { id: 'retek',       name: 'Hónapos retek',    icon: '🌱', family: 'brassicaceae', type: 'crop', demand: 'light', cost: 1, days: 35, frostProof: true,  earlyOk: true,  yield: 20, soilBonus: 0,  desc: '30-40 nap • Fagytűrő' },
   { id: 'borso',       name: 'Kerti borsó',     icon: '🫛', family: 'fabaceae',     type: 'crop', demand: 'giver', cost: -2, days: 70, frostProof: true,  earlyOk: true,  yield: 30, soilBonus: 10, desc: '65-75 nap • N-gyár' },
@@ -1243,8 +1212,6 @@ const CROPS = [
   { id: 'bab',         name: 'Bokorbab',        icon: '🫘', family: 'fabaceae',     type: 'crop', demand: 'giver', cost: -1, days: 65, frostProof: false, earlyOk: false, yield: 30, soilBonus: 10, desc: '60-70 nap • N-kötő' },
   { id: 'kaposzta',    name: 'Őszi fejeskáposzta', icon: '🥬', family: 'brassicaceae', type: 'crop', demand: 'heavy', cost: 2, days: 110, frostProof: true, earlyOk: false, yield: 45, soilBonus: 0, desc: '100-120 nap • Késői' },
   { id: 'repa',        name: 'Sárgarépa',       icon: '🥕', family: 'apiaceae',     type: 'crop', demand: 'medium', cost: 1, days: 100, frostProof: true, earlyOk: true, yield: 35, soilBonus: 0, desc: '90-110 nap • Mélylazító' },
-
-  // TAKARÓK
   { id: 'rozs',        name: 'Őszi rozs',       icon: '🌾', family: 'poaceae',       type: 'cover', demand: 'cover', cost: -1, days: 180, frostProof: true, earlyOk: true, yield: 0, soilBonus: 20, desc: 'Dús gyökértömeg' },
   { id: 'zab',         name: 'Tavaszi zab',     icon: '🌾', family: 'poaceae',       type: 'cover', demand: 'cover', cost: 0, days: 70, frostProof: true, earlyOk: true, yield: 0, soilBonus: 15, desc: 'Gyors zöldtömeg' },
   { id: 'facelia',     name: 'Mézontófű (Facélia)', icon: '🌸', family: 'boraginaceae', type: 'cover', demand: 'cover', cost: 0, days: 60, frostProof: true, earlyOk: true, yield: 0, soilBonus: 20, desc: 'Nem rokon a zöldségekkel!' },
@@ -1254,209 +1221,19 @@ const CROPS = [
   { id: 'pohanka',     name: 'Pohánka',         icon: '🌾', family: 'polygonaceae', type: 'cover', demand: 'cover', cost: 0, days: 60, frostProof: false, earlyOk: false, yield: 0, soilBonus: 15, desc: 'Foszformozgató mulcs' },
   { id: 'lucerna',     name: 'Kék lucerna',     icon: '🌿', family: 'fabaceae',     type: 'cover', demand: 'cover', cost: -2, days: 120, frostProof: true, earlyOk: true, yield: 0, soilBonus: 25, desc: 'Mély gyökérzet, N-gyár' }
 ];
-// ÁLLÍTSD BE AZ APPS SCRIPT WEB APP URL-T!
+
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby6nNEj7Spkrm8aH2hvXvT2mhRGOLWx8qZqrRPfGKJwIRfIlSsYkVwLBO8fMzCUtjsSAw/exec";
 
-// PARCELLÁK KÖZÖTTI ERŐS SZOMSZÉDSÁGI TÉRKÉP (Közös ágyáson belül)
 const BED_NEIGHBORS = {
   'Gémorr fúrók': ['Zöld lándzsások'],
   'Zöld lándzsások': ['Gémorr fúrók'],
   'Vitorlázó jávaiak': ['Mag páncélosok'],
   'Mag páncélosok': ['Vitorlázó jávaiak', 'Hangya-taxik'],
   'Hangya-taxik': ['Mag páncélosok'],
-  'Magágyúsok': [], // Különálló ágyás
-  'Kemény magok': [] // Különálló kis négyzet
+  'Magágyúsok': [],
+  'Kemény magok': []
 };
 
-// ÉV MENTÉSE AZ APPS SCRIPTBE (POST)
-// ÉV MENTÉSE AZ APPS SCRIPTBE (Hibabiztos POST)
-async function syncYearToSpreadsheet() {
-  const currentTeam = teamSelector.value;
-  const payload = {
-    team: currentTeam,
-    year: gameState.currentYear,
-    early: gameState.currentPlan.early.map(c => c.name).join(' + '),
-    summer: gameState.currentPlan.summer.map(c => c.name).join(' + '),
-    winter: gameState.currentPlan.winter.map(c => c.name).join(' + '),
-    yield: gameState.totalYield,
-    soil: gameState.soilHealth
-  };
-
-  try {
-    // text/plain küldése kötelező, hogy az Apps Script átengedje és a postData megmaradjon!
-    const response = await fetch(APPS_SCRIPT_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8"
-      },
-      body: JSON.stringify(payload)
-    });
-    
-    console.log("✅ Sikeres kérés elküldve az Apps Scriptnek!");
-  } catch (err) {
-    console.error("❌ Hiba az adatok küldésekor:", err);
-  }
-}
-
-  try {
-    await fetch(APPS_SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    console.log("Sikeres mentés a központi Google Sheetbe!");
-  } catch (err) {
-    console.warn("Offline futás vagy szinkron hiba:", err);
-  }
-}
-
-// MINDEN CSAPAT ADATAINAK LEKÉRÉSE ÉS LÁNCOLAT-SZÁMÍTÁS (GET)
-async function fetchAndAnalyzeGardenNetwork() {
-  try {
-    const res = await fetch(APPS_SCRIPT_URL);
-    const result = await res.json();
-    if (result.status === "success" && result.teams) {
-      // Frissítjük a központi adatbázist a valós táblázat-adatokkal
-      Object.keys(result.teams).forEach(tName => {
-        if (allTeamsGardenData[tName]) {
-          const t = result.teams[tName];
-          allTeamsGardenData[tName].cropsY3 = t.summer || allTeamsGardenData[tName].cropsY3;
-        }
-      });
-    }
-  } catch (err) {
-    console.warn("Valós adatok nem elérhetők, helyi modell fut.", err);
-  }
-
-  // 1. ERŐS ÉS GYENGE LÁNCOLAT ELEMZÉSE
-  evaluateGardenEcology();
-}
-
-function evaluateGardenEcology() {
-  const teams = Object.keys(allTeamsGardenData);
-  const currentTeam = teamSelector.value;
-
-  // Gyenge láncolathoz kertszintű családszámláló (3. év alapján)
-  const familyCount = {};
-  teams.forEach(t => {
-    const cropName = allTeamsGardenData[t].cropsY3;
-    const crop = CROPS.find(c => c.name === cropName);
-    if (crop) {
-      familyCount[crop.family] = (familyCount[crop.family] || 0) + 1;
-    }
-  });
-
-  // Táblázat renderelése és láncolatok vizsgálata
-  const tbody = document.getElementById('gardenMatrixBody');
-  tbody.innerHTML = '';
-
-  let totalPestPressure = 0;
-
-  teams.forEach(tName => {
-    const data = allTeamsGardenData[tName];
-    const isCurrent = tName === currentTeam;
-    const currentCrop = CROPS.find(c => c.name === data.cropsY3);
-    const neighbors = BED_NEIGHBORS[tName] || [];
-
-    let strongConflict = false;
-    let weakConflict = false;
-    let statusBadge = '<span class="synergy-tag-ok">Tiszta Talaj ✨</span>';
-
-    // A) ERŐS LÁNCOLAT VIZSGÁLAT (Közvetlen ágyástárs)
-    neighbors.forEach(nName => {
-      const neighborCrop = CROPS.find(c => c.name === allTeamsGardenData[nName].cropsY3);
-      if (currentCrop && neighborCrop && currentCrop.family === neighborCrop.family) {
-        strongConflict = true;
-      }
-    });
-
-    // B) GYENGE LÁNCOLAT VIZSGÁLAT (Kertszintű monokultúra halmozódás)
-    if (currentCrop && familyCount[currentCrop.family] >= 3) {
-      weakConflict = true;
-    }
-
-    if (strongConflict) {
-      statusBadge = '<span class="synergy-tag-strong">🚨 Erős lánc: Gyökérfertőzés!</span>';
-      totalPestPressure += 2;
-    } else if (weakConflict) {
-      statusBadge = '<span class="synergy-tag-weak">⚠️ Gyenge lánc: Lepkerajzás!</span>';
-      totalPestPressure += 1;
-    }
-
-    const tr = document.createElement('tr');
-    if (isCurrent) tr.style.background = 'rgba(16, 185, 129, 0.12)';
-    tr.innerHTML = `
-      <td style="font-weight:700; ${isCurrent ? 'color:var(--green);' : ''}">${tName} ${isCurrent ? '⭐' : ''}</td>
-      <td>${data.cropsY1}</td>
-      <td>${data.cropsY2}</td>
-      <td>${data.cropsY3}</td>
-      <td>${statusBadge}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-
-  // Ha a kártevő-nyomás magas, villan a válság-banner
-  const crisisBanner = document.getElementById('crisisShockBanner');
-  if (totalPestPressure >= 3) {
-    crisisBanner.style.display = 'block';
-  } else {
-    crisisBanner.style.display = 'none';
-  }
-
-  // 2. KÖZÖS ÉLÉSKAMRA KISZÁMÍTÁSA
-  calculateClassPantry(teams);
-}
-
-function calculateClassPantry(teams) {
-  let fruit = 0;   // Solanaceae / Cucurbitaceae
-  let root = 0;    // Brassicaceae (retek) / Apiaceae
-  let legume = 0;  // Fabaceae
-  let allium = 0;  // Amaryllidaceae / Amaranthaceae
-  let grain = 0;   // Poaceae
-
-  teams.forEach(tName => {
-    const cropName = allTeamsGardenData[tName].cropsY3;
-    const crop = CROPS.find(c => c.name === cropName);
-    if (!crop) return;
-
-    if (crop.family === 'solanaceae' || crop.family === 'cucurbitaceae') fruit += 3;
-    if (crop.family === 'apiaceae' || crop.id === 'retek') root += 2;
-    if (crop.family === 'fabaceae') legume += 2;
-    if (crop.family === 'amaryllidaceae' || crop.family === 'amaranthaceae') allium += 2;
-    if (crop.family === 'poaceae') grain += 3;
-  });
-
-  document.getElementById('pantryFruit').textContent = `${fruit} kosár`;
-  document.getElementById('pantryRoot').textContent = `${root} kosár`;
-  document.getElementById('pantryLegume').textContent = `${legume} kosár`;
-  document.getElementById('pantryAlliums').textContent = `${allium} kosár`;
-  document.getElementById('pantryGrain').textContent = `${grain} kosár`;
-
-  const pantryStatus = document.getElementById('pantryBalanceStatus');
-
-  // Kamra kiértékelés: van-e hiánycikk?
-  const categories = [fruit, root, legume, allium, grain];
-  const zeroCount = categories.filter(c => c === 0).length;
-
-  if (zeroCount === 0 && fruit >= 4 && legume >= 2) {
-    pantryStatus.style.background = "rgba(16, 185, 129, 0.2)";
-    pantryStatus.style.color = "#6ee7b7";
-    pantryStatus.style.border = "1px solid var(--green)";
-    pantryStatus.innerHTML = "🌟 ARANY KAMRA DÍJ: Az iskolakert teljesen önellátó és változatos! Jutott fehérje, vitamin és téli tárolható zöldség is!";
-  } else if (zeroCount <= 2) {
-    pantryStatus.style.background = "rgba(245, 158, 11, 0.2)";
-    pantryStatus.style.color = "#fde68a";
-    pantryStatus.style.border = "1px solid var(--amber)";
-    pantryStatus.innerHTML = "⚠️ FÉLIG ÜRES KAMRA: Túl sok a paradicsom vagy a kukorica, de hiányzik a gyökérzöldség vagy a fehérjedús hüvelyes!";
-  } else {
-    pantryStatus.style.background = "rgba(239, 68, 68, 0.2)";
-    pantryStatus.style.color = "#fca5a5";
-    pantryStatus.style.border = "1px solid var(--red)";
-    pantryStatus.innerHTML = "🚨 EGYOLDALÚ TÁPLÁLKOZÁS: Csak egyféle zöldség termett a kertben, a konyha nem tud változatos ebédet főzni!";
-  }
-}
-// OSZTÁLYSZINTŰ ADATTÁR A 7 PARCELLÁHOZ
 let allTeamsGardenData = {
   'Magágyúsok': { cropsY1: 'Paradicsom', cropsY2: 'Csemegekukorica', cropsY3: 'Paradicsom', pest: 'Fitoftóra & Bogár 🐛', isClean: false },
   'Gémorr fúrók': { cropsY1: 'Csemegekukorica', cropsY2: 'Paradicsom', cropsY3: 'Csemegekukorica', pest: 'Kukoricabogár 🦗', isClean: false },
@@ -1489,6 +1266,168 @@ const slotEarly = document.getElementById('slotEarlySpring');
 const slotSummer = document.getElementById('slotSummer');
 const slotWinter = document.getElementById('slotWinter');
 const slotBoxes = [slotEarly, slotSummer, slotWinter];
+
+// HIBABIZTOS ADATMENTÉS GOOGLE SPREADSHEETBE (CORS mentes POST)
+async function syncYearToSpreadsheet() {
+  const currentTeam = teamSelector.value;
+  const payload = {
+    team: currentTeam,
+    year: gameState.currentYear,
+    early: gameState.currentPlan.early.map(c => c.name).join(' + '),
+    summer: gameState.currentPlan.summer.map(c => c.name).join(' + '),
+    winter: gameState.currentPlan.winter.map(c => c.name).join(' + '),
+    yield: gameState.totalYield,
+    soil: gameState.soilHealth
+  };
+
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+      body: JSON.stringify(payload)
+    });
+    console.log("✅ Sikeres kérés elküldve az Apps Scriptnek!");
+  } catch (err) {
+    console.warn("Szinkronizálási figyelmeztetés:", err);
+  }
+}
+
+// OSZTÁLYSZINTŰ ADATOK LEKÉRÉSE
+async function fetchAndAnalyzeGardenNetwork() {
+  try {
+    const res = await fetch(APPS_SCRIPT_URL);
+    const result = await res.json();
+    if (result && result.status === "success" && result.teams) {
+      Object.keys(result.teams).forEach(tName => {
+        if (allTeamsGardenData[tName]) {
+          const t = result.teams[tName];
+          allTeamsGardenData[tName].cropsY3 = t.summer || allTeamsGardenData[tName].cropsY3;
+        }
+      });
+    }
+  } catch (err) {
+    console.warn("A központi adatok lekérése helyi módban folytatódik.", err);
+  }
+  evaluateGardenEcology();
+}
+
+function evaluateGardenEcology() {
+  const teams = Object.keys(allTeamsGardenData);
+  const currentTeam = teamSelector.value;
+
+  const familyCount = {};
+  teams.forEach(t => {
+    const cropName = allTeamsGardenData[t].cropsY3;
+    const crop = CROPS.find(c => c.name === cropName);
+    if (crop) {
+      familyCount[crop.family] = (familyCount[crop.family] || 0) + 1;
+    }
+  });
+
+  const tbody = document.getElementById('gardenMatrixBody');
+  tbody.innerHTML = '';
+  let totalPestPressure = 0;
+
+  teams.forEach(tName => {
+    const data = allTeamsGardenData[tName];
+    const isCurrent = tName === currentTeam;
+    const currentCrop = CROPS.find(c => c.name === data.cropsY3);
+    const neighbors = BED_NEIGHBORS[tName] || [];
+
+    let strongConflict = false;
+    let weakConflict = false;
+    let statusBadge = '<span class="synergy-tag-ok">Tiszta Talaj ✨</span>';
+
+    neighbors.forEach(nName => {
+      const neighborCrop = CROPS.find(c => c.name === allTeamsGardenData[nName].cropsY3);
+      if (currentCrop && neighborCrop && currentCrop.family === neighborCrop.family) {
+        strongConflict = true;
+      }
+    });
+
+    if (currentCrop && familyCount[currentCrop.family] >= 3) {
+      weakConflict = true;
+    }
+
+    if (strongConflict) {
+      statusBadge = '<span class="synergy-tag-strong">🚨 Erős lánc: Gyökérfertőzés!</span>';
+      totalPestPressure += 2;
+    } else if (weakConflict) {
+      statusBadge = '<span class="synergy-tag-weak">⚠️ Gyenge lánc: Lepkerajzás!</span>';
+      totalPestPressure += 1;
+    }
+
+    const tr = document.createElement('tr');
+    if (isCurrent) tr.style.background = 'rgba(16, 185, 129, 0.12)';
+    tr.innerHTML = `
+      <td style="font-weight:700; ${isCurrent ? 'color:var(--green);' : ''}">${tName} ${isCurrent ? '⭐' : ''}</td>
+      <td>${data.cropsY1}</td>
+      <td>${data.cropsY2}</td>
+      <td>${data.cropsY3}</td>
+      <td>${statusBadge}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  const crisisBanner = document.getElementById('crisisShockBanner');
+  if (totalPestPressure >= 3) {
+    crisisBanner.style.display = 'block';
+  } else {
+    crisisBanner.style.display = 'none';
+  }
+
+  calculateClassPantry(teams);
+}
+
+function calculateClassPantry(teams) {
+  let fruit = 0;
+  let root = 0;
+  let legume = 0;
+  let allium = 0;
+  let grain = 0;
+
+  teams.forEach(tName => {
+    const cropName = allTeamsGardenData[tName].cropsY3;
+    const crop = CROPS.find(c => c.name === cropName);
+    if (!crop) return;
+
+    if (crop.family === 'solanaceae' || crop.family === 'cucurbitaceae') fruit += 3;
+    if (crop.family === 'apiaceae' || crop.id === 'retek') root += 2;
+    if (crop.family === 'fabaceae') legume += 2;
+    if (crop.family === 'amaryllidaceae' || crop.family === 'amaranthaceae') allium += 2;
+    if (crop.family === 'poaceae') grain += 3;
+  });
+
+  document.getElementById('pantryFruit').textContent = `${fruit} kosár`;
+  document.getElementById('pantryRoot').textContent = `${root} kosár`;
+  document.getElementById('pantryLegume').textContent = `${legume} kosár`;
+  document.getElementById('pantryAlliums').textContent = `${allium} kosár`;
+  document.getElementById('pantryGrain').textContent = `${grain} kosár`;
+
+  const pantryStatus = document.getElementById('pantryBalanceStatus');
+  const categories = [fruit, root, legume, allium, grain];
+  const zeroCount = categories.filter(c => c === 0).length;
+
+  if (zeroCount === 0 && fruit >= 4 && legume >= 2) {
+    pantryStatus.style.background = "rgba(16, 185, 129, 0.2)";
+    pantryStatus.style.color = "#6ee7b7";
+    pantryStatus.style.border = "1px solid var(--green)";
+    pantryStatus.innerHTML = "🌟 ARANY KAMRA DÍJ: Az iskolakert teljesen önellátó és változatos! Jutott fehérje, vitamin és téli zöldség is!";
+  } else if (zeroCount <= 2) {
+    pantryStatus.style.background = "rgba(245, 158, 11, 0.2)";
+    pantryStatus.style.color = "#fde68a";
+    pantryStatus.style.border = "1px solid var(--amber)";
+    pantryStatus.innerHTML = "⚠️ FÉLIG ÜRES KAMRA: Túl sok az egyféle termény, de hiányzik a gyökérzöldség vagy a fehérjedús hüvelyes!";
+  } else {
+    pantryStatus.style.background = "rgba(239, 68, 68, 0.2)";
+    pantryStatus.style.color = "#fca5a5";
+    pantryStatus.style.border = "1px solid var(--red)";
+    pantryStatus.innerHTML = "🚨 EGYOLDALÚ TÁPLÁLKOZÁS: Csak egyféle zöldség termett, a konyha nem tud változatos ebédet főzni!";
+  }
+}
 
 function updateTeamBaseline() {
   const team = teamSelector.value;
@@ -1724,7 +1663,6 @@ btnReset.addEventListener('click', () => {
   pestAlertBox.style.display = 'none';
 });
 
-// ÉLŐ KÁRTEVŐ- ÉS CSALÁD-ELLENŐRZÉS TERVEZÉS KÖZBEN
 function inspectCropRotationWarning() {
   const summerCrop = gameState.currentPlan.summer[0];
   const earlyCrop = gameState.currentPlan.early[0];
@@ -1750,7 +1688,7 @@ function inspectCropRotationWarning() {
       <span style="font-size:1.6rem;">${pest.icon}</span>
       <div>
         <strong>KÁRTEVŐ RIADÓ: ${pest.name}!</strong><br>
-        <span>${pest.desc} Az előző növények rokon családba tartoztak (${summerCrop.family}). Ha így indítjátok el, a termés egy része odalesz!</span>
+        <span>${pest.desc} Az előző növények rokon családba tartoztak (${summerCrop.family}).</span>
       </div>
     `;
     triggered = true;
@@ -1773,7 +1711,6 @@ function inspectCropRotationWarning() {
   }
 }
 
-// ÉV LEZÁRÁSA ÉS SZIMULÁCIÓ
 btnCommit.addEventListener('click', () => {
   const plan = gameState.currentPlan;
   const year = gameState.currentYear;
@@ -1796,35 +1733,33 @@ btnCommit.addEventListener('click', () => {
   plan.early.forEach(crop => {
     if (!crop.frostProof || !crop.earlyOk) {
       gameState.soilHealth -= 25;
-      logs.push({ type: 'danger', text: `🥶 KORA TAVASZI FAGYHALÁL! A melegigényes ${crop.name} február-márciusban elfagyott! (-25 talajélet).` });
+      logs.push({ type: 'danger', text: `🥶 KORA TAVASZI FAGYHALÁL! A melegigényes ${crop.name} elfagyott (-25 talajélet)!` });
     } else {
       if (prevFamilies.includes(crop.family) && crop.family !== 'none') {
         gameState.soilHealth -= 30;
         const pest = FAMILY_PESTS[crop.family] || { icon: '🍄', name: 'Gyökérkártevő' };
-        logs.push({ type: 'danger', text: `${pest.icon} KÁRTEVŐ FERTOZÉS! A(z) ${crop.name} előtt rokon növény volt (${crop.family}). Megjelent a ${pest.name}: 0 termés (-30 talajpont)!` });
+        logs.push({ type: 'danger', text: `${pest.icon} KÁRTEVŐ FERTŐZÉS! A(z) ${crop.name} előtt rokon család volt: 0 termés (-30 pont)!` });
       } else {
         const y = crop.yield || 0;
         gameState.totalYield += y;
         gameState.nitrogen -= (crop.cost || 0);
-        logs.push({ type: 'success', text: `🌱 Sikeres kora tavaszi idény: ${crop.name} szépen beérett (+${y} kosár)!` });
+        logs.push({ type: 'success', text: `🌱 Sikeres kora tavaszi idény: ${crop.name} beérett (+${y} kosár)!` });
       }
     }
-  }
-                  
-  );
+  });
 
   // 2. NYÁRI FŐKULTÚRA
   plan.summer.forEach(crop => {
     if (crop.id === 'retek' || crop.id === 'spenot') {
       gameState.soilHealth -= 10;
-      logs.push({ type: 'danger', text: `☀️ HŐSOKK & FELMAGZÁS! A 25-30°C-os kánikulában a(z) ${crop.name} azonnal magba szökött: 0 kosár termés!` });
+      logs.push({ type: 'danger', text: `☀️ HŐSOKK & FELMAGZÁS! A kánikulában a(z) ${crop.name} magba szökött: 0 kosár termés!` });
       return;
     }
 
     let timePenalty = 1.0;
     if (plan.early.some(c => c.days >= 90) && crop.days >= 110) {
       timePenalty = 0.3;
-      logs.push({ type: 'warn', text: `⏳ TENYÉSZIDŐ CSÚSZÁS! A tavaszi gyökérzöldség miatt a(z) ${crop.name} későn került ki, nem tudott beérni (-70% termés)!` });
+      logs.push({ type: 'warn', text: `⏳ TENYÉSZIDŐ CSÚSZÁS! A későn ültetett ${crop.name} nem tudott teljesen beérni (-70% termés)!` });
     }
 
     let pestMultiplier = 1.0;
@@ -1832,19 +1767,19 @@ btnCommit.addEventListener('click', () => {
       const pest = FAMILY_PESTS[crop.family] || { icon: '🐛', name: 'Talajkórokozó' };
       gameState.soilHealth -= 35;
       pestMultiplier = 0.25;
-      logs.push({ type: 'danger', text: `🚨 SÚLYOS KÁRTEVŐ-INVÁZIÓ: ${pest.icon} ${pest.name}! Két nyáron át ugyanaz a család (${crop.family}) szerepelt: a hernyók felzabálták a termés 75%-át (-35 talajpont)!` });
+      logs.push({ type: 'danger', text: `🚨 SÚLYOS KÁRTEVŐ-INVÁZIÓ: ${pest.icon} ${pest.name}! A kártevők felélték a termés javát (-35 talajpont)!` });
     }
 
     const earlyFamilies = plan.early.map(c => c.family);
     if (earlyFamilies.includes(crop.family) && crop.family !== 'none') {
       gameState.soilHealth -= 20;
       pestMultiplier = Math.min(pestMultiplier, 0.5);
-      logs.push({ type: 'danger', text: `❌ CSALÁDI ISMÉTLÉS EGY ÉVBEN: Tavasz után nyáron is ${crop.family} volt a földben: a kórokozók azonnal átterjedtek!` });
+      logs.push({ type: 'danger', text: `❌ CSALÁDI ISMÉTLÉS EGY ÉVBEN: Tavasz után nyáron is ${crop.family} volt a földben!` });
     }
 
     if (crop.demand === 'heavy' && gameState.nitrogen <= 0) {
       gameState.soilHealth -= 25;
-      logs.push({ type: 'danger', text: `🥀 TÁPANYAG-ÉHÍNSÉG! Elfogyott a nitrogén (0 N). A(z) ${crop.name} elsárgult: 0 kosár termés (-25 talajpont)!` });
+      logs.push({ type: 'danger', text: `🥀 TÁPANYAG-ÉHÍNSÉG! Elfogyott a nitrogén (0 N). A(z) ${crop.name} elsárgult: 0 kosár termés!` });
     } else {
       gameState.nitrogen -= (crop.cost || 0);
       const rawYield = crop.yield || 0;
@@ -1862,7 +1797,7 @@ btnCommit.addEventListener('click', () => {
     }
   });
 
-  // 3. ŐSZ ÉS TÉL (BIOREMÉDIÁCIÓ ÉS TAKARÓK)
+  // 3. ŐSZ ÉS TÉL
   const isWinterCover = document.querySelector('.season-box[data-slot="winter"]').dataset.mode === 'cover';
   if (isWinterCover) {
     const count = plan.winter.length;
@@ -1873,7 +1808,7 @@ btnCommit.addEventListener('click', () => {
 
     plan.winter.forEach(c => {
       if (c.id === 'pohanka') {
-        logs.push({ type: 'warn', text: `🍂 HIDEGSORK: A pohánka már az októberi fagyokban elfagyott, nem védte a téli talajt!` });
+        logs.push({ type: 'warn', text: `🍂 HIDEGSORK: A pohánka az őszi fagyokban elfagyott, nem védte a téli talajt!` });
       } else {
         coverSoilBonus += (c.soilBonus || 15);
         if (c.family === 'fabaceae') coverNBonus += 2;
@@ -1882,18 +1817,18 @@ btnCommit.addEventListener('click', () => {
 
     if (hasMustard || hasFacelia) {
       coverSoilBonus += 15;
-      logs.push({ type: 'info', text: `🛡️ BIOREMÉDIÁCIÓ ÉS TALAJTISZTÍTÁS: A mustár és a facélia illóolajai elpusztították a káros talajfonalférgeket (+15 talajegészség)!` });
+      logs.push({ type: 'info', text: `🛡️ BIOREMÉDIÁCIÓ: A mustár és a facélia elpusztította a káros talajfonalférgeket (+15 talajpont)!` });
     }
 
     if (count >= 3) {
       coverSoilBonus += 25;
       coverNBonus += 1;
-      logs.push({ type: 'purple', text: `🌟 3-KOMPONENSŰ SZUPER-KEVERÉK! A sokféleség teljesen felfrissítette a mikrobiomot (+${coverSoilBonus} pont, +${coverNBonus} N)!` });
+      logs.push({ type: 'purple', text: `🌟 3-KOMPONENSŰ SZUPER-KEVERÉK! (+${coverSoilBonus} pont, +${coverNBonus} N)!` });
     } else if (count === 2) {
       coverSoilBonus += 10;
-      logs.push({ type: 'info', text: `🌾 2-fajú takarókeverék: Megvédte a humuszt a téli esőktől (+${coverSoilBonus} pont).` });
+      logs.push({ type: 'info', text: `🌾 2-fajú takarókeverék: Megvédte a humuszt télen (+${coverSoilBonus} pont).` });
     } else if (count === 1) {
-      logs.push({ type: 'info', text: `🌱 1-fajú takarónövény elvetve (+${coverSoilBonus} pont).` });
+      logs.push({ type: 'info', text: `🌱 1-fajú takarónövény (+${coverSoilBonus} pont).` });
     }
 
     gameState.soilHealth += coverSoilBonus;
@@ -1902,12 +1837,12 @@ btnCommit.addEventListener('click', () => {
     plan.winter.forEach(crop => {
       if (!crop.frostProof) {
         gameState.soilHealth -= 30;
-        logs.push({ type: 'danger', text: `🥶 TÉLI FAGYHALÁL! A(z) ${crop.name} novemberben elfagyott és elrohadt (-30 talajpont)!` });
+        logs.push({ type: 'danger', text: `🥶 TÉLI FAGYHALÁL! A(z) ${crop.name} novemberben elfagyott és elrohadt (-30 pont)!` });
       } else {
         const partialYield = Math.round((crop.yield || 0) * 0.5);
         gameState.totalYield += partialYield;
         gameState.soilHealth -= 20;
-        logs.push({ type: 'warn', text: `❄️ Téli szüret: Fagytűrő ${crop.name} (+${partialYield} kosár), de csupaszon maradt a talaj (-20 pont)!` });
+        logs.push({ type: 'warn', text: `❄️ Téli szüret: ${crop.name} (+${partialYield} kosár), de a csupasz talaj kimerült (-20 pont)!` });
       }
     });
   }
@@ -1922,7 +1857,6 @@ btnCommit.addEventListener('click', () => {
     winter: [...plan.winter]
   });
 
-  // Frissítjük a központi adatbázisban a csapat eredményét
   if (plan.summer[0]) {
     const sName = plan.summer[0].name;
     if (year === 1) allTeamsGardenData[team].cropsY1 = sName;
@@ -1936,6 +1870,8 @@ btnCommit.addEventListener('click', () => {
     d.textContent = `[${year}. Év] ${l.text}`;
     chronicleLog.prepend(d);
   });
+
+  // HÁTTÉRBEN MENTÜNK A GOOGLE TÁBLÁZATBA
   syncYearToSpreadsheet();
   updateDashboard();
 
@@ -1976,28 +1912,6 @@ function updateDashboard() {
   document.getElementById('valTotalScore').textContent = `${isNaN(total) ? 0 : total} pont`;
 }
 
-// 7 PARCELLÁS ÖSSZESÍTŐ MÁTRIX KITÖLTÉSE
-function renderGardenMatrix() {
-  const tbody = document.getElementById('gardenMatrixBody');
-  tbody.innerHTML = '';
-
-  Object.keys(allTeamsGardenData).forEach(tName => {
-    const data = allTeamsGardenData[tName];
-    const isCurrent = tName === teamSelector.value;
-    const tr = document.createElement('tr');
-    if (isCurrent) tr.style.background = 'rgba(16, 185, 129, 0.1)';
-
-    tr.innerHTML = `
-      <td style="font-weight:700; ${isCurrent ? 'color:var(--green);' : ''}">${tName} ${isCurrent ? '⭐' : ''}</td>
-      <td>${data.cropsY1}</td>
-      <td>${data.cropsY2}</td>
-      <td>${data.cropsY3}</td>
-      <td><span class="badge" style="background:rgba(239,68,68,0.2); color:#fca5a5;">${data.pest}</span></td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
 function showGameOver(isBankrupt = false) {
   const modal = document.getElementById('endGameModal');
   const team = teamSelector.value;
@@ -2012,18 +1926,15 @@ function showGameOver(isBankrupt = false) {
   const summary = document.getElementById('modalResultSummary');
   const awardsBox = document.getElementById('modalAwards');
   const trophyIcon = document.getElementById('modalTrophyIcon');
-  const crisisBanner = document.getElementById('crisisShockBanner');
   awardsBox.innerHTML = '';
 
   if (isBankrupt) {
     trophyIcon.textContent = '💥';
     summary.innerHTML = `<span style="color:#f87171; font-weight:800;">TALAJCSŐD MIATT KIESETT A CSAPAT!</span><br>A parcella talajélete összeomlott (15 pont alá esett). Halott talajon nem lehet gazdálkodni (0 pont).`;
-    crisisBanner.style.display = 'none';
+    document.getElementById('crisisShockBanner').style.display = 'none';
   } else {
     trophyIcon.textContent = '⚠️';
     summary.textContent = "A 3 éves ciklus véget ért. Egyénileg elértétek a pontokat, de nézzétek meg az alábbi iskolakerti összképet:";
-    // DRÁMAI SIRALMAS FORDULAT MEGJELENÍTÉSE
-    crisisBanner.style.display = 'block';
   }
 
   fetchAndAnalyzeGardenNetwork();
@@ -2072,12 +1983,11 @@ function showGameOver(isBankrupt = false) {
   modal.style.display = 'flex';
 }
 
-// OSZTÁLYTERMI KOOPERATÍV ÚJRAHANGOLÁS AKTIVÁLÁSA
 function enableClassroomTuning() {
   document.getElementById('endGameModal').style.display = 'none';
   const entry = document.createElement('div');
   entry.className = 'log-entry log-purple';
-  entry.innerHTML = `🤝 <strong>KÖZÖSSÉGI ÚJRAHANGOLÁS ELINDÍTVA!</strong> Menjetek oda a szomszédos ágyás csapataihoz! Cseréljetek növénycsaládokat úgy, hogy senkinél ne ismétlődjön ugyanaz a nyári zöldség!`;
+  entry.innerHTML = `🤝 <strong>KÖZÖSSÉGI ÚJRAHANGOLÁS ELINDÍTVA!</strong> Menjetek oda a szomszédos ágyás csapataihoz és cseréljetek növényeket!`;
   chronicleLog.prepend(entry);
 }
 
@@ -2151,7 +2061,6 @@ btnDoneMaster.addEventListener('click', () => {
   chronicleLog.prepend(entry);
 });
 
-// SZEZONÁLIS HŐMÉRSÉKLET ÉS ÜTKÖZÉSEK RAJZOLÁSA
 function updateTimelineRibbons() {
   const plan = gameState.currentPlan;
   const trackEarly = document.getElementById('trackEarlyContent');
@@ -2285,7 +2194,6 @@ function updateTimelineRibbons() {
   }
 }
 
-// INDÍTÁS
 updateTeamBaseline();
 renderPalette();
 </script>
