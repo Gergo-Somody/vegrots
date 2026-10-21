@@ -1300,17 +1300,29 @@ async function fetchAndAnalyzeGardenNetwork() {
   try {
     const res = await fetch(APPS_SCRIPT_URL);
     const result = await res.json();
+
     if (result && result.status === "success" && result.teams) {
       Object.keys(result.teams).forEach(tName => {
         if (allTeamsGardenData[tName]) {
-          const t = result.teams[tName];
-          allTeamsGardenData[tName].cropsY3 = t.summer || allTeamsGardenData[tName].cropsY3;
+          const remoteYears = result.teams[tName].years || {};
+
+          // Beemeljük az 1., 2. és 3. évet a táblázatból
+          [1, 2, 3].forEach(y => {
+            if (remoteYears[y]) {
+              allTeamsGardenData[tName].years[y] = {
+                early: remoteYears[y].early,
+                summer: remoteYears[y].summer,
+                winter: remoteYears[y].winter
+              };
+            }
+          });
         }
       });
     }
   } catch (err) {
     console.warn("A központi adatok lekérése helyi módban folytatódik.", err);
   }
+
   evaluateGardenEcology();
 }
 
