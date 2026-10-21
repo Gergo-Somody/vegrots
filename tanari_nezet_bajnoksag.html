@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VegRots – Tanári Monitoring & Elemző Pult</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #131b2e;
+      --card-hover: #1e293b;
+      --border: rgba(148, 163, 184, 0.18);
+      --green: #10b981;
+      --green-glow: rgba(16, 185, 129, 0.2);
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --blue: #38bdf8;
+      --purple: #a855f7;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container { max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+    header {
+      background: linear-gradient(135deg, #131b2e 0%, #0b1120 100%);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .header-left h1 { font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+    .header-left p { color: var(--text-muted); font-size: 0.85rem; }
+    .badge-teacher {
+      background: rgba(168, 85, 247, 0.18);
+      color: var(--purple);
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-weight: 800;
+      border: 1px solid rgba(168, 85, 247, 0.35);
+    }
+
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: #1e293b;
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn:hover { background: #334155; }
+    .btn-primary { background: var(--green); color: #022c22; border-color: var(--green); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 14px var(--green-glow); }
+
+    /* Vezérlő sáv & Tabok */
+    .controls-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 12px 18px;
+      border-radius: 14px;
+    }
+    .view-switch {
+      display: flex;
+      background: #090d16;
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      gap: 4px;
+    }
+    .switch-tab {
+      padding: 6px 14px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      border: none;
+      background: transparent;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .switch-tab.active { background: #1e293b; color: var(--blue); }
+
+    .auto-refresh-tag { font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+
+    /* Gyors statisztika */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    .summary-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .summary-card span { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; }
+    .summary-card strong { font-size: 1.4rem; font-weight: 800; }
+
+    /* Ágyás kártyák nézet (Grid) */
+    .team-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 16px;
+    }
+    .team-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+    }
+    .team-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+    .team-title { font-size: 1.1rem; font-weight: 800; color: var(--text); }
+    .team-latest-tag {
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--blue);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+    .team-metrics-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      background: #090d16;
+      border-radius: 8px;
+      padding: 8px 12px;
+    }
+    .metric-item span { font-size: 0.7rem; color: var(--text-muted); display: block; }
+    .metric-item strong { font-size: 1rem; font-weight: 700; }
+
+    .seasons-flow-box {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.78rem;
+    }
+    .season-row-item {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      align-items: center;
+      gap: 8px;
+      background: rgba(30, 41, 59, 0.4);
+      padding: 5px 10px;
+      border-radius: 6px;
+    }
+    .season-label { font-weight: 700; color: var(--text-muted); }
+    .season-value { color: #f1f5f9; font-weight: 600; }
+
+    /* Idősoros krónika / Történet nézet */
+    .history-timeline-box {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .history-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .history-team-name { font-size: 1.05rem; font-weight: 800; color: var(--green); }
+    .history-timestamp { font-size: 0.75rem; color: var(--text-muted); }
+
+    .history-steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    @media (max-width: 800px) { .history-steps-grid { grid-template-columns: 1fr; } }
+
+    .history-step-col {
+      background: #090d16;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 8px;
+      font-size: 0.75rem;
+    }
+    .history-step-col strong { display: block; margin-bottom: 2px; color: var(--blue); }
+
+    .status-badge-dead { background: rgba(239, 68, 68, 0.2); color: #fca5a5; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 0.7rem; }
+    .status-badge-ok { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 0.7rem; }
+    
+    .loading-spinner {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <header>
+    <div class="header-left">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span class="badge-teacher">🎓 Tanári Vezérlőpult</span>
+        <span style="font-size:0.75rem; color:var(--text-muted);">VegRots Rábapatona</span>
+      </div>
+      <h1>🌱 Kerti Vetésforgó Tanári Monitor</h1>
+      <p>A 7 iskolakerti ágyás élő beküldéseinek összevetése, fejlődési krónikája és hibaelemzése.</p>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn" id="btnManualRefresh">🔄 Frissítés most</button>
+      <button class="btn btn-primary" onclick="window.print()">🖨️ Riport Nyomtatása</button>
+    </div>
+  </header>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <span>AKTÍV / BEKÜLDÖTT ÁGYÁSOK</span>
+      <strong id="statActiveBeds">0 / 7</strong>
+    </div>
+    <div class="summary-card">
+      <span>ÁTLAGOS TALAJÉLET</span>
+      <strong id="statAvgSoil" style="color:var(--green);">—</strong>
+    </div>
+    <div class="summary-card">
+      <span>ÖSSZES BETAKARÍTOTT TERMÉS</span>
+      <strong id="statTotalYield" style="color:var(--amber);">0 kosár</strong>
+    </div>
+    <div class="summary-card">
+      <span>LEGFELKAPOTTABB CSALÁD</span>
+      <strong id="statDominantFamily" style="color:var(--blue);">—</strong>
+    </div>
+  </div>
+
+  <div class="controls-bar">
+    <div class="view-switch">
+      <button class="switch-tab active" data-view="latest" id="tabLatest">⚡ Legfrissebb Állapot (Áttekintő)</button>
+      <button class="switch-tab" data-view="history" id="tabHistory">📜 Teljes Fejlődési Történet (Log)</button>
+    </div>
+
+    <div class="auto-refresh-tag">
+      <span id="syncStatus">🟢 Élő kapcsolat</span> • 
+      <span id="lastUpdated">Még nincs frissítve</span>
+    </div>
+  </div>
+
+  <!-- NÉZET 1: Legfrissebb Állapot (Csapatonként 1 db aktuális kártya) -->
+  <section id="viewLatest" class="team-cards-grid">
+    <div class="loading-spinner">Adatok betöltése a táblázatból...</div>
+  </section>
+
+  <!-- NÉZET 2: Teljes Fejlődési Krónika (Minden rögzítés időrendben) -->
+  <section id="viewHistory" class="history-timeline-box" style="display:none;">
+    <div class="loading-spinner">Krónika betöltése...</div>
+  </section>
+
+</div>
+
+<script>
+// A publikált Google Apps Script URL-ed:
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby6nNEj7Spkrm8aH2hvXvT2mhRGOLWx8qZqrRPfGKJwIRfIlSsYkVwLBO8fMzCUtjsSAw/exec";
+
+// A 7 hivatalos iskolakerti ágyáscsapat
+const OFFICIAL_TEAMS = [
+  'Magágyúsok',
+  'Gémorr fúrók',
+  'Zöld lándzsások',
+  'Vitorlázó jávaiak',
+  'Mag páncélosok',
+  'Hangya-taxik',
+  'Kemény magok'
+];
+
+let rawLogRows = [];
+let latestPerTeam = {};
+
+// Fülek közötti váltás
+document.getElementById('tabLatest').addEventListener('click', () => switchView('latest'));
+document.getElementById('tabHistory').addEventListener('click', () => switchView('history'));
+document.getElementById('btnManualRefresh').addEventListener('click', fetchData);
+
+function switchView(viewName) {
+  document.querySelectorAll('.switch-tab').forEach(b => b.classList.remove('active'));
+  if (viewName === 'latest') {
+    document.getElementById('tabLatest').classList.add('active');
+    document.getElementById('viewLatest').style.display = 'grid';
+    document.getElementById('viewHistory').style.display = 'none';
+  } else {
+    document.getElementById('tabHistory').classList.add('active');
+    document.getElementById('viewLatest').style.display = 'none';
+    document.getElementById('viewHistory').style.display = 'flex';
+  }
+}
+
+async function fetchData() {
+  const syncTag = document.getElementById('syncStatus');
+  syncTag.textContent = '⏳ Szinkronizálás...';
+  
+  try {
+    const res = await fetch(APPS_SCRIPT_URL);
+    const result = await res.json();
+
+    if (result && result.status === 'success') {
+      processData(result.teams);
+      renderLatestCards();
+      renderHistoryList();
+      updateTeacherSummary();
+
+      syncTag.textContent = '🟢 Frissítve';
+      document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString('hu-HU');
+    } else {
+      syncTag.textContent = '⚠️ Nem érkezett adat';
+    }
+  } catch (err) {
+    console.error("Hiba az adatok lekérésekor:", err);
+    syncTag.textContent = '❌ Kapcsolati hiba';
+  }
+}
+
+function processData(teamsObj) {
+  latestPerTeam = {};
+  rawLogRows = [];
+
+  // Végigmegyünk a csapatokon és az éveiken
+  Object.keys(teamsObj || {}).forEach(teamName => {
+    const tData = teamsObj[teamName];
+    const years = tData.years || {};
+
+    let maxYear = 0;
+    let mostRecentRecord = null;
+
+    Object.keys(years).forEach(yNum => {
+      const rec = years[yNum];
+      const entry = {
+        team: teamName,
+        year: Number(yNum),
+        early: rec.early || '—',
+        summer: rec.summer || '—',
+        winter: rec.winter || '—',
+        yield: Number(rec.yield) || 0,
+        soil: Number(rec.soil) || 0,
+        timestamp: rec.timestamp ? new Date(rec.timestamp) : new Date()
+      };
+
+      rawLogRows.push(entry);
+
+      // Kikeressük a legnagyobb évet vagy legfrissebb időbélyeget
+      if (Number(yNum) >= maxYear) {
+        maxYear = Number(yNum);
+        mostRecentRecord = entry;
+      }
+    });
+
+    if (mostRecentRecord) {
+      latestPerTeam[teamName] = {
+        latest: mostRecentRecord,
+        allYears: years
+      };
+    }
+  });
+
+  // Időrendbe rendezzük a naplót (legfrissebb elöl)
+  rawLogRows.sort((a, b) => b.timestamp - a.timestamp);
+}
+
+function renderLatestCards() {
+  const container = document.getElementById('viewLatest');
+  container.innerHTML = '';
+
+  OFFICIAL_TEAMS.forEach(teamName => {
+    const data = latestPerTeam[teamName];
+    const card = document.createElement('div');
+    card.className = 'team-card';
+
+    if (!data) {
+      // Még nincs beküldés ebből az ágyásból
+      card.innerHTML = `
+        <div class="team-card-header">
+          <div>
+            <div class="team-title">${teamName}</div>
+            <span style="font-size:0.75rem; color:var(--text-muted);">Még nem indított szimulációt</span>
+          </div>
+          <span style="font-size:0.72rem; color:var(--text-muted); background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:6px;">Inaktív</span>
+        </div>
+        <div style="padding:20px 0; text-align:center; color:var(--text-muted); font-size:0.8rem; font-style:italic;">
+          Várakozás a csapat első évének lezárására...
+        </div>
+      `;
+      container.appendChild(card);
+      return;
+    }
+
+    const cur = data.latest;
+    const isSoilDead = cur.soil <= 15;
+
+    // Megvizsgáljuk, hányadik évnél tartanak
+    const completedYears = Object.keys(data.allYears).map(y => `${y}. Év`).join(', ');
+
+    card.innerHTML = `
+      <div class="team-card-header">
+        <div>
+          <div class="team-title">${teamName}</div>
+          <span style="font-size:0.75rem; color:var(--text-muted);">Utolsó rögzített kör: <strong>${cur.year}. Év</strong> (${cur.timestamp.toLocaleTimeString('hu-HU')})</span>
+        </div>
+        <span class="team-latest-tag">${completedYears} lezárva</span>
+      </div>
+
+      <div class="team-metrics-row">
+        <div class="metric-item">
+          <span>Talaj-mikrobiom élet</span>
+          <strong style="color:${isSoilDead ? 'var(--red)' : 'var(--green)'};">
+            ${cur.soil} pont ${isSoilDead ? '🚨 (CSŐD)' : ''}
+          </strong>
+        </div>
+        <div class="metric-item">
+          <span>Betakarított termés</span>
+          <strong style="color:var(--amber);">${cur.yield} kosár</strong>
+        </div>
+      </div>
+
+      <div class="seasons-flow-box">
+        <span style="font-size:0.7rem; font-weight:800; color:var(--text-muted); text-transform:uppercase;">
+          A legutóbbi (${cur.year}. Év) vetéssora:
+        </span>
+        <div class="season-row-item">
+          <span class="season-label">🌱 Kora tavasz:</span>
+          <span class="season-value">${cur.early}</span>
+        </div>
+        <div class="season-row-item">
+          <span class="season-label">☀️ Nyár:</span>
+          <span class="season-value">${cur.summer}</span>
+        </div>
+        <div class="season-row-item">
+          <span class="season-label">❄️ Tél:</span>
+          <span class="season-value">${cur.winter}</span>
+        </div>
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+function renderHistoryList() {
+  const container = document.getElementById('viewHistory');
+  container.innerHTML = '';
+
+  if (rawLogRows.length === 0) {
+    container.innerHTML = `<div class="loading-spinner">Még nincs rögzített történet.</div>`;
+    return;
+  }
+
+  rawLogRows.forEach(row => {
+    const card = document.createElement('div');
+    card.className = 'history-card';
+
+    const isDead = row.soil <= 15;
+    const timeStr = row.timestamp.toLocaleDateString('hu-HU') + ' ' + row.timestamp.toLocaleTimeString('hu-HU');
+
+    card.innerHTML = `
+      <div class="history-header">
+        <div>
+          <span class="history-team-name">${row.team}</span>
+          <span style="color:var(--text-muted); font-size:0.85rem; margin-left:6px;">➔ <strong>${row.year}. Évi futás</strong></span>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="history-timestamp">🕒 ${timeStr}</span>
+          <span class="${isDead ? 'status-badge-dead' : 'status-badge-ok'}">
+            ${isDead ? 'Talajcsőd' : 'Sikeres'}
+          </span>
+        </div>
+      </div>
+
+      <div class="history-steps-grid">
+        <div class="history-step-col">
+          <strong>1. Kora tavasz</strong>
+          <span>${row.early}</span>
+        </div>
+        <div class="history-step-col">
+          <strong>2. Nyári főidény</strong>
+          <span>${row.summer}</span>
+        </div>
+        <div class="history-step-col">
+          <strong>3. Téli takaró / zöldség</strong>
+          <span>${row.winter}</span>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-muted); padding-top:4px; border-top:1px solid rgba(255,255,255,0.05);">
+        <span>Részeredmény ennél a lépésnél:</span>
+        <span>
+          Talajélet: <strong style="color:var(--green);">${row.soil} pont</strong> | 
+          Hozam: <strong style="color:var(--amber);">${row.yield} kosár</strong>
+        </span>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function updateTeacherSummary() {
+  const activeTeamsCount = Object.keys(latestPerTeam).length;
+  document.getElementById('statActiveBeds').textContent = `${activeTeamsCount} / ${OFFICIAL_TEAMS.length}`;
+
+  if (activeTeamsCount === 0) return;
+
+  let totalSoil = 0;
+  let totalYield = 0;
+  const cropCounts = {};
+
+  Object.values(latestPerTeam).forEach(t => {
+    totalSoil += t.latest.soil;
+    totalYield += t.latest.yield;
+
+    // Számoljuk a leggyakoribb nyári főkultúrákat beszélgetésindítónak
+    const sCrop = t.latest.summer;
+    if (sCrop && sCrop !== '—') {
+      cropCounts[sCrop] = (cropCounts[sCrop] || 0) + 1;
+    }
+  });
+
+  const avgSoil = Math.round(totalSoil / activeTeamsCount);
+  document.getElementById('statAvgSoil').textContent = `${avgSoil} pont`;
+  document.getElementById('statTotalYield').textContent = `${totalYield} kosár`;
+
+  // Leggyakoribb növény megtalálása
+  let topCrop = 'Változatos';
+  let maxCount = 0;
+  Object.keys(cropCounts).forEach(c => {
+    if (cropCounts[c] > maxCount) {
+      maxCount = cropCounts[c];
+      topCrop = `${c} (${maxCount} ágyásban)`;
+    }
+  });
+  document.getElementById('statDominantFamily').textContent = topCrop;
+}
+
+// Első betöltés
+fetchData();
+
+// 10 másodpercenként automatikus csendes frissítés tanórán
+setInterval(fetchData, 10000);
+</script>
+
+</body>
+</html>
