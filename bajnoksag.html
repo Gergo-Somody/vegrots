@@ -1109,9 +1109,9 @@
         <thead>
           <tr>
             <th>Ágyás / Csapat</th>
-            <th>1. Év Nyár</th>
-            <th>2. Év Nyár</th>
-            <th>3. Év Nyár</th>
+            <th>1. Év (3 Szakasz)</th>
+            <th>2. Év (3 Szakasz)</th>
+            <th>3. Év (3 Szakasz)</th>
             <th>Kártevő Státusz</th>
           </tr>
         </thead>
@@ -1235,13 +1235,13 @@ const BED_NEIGHBORS = {
 };
 
 let allTeamsGardenData = {
-  'Magágyúsok': { cropsY1: '—', cropsY2: '—', cropsY3: '—', pest: 'Várakozás...', isClean: true },
-  'Gémorr fúrók': { cropsY1: '—', cropsY2: '—', cropsY3: '—', pest: 'Várakozás...', isClean: true },
-  'Zöld lándzsások': { cropsY1: '—', cropsY2: '—', cropsY3: '—', pest: 'Várakozás...', isClean: true },
-  'Vitorlázó jávaiak': { cropsY1: '—', cropsY2: '—', cropsY3: '—', pest: 'Várakozás...', isClean: true },
-  'Mag páncélosok': { cropsY1: '—', cropsY2: '—', cropsY3: '—', pest: 'Várakozás...', isClean: true },
-  'Hangya-taxik': { cropsY1: '—', cropsY2: '—', cropsY3: '—', pest: 'Várakozás...', isClean: true },
-  'Kemény magok': { cropsY1: '—', cropsY2: '—', cropsY3: '—', pest: 'Várakozás...', isClean: true }
+  'Magágyúsok': { years: { 1: null, 2: null, 3: null }, allCrops: [] },
+  'Gémorr fúrók': { years: { 1: null, 2: null, 3: null }, allCrops: [] },
+  'Zöld lándzsások': { years: { 1: null, 2: null, 3: null }, allCrops: [] },
+  'Vitorlázó jávaiak': { years: { 1: null, 2: null, 3: null }, allCrops: [] },
+  'Mag páncélosok': { years: { 1: null, 2: null, 3: null }, allCrops: [] },
+  'Hangya-taxik': { years: { 1: null, 2: null, 3: null }, allCrops: [] },
+  'Kemény magok': { years: { 1: null, 2: null, 3: null }, allCrops: [] }
 };
 
 let gameState = {
@@ -1367,17 +1367,28 @@ function evaluateGardenEcology() {
       }
     }
 
+  
+    const formatYear = (yData) => {
+      if (!yData) return '<span style="color:var(--text-muted); font-size:0.75rem;">—</span>';
+      return `<div style="line-height:1.3; font-size:0.72rem;">
+        <div>🌱 ${yData.early}</div>
+        <div>☀️ ${yData.summer}</div>
+        <div>❄️ ${yData.winter}</div>
+      </div>`;
+    };
+
     const tr = document.createElement('tr');
     if (isCurrent) tr.style.background = 'rgba(16, 185, 129, 0.12)';
     tr.innerHTML = `
       <td style="font-weight:700; ${isCurrent ? 'color:var(--green);' : ''}">${tName} ${isCurrent ? '⭐' : ''}</td>
-      <td>${data.cropsY1}</td>
-      <td>${data.cropsY2}</td>
-      <td>${data.cropsY3}</td>
+      <td>${formatYear(data.years ? data.years[1] : null)}</td>
+      <td>${formatYear(data.years ? data.years[2] : null)}</td>
+      <td>${formatYear(data.years ? data.years[3] : null)}</td>
       <td>${statusBadge}</td>
     `;
     tbody.appendChild(tr);
-  });
+
+     });
 
   const crisisBanner = document.getElementById('crisisShockBanner');
   // Csak akkor jön a válság-banner, ha tényleg volt legalább 3 fertőzési pont
@@ -1398,15 +1409,20 @@ function calculateClassPantry(teams) {
   let grain = 0;
 
   teams.forEach(tName => {
-    const cropName = allTeamsGardenData[tName].cropsY3;
-    const crop = CROPS.find(c => c.name === cropName);
-    if (!crop) return;
-
-    if (crop.family === 'solanaceae' || crop.family === 'cucurbitaceae') fruit += 3;
-    if (crop.family === 'apiaceae' || crop.id === 'retek') root += 2;
-    if (crop.family === 'fabaceae') legume += 2;
-    if (crop.family === 'amaryllidaceae' || crop.family === 'amaranthaceae') allium += 2;
-    if (crop.family === 'poaceae') grain += 3;
+    const crops = allTeamsGardenData[tName].allCrops || [];
+    
+    crops.forEach(crop => {
+      // Gyümölcstermők (pl. paradicsom, paprika, cukkini)
+      if (crop.family === 'solanaceae' || crop.family === 'cucurbitaceae') fruit += 3;
+      // Gyökérzöldségek (pl. sárgarépa, tavaszi hónapos retek)
+      if (crop.family === 'apiaceae' || crop.id === 'retek') root += 2;
+      // Fehérjebázis (pl. kerti borsó, nyári bab)
+      if (crop.family === 'fabaceae') legume += 2;
+      // Ízesítők és zöldek (pl. tavaszi zöldhagyma, kora spenót, őszi káposzta)
+      if (crop.family === 'amaryllidaceae' || crop.family === 'amaranthaceae' || crop.id === 'kaposzta') allium += 2;
+      // Gabona / Szénhidrát (pl. kukorica)
+      if (crop.family === 'poaceae') grain += 3;
+    });
   });
 
   document.getElementById('pantryFruit').textContent = `${fruit} kosár`;
@@ -1419,21 +1435,22 @@ function calculateClassPantry(teams) {
   const categories = [fruit, root, legume, allium, grain];
   const zeroCount = categories.filter(c => c === 0).length;
 
-  if (zeroCount === 0 && fruit >= 4 && legume >= 2) {
+  // A küszöbértékeket érdemes a 3 szezonra kalibrálni
+  if (zeroCount === 0 && fruit >= 6 && legume >= 4 && root >= 4) {
     pantryStatus.style.background = "rgba(16, 185, 129, 0.2)";
     pantryStatus.style.color = "#6ee7b7";
     pantryStatus.style.border = "1px solid var(--green)";
-    pantryStatus.innerHTML = "🌟 ARANY KAMRA DÍJ: Az iskolakert teljesen önellátó és változatos! Jutott fehérje, vitamin és téli zöldség is!";
+    pantryStatus.innerHTML = "🌟 ARANY KAMRA DÍJ: A kora tavaszi és őszi zöldségekkel együtt az iskolakert teljesen önellátó és kiegyensúlyozott!";
   } else if (zeroCount <= 2) {
     pantryStatus.style.background = "rgba(245, 158, 11, 0.2)";
     pantryStatus.style.color = "#fde68a";
     pantryStatus.style.border = "1px solid var(--amber)";
-    pantryStatus.innerHTML = "⚠️ FÉLIG ÜRES KAMRA: Túl sok az egyféle termény, de hiányzik a gyökérzöldség vagy a fehérjedús hüvelyes!";
+    pantryStatus.innerHTML = "⚠️ FÉLIG ÜRES KAMRA: Hiányoznak a korai zöldek, a gyökérzöldségek vagy a nitrogénkötő hüvelyesek!";
   } else {
     pantryStatus.style.background = "rgba(239, 68, 68, 0.2)";
     pantryStatus.style.color = "#fca5a5";
     pantryStatus.style.border = "1px solid var(--red)";
-    pantryStatus.innerHTML = "🚨 EGYOLDALÚ TÁPLÁLKOZÁS: Csak egyféle zöldség termett, a konyha nem tud változatos ebédet főzni!";
+    pantryStatus.innerHTML = "🚨 EGYOLDALÚ TÁPLÁLKOZÁS: Nem használtátok ki a 3 szakaszt, a kamra szinte üres maradt!";
   }
 }
 
@@ -1865,12 +1882,42 @@ btnCommit.addEventListener('click', () => {
     winter: [...plan.winter]
   });
 
-  if (plan.summer[0]) {
-    const sName = plan.summer[0].name;
-    if (year === 1) allTeamsGardenData[team].cropsY1 = sName;
-    if (year === 2) allTeamsGardenData[team].cropsY2 = sName;
-    if (year === 3) allTeamsGardenData[team].cropsY3 = sName;
+// Korábbi kizárólagos nyári mentés helyett:
+  // Összegyűjtjük az adott évben ténylegesen betakarított zöldségeket (takarónövények kivételével)
+  const harvestedThisYear = [];
+  
+  // 1. Kora tavaszi zöldségek (ha fagytűrő és nincs tilalom alatt)
+  plan.early.forEach(c => {
+    if (c.type === 'crop' && c.frostProof && c.earlyOk && !prevFamilies.includes(c.family)) {
+      harvestedThisYear.push(c);
+    }
+  });
+
+  // 2. Nyári főnövény (ha nem magzott fel vagy éhezett ki teljesen)
+  plan.summer.forEach(c => {
+    if (c.type === 'crop' && c.id !== 'retek' && c.id !== 'spenot' && gameState.nitrogen > 0) {
+      harvestedThisYear.push(c);
+    }
+  });
+
+  // 3. Téli / Késői zöldség (ha nem takarónövény és fagytűrő)
+  if (!isWinterCover) {
+    plan.winter.forEach(c => {
+      if (c.type === 'crop' && c.frostProof) {
+        harvestedThisYear.push(c);
+      }
+    });
   }
+
+  // Eltároljuk az adott év részleteit
+  allTeamsGardenData[team].years[year] = {
+    early: plan.early.map(c => c.name).join(', ') || '—',
+    summer: plan.summer.map(c => c.name).join(', ') || '—',
+    winter: plan.winter.map(c => c.name).join(' + ') || '—'
+  };
+
+  // Hozzáfűzzük a teljes 3 éves listához
+  allTeamsGardenData[team].allCrops.push(...harvestedThisYear);
 
   logs.forEach(l => {
     const d = document.createElement('div');
