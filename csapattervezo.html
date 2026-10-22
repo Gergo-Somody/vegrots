@@ -49,10 +49,6 @@
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <button onclick="openScriptModal()" class="bg-white/20 hover:bg-white/30 text-white border border-white/30 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 shadow-sm">
-          <i class="fa-solid fa-code"></i>
-          <span>Google Sheets Kód</span>
-        </button>
         <button onclick="randomizeAll()" class="bg-amber-400 hover:bg-amber-300 text-emerald-950 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold shadow-md transition transform active:scale-95 flex items-center gap-1.5">
           <i class="fa-solid fa-dice"></i>
           <span>Meglepetés!</span>
@@ -253,26 +249,6 @@
         </div>
 
         <!-- 3. Kártya: Google Apps Script Webhook Beállítás -->
-        <div class="bg-white/90 backdrop-blur rounded-3xl p-6 shadow-md border-2 border-green-200">
-          <h2 class="text-lg font-bold text-emerald-800 flex items-center justify-between gap-2 mb-3">
-            <span class="flex items-center gap-2">
-              <span class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm font-bold">3</span>
-              Google Táblázat Beküldés (Apps Script)
-            </span>
-            <span class="text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-lg border border-emerald-300">Live Post</span>
-          </h2>
-          <p class="text-xs text-slate-600 mb-3">
-            Illeszd be a Google Apps Script Web App közzétételi URL-edet. A csapat adatai és a komplett SVG logó azonnal bekerülnek a táblázatba!
-          </p>
-          <div class="flex flex-col sm:flex-row gap-2">
-            <input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/AKfycb.../exec"
-              class="flex-grow px-3.5 py-2 rounded-xl border-2 border-green-200 text-xs sm:text-sm font-mono focus:border-emerald-500 focus:outline-none">
-            <button type="button" onclick="saveWebhookUrl()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition border border-slate-300">
-              Mentés
-            </button>
-          </div>
-        </div>
-
       </section>
 
       <!-- JOBB OLDAL: Élő Előnézet, Letöltés, Beküldés (5 oszlop) -->
@@ -346,92 +322,7 @@
   </footer>
 
   <!-- MODAL: Apps Script Kód Segédlet -->
-  <div id="scriptModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border-2 border-emerald-400 overflow-hidden">
-      
-      <div class="p-5 bg-emerald-600 text-white flex justify-between items-center">
-        <div class="flex items-center gap-2">
-          <i class="fa-solid fa-file-code text-xl text-yellow-300"></i>
-          <h3 class="font-bold text-lg">Google Apps Script Telepítési Útmutató</h3>
-        </div>
-        <button onclick="closeScriptModal()" class="text-white hover:text-yellow-300 text-xl font-bold">&times;</button>
-      </div>
 
-      <div class="p-6 overflow-y-auto custom-scroll space-y-4 text-sm text-slate-700">
-        <ol class="list-decimal pl-5 space-y-2 text-xs sm:text-sm">
-          <li>Hozz létre egy új <strong class="text-emerald-700">Google Táblázatot</strong> (Google Sheets).</li>
-          <li>Kattints a menüben: <strong>Bővítmények &gt; Apps Script</strong>.</li>
-          <li>Másold be az alábbi kódot a szerkesztőbe a meglévő helyére:</li>
-        </ol>
-
-        <div class="relative">
-          <pre class="bg-slate-900 text-emerald-400 p-4 rounded-xl text-xs font-mono overflow-x-auto select-all max-h-60" id="appsScriptCode">
-function doPost(e) {
-  var lock = LockService.getScriptLock();
-  lock.tryLock(10000);
-  
-  try {
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    
-    // Ha üres a táblázat, hozzuk létre a fejléceket
-    if (sheet.getLastRow() === 0) {
-      sheet.appendRow([
-        "Időbélyeg", 
-        "Csapat Neve", 
-        "Csapattagok", 
-        "Iskola / Osztály", 
-        "Mottó", 
-        "Fő Növényi Ikon", 
-        "Alapforma", 
-        "SVG Kód"
-      ]);
-    }
-    
-    var data = JSON.parse(e.postData.contents);
-    
-    sheet.appendRow([
-      new Date(),
-      data.teamName || "Névtelen",
-      (data.members || []).join(", "),
-      data.school || "",
-      data.motto || "",
-      data.symbol || "",
-      data.shape || "",
-      data.svgCode || ""
-    ]);
-    
-    return ContentService
-      .createTextOutput(JSON.stringify({ status: "success", message: "Csapat sikeresen rögzítve!" }))
-      .setMimeType(ContentService.MimeType.JSON);
-      
-  } catch (error) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ status: "error", message: error.toString() }))
-      .setMimeType(ContentService.MimeType.JSON);
-  } finally {
-    lock.releaseLock();
-  }
-}
-          </pre>
-          <button onclick="copyAppsScriptCode()" class="absolute top-2 right-2 bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow">
-            <i class="fa-regular fa-copy"></i> Másolás
-          </button>
-        </div>
-
-        <ol start="4" class="list-decimal pl-5 space-y-2 text-xs sm:text-sm">
-          <li>Kattints a kék <strong>Központi telepítés (Deploy) &gt; Új telepítés (New deployment)</strong> gombra.</li>
-          <li>Válaszd ki a típust: <strong>Webalkalmazás (Web app)</strong>.</li>
-          <li>Hozzáférési jog (Who has access): <strong>Bárki (Anyone)</strong>.</li>
-          <li>Másold ki a kapott <strong>Web App URL-t</strong>, és illeszd be a fenti <em>Google Táblázat Beküldés</em> mezőbe!</li>
-        </ol>
-      </div>
-
-      <div class="p-4 bg-slate-50 border-t border-slate-200 text-right">
-        <button onclick="closeScriptModal()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm">Értem, rendben!</button>
-      </div>
-
-    </div>
-  </div>
 
   <!-- JavaScript Logika -->
   <script>
@@ -448,7 +339,7 @@ function doPost(e) {
       wreath: "leaves",
       scale: 100,
       rotate: 0,
-      scriptUrl: ""
+      scriptUrl: "https://script.google.com/macros/s/AKfycby6nNEj7Spkrm8aH2hvXvT2mhRGOLWx8qZqrRPfGKJwIRfIlSsYkVwLBO8fMzCUtjsSAw/exec"
     };
 
     // SVG Ikon grafikai definíciók (Child-friendly, tiszta vektoros rajzok)
