@@ -249,25 +249,7 @@
         </div>
 
         <!-- 3. Kártya: Google Apps Script Webhook Beállítás -->
-          <div class="bg-white/90 backdrop-blur rounded-3xl p-6 shadow-md border-2 border-green-200">
-          <h2 class="text-lg font-bold text-emerald-800 flex items-center justify-between gap-2 mb-3">
-            <span class="flex items-center gap-2">
-              <span class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm font-bold">3</span>
-              Google Táblázat Beküldés (Apps Script)
-            </span>
-            <span class="text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-lg border border-emerald-300">Live Post</span>
-          </h2>
-          <p class="text-xs text-slate-600 mb-3">
-            Illeszd be a Google Apps Script Web App közzétételi URL-edet. A csapat adatai és a komplett SVG logó azonnal bekerülnek a táblázatba!
-          </p>
-          <div class="flex flex-col sm:flex-row gap-2">
-            <input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/AKfycby6nNEj7Spkrm8aH2hvXvT2mhRGOLWx8qZqrRPfGKJwIRfIlSsYkVwLBO8fMzCUtjsSAw/exec"
-              class="flex-grow px-3.5 py-2 rounded-xl border-2 border-green-200 text-xs sm:text-sm font-mono focus:border-emerald-500 focus:outline-none">
-            <button type="button" onclick="saveWebhookUrl()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition border border-slate-300">
-              Mentés
-            </button>
-          </div>
-        </div>
+
       </section>
 
       <!-- JOBB OLDAL: Élő Előnézet, Letöltés, Beküldés (5 oszlop) -->
@@ -781,8 +763,8 @@
 
     // Google Sheets mentés / beküldés
     async function submitToGoogleSheet() {
+      const scriptUrl = "https://script.google.com/macros/s/AKfycby6nNEj7Spkrm8aH2hvXvT2mhRGOLWx8qZqrRPfGKJwIRfIlSsYkVwLBO8fMzCUtjsSAw/exec";
       const submitBtn = document.getElementById('submitBtn');
-      const scriptUrl = (document.getElementById('scriptUrl').value || state.scriptUrl).trim();
 
       // Alap validálás
       if (!state.teamName.trim()) {
@@ -792,6 +774,7 @@
 
       // Payload összeállítása
       const payload = {
+        type: "team_register",
         teamName: state.teamName.trim(),
         school: state.school.trim(),
         motto: state.motto.trim(),
@@ -804,16 +787,6 @@
       // Gomb állapot frissítés
       submitBtn.disabled = true;
       submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Beküldés folyamatban...</span>`;
-
-      if (!scriptUrl) {
-        // Ha még nincs megadva webhook URL, demonstrációs módban szimuláljuk
-        setTimeout(() => {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> <span>Csapat Nevezése a Bajnokságba!</span>`;
-          showToast("✨ Minta beküldés kész! (Valós mentéshez add meg a Google Web App linket a 3. pontban)");
-        }, 900);
-        return;
-      }
 
       try {
         // Google Apps Script no-cors módban fogadja el a hívást böngészőből
