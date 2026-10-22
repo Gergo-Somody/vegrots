@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vetésforgó Bajnokság - Csapattervező</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Fredoka', 'Inter', sans-serif;
+      background-color: #f3faf2;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background-color: #86efac;
+      border-radius: 9999px;
+    }
+    .badge-preview-shadow {
+      filter: drop-shadow(0 15px 25px rgba(22, 101, 52, 0.2));
+    }
+    .pattern-bg {
+      background-color: #f0fdf4;
+      background-image: radial-gradient(#bbf7d0 1.2px, transparent 1.2px);
+      background-size: 24px 24px;
+    }
+  </style>
+</head>
+<body class="pattern-bg min-h-screen text-slate-800 flex flex-col justify-between">
+
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-emerald-600 via-green-600 to-lime-600 text-white shadow-lg sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-3 sm:py-4 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center space-x-3">
+        <span class="text-3xl sm:text-4xl transform hover:scale-110 transition-transform cursor-pointer">🌱</span>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-bold tracking-wide flex items-center gap-2">
+            Vetésforgó Bajnokság
+            <span class="text-xs bg-yellow-400 text-emerald-950 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Csapattervező</span>
+          </h1>
+          <p class="text-xs sm:text-sm text-green-100 font-normal">Készítsétek el a csapatotok profilját és egyedi kerti logóját!</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="openScriptModal()" class="bg-white/20 hover:bg-white/30 text-white border border-white/30 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 shadow-sm">
+          <i class="fa-solid fa-code"></i>
+          <span>Google Sheets Kód</span>
+        </button>
+        <button onclick="randomizeAll()" class="bg-amber-400 hover:bg-amber-300 text-emerald-950 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold shadow-md transition transform active:scale-95 flex items-center gap-1.5">
+          <i class="fa-solid fa-dice"></i>
+          <span>Meglepetés!</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 py-6 w-full flex-grow">
+    
+    <!-- Banner for feedback -->
+    <div id="statusToast" class="hidden fixed bottom-6 right-6 z-50 bg-emerald-600 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 border-2 border-emerald-400 animate-bounce">
+      <i id="toastIcon" class="fa-solid fa-circle-check text-xl text-yellow-300"></i>
+      <span id="toastMessage" class="text-sm font-semibold">Mentve a táblázatba!</span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- BAL OLDAL: Csapat adatok & Beállítások (7 oszlop) -->
+      <section class="lg:col-span-7 space-y-6">
+
+        <!-- 1. Kártya: Csapat Alapadatok -->
+        <div class="bg-white/90 backdrop-blur rounded-3xl p-6 shadow-md border-2 border-green-200">
+          <h2 class="text-lg font-bold text-emerald-800 flex items-center gap-2 mb-4">
+            <span class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm font-bold">1</span>
+            Csapat Alapadatok
+          </h2>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="sm:col-span-2">
+              <label for="teamName" class="block text-xs font-bold uppercase text-emerald-900 mb-1">Csapat Neve *</label>
+              <div class="relative">
+                <input type="text" id="teamName" value="Káposzta Bajnokok" placeholder="Pl. Zöldborsó Zsenik"
+                  class="w-full pl-10 pr-4 py-2.5 rounded-xl border-2 border-green-200 focus:border-emerald-500 focus:outline-none text-base font-semibold text-slate-800 transition"
+                  oninput="updateLogo()">
+                <i class="fa-solid fa-users text-emerald-500 absolute left-3.5 top-3.5 text-sm"></i>
+              </div>
+            </div>
+
+            <div>
+              <label for="schoolName" class="block text-xs font-bold uppercase text-emerald-900 mb-1">Iskola / Osztály</label>
+              <input type="text" id="schoolName" value="Napraforgó Általános Iskola, 4.b" placeholder="Pl. Petőfi Sándor Ált. Isk. 3.a"
+                class="w-full px-3.5 py-2 rounded-xl border-2 border-green-200 focus:border-emerald-500 focus:outline-none text-sm font-medium">
+            </div>
+
+            <div>
+              <label for="mascotPlant" class="block text-xs font-bold uppercase text-emerald-900 mb-1">Kabala Növény / Mottó</label>
+              <input type="text" id="mascotPlant" value="Mindig a nap felé fordulunk!" placeholder="Pl. A hüvelyesek ereje"
+                class="w-full px-3.5 py-2 rounded-xl border-2 border-green-200 focus:border-emerald-500 focus:outline-none text-sm font-medium">
+            </div>
+          </div>
+
+          <!-- Csapattagok Dinamikus Listája -->
+          <div class="mt-5 pt-4 border-t border-green-100">
+            <div class="flex justify-between items-center mb-2">
+              <label class="text-xs font-bold uppercase text-emerald-900 flex items-center gap-1.5">
+                <i class="fa-solid fa-user-group text-emerald-600"></i> Csapattagok (2-5 diák)
+              </label>
+              <button type="button" onclick="addMember()" id="addMemberBtn"
+                class="text-xs bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-3 py-1 rounded-lg transition flex items-center gap-1">
+                <i class="fa-solid fa-plus text-xs"></i> Tag hozzáadása
+              </button>
+            </div>
+            
+            <div id="membersContainer" class="space-y-2">
+              <!-- Dinamikusan renderelt mezők -->
+            </div>
+            <p id="memberNotice" class="text-xs text-amber-600 mt-2 hidden font-medium">💡 Legfeljebb 5 fős csapat javasolt a kényelmes vetésforgó feladatmegosztáshoz!</p>
+          </div>
+        </div>
+
+        <!-- 2. Kártya: Növénytudományi Logó Beállítások -->
+        <div class="bg-white/90 backdrop-blur rounded-3xl p-6 shadow-md border-2 border-green-200">
+          <h2 class="text-lg font-bold text-emerald-800 flex items-center gap-2 mb-4">
+            <span class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm font-bold">2</span>
+            Növénytudományi Logó Műhely
+          </h2>
+
+          <!-- Alapforma kiválasztása -->
+          <div class="mb-5">
+            <label class="block text-xs font-bold uppercase text-emerald-900 mb-2">Pajzs & Alapforma</label>
+            <div class="grid grid-cols-5 gap-2 sm:gap-3" id="shapeSelector">
+              <button type="button" onclick="setShield('circle')" data-shape="circle" class="shape-btn flex flex-col items-center justify-center p-2 rounded-2xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 transition hover:bg-emerald-100">
+                <i class="fa-solid fa-circle text-xl"></i>
+                <span class="text-[10px] sm:text-xs font-semibold mt-1">Kör</span>
+              </button>
+              <button type="button" onclick="setShield('shield')" data-shape="shield" class="shape-btn flex flex-col items-center justify-center p-2 rounded-2xl border-2 border-green-200 bg-white text-slate-700 transition hover:bg-emerald-50">
+                <i class="fa-solid fa-shield-halved text-xl"></i>
+                <span class="text-[10px] sm:text-xs font-semibold mt-1">Pajzs</span>
+              </button>
+              <button type="button" onclick="setShield('leaf')" data-shape="leaf" class="shape-btn flex flex-col items-center justify-center p-2 rounded-2xl border-2 border-green-200 bg-white text-slate-700 transition hover:bg-emerald-50">
+                <i class="fa-solid fa-leaf text-xl"></i>
+                <span class="text-[10px] sm:text-xs font-semibold mt-1">Levél</span>
+              </button>
+              <button type="button" onclick="setShield('hexagon')" data-shape="hexagon" class="shape-btn flex flex-col items-center justify-center p-2 rounded-2xl border-2 border-green-200 bg-white text-slate-700 transition hover:bg-emerald-50">
+                <i class="fa-solid fa-certificate text-xl"></i>
+                <span class="text-[10px] sm:text-xs font-semibold mt-1">Hatszög</span>
+              </button>
+              <button type="button" onclick="setShield('pot')" data-shape="pot" class="shape-btn flex flex-col items-center justify-center p-2 rounded-2xl border-2 border-green-200 bg-white text-slate-700 transition hover:bg-emerald-50">
+                <i class="fa-solid fa-cubes-stacked text-xl"></i>
+                <span class="text-[10px] sm:text-xs font-semibold mt-1">Cserép</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Növénytani Ikon Választó -->
+          <div class="mb-5">
+            <label class="block text-xs font-bold uppercase text-emerald-900 mb-2">Fő Növénytani Szimbólum (Vetésforgó Szakaszok)</label>
+            <div class="grid grid-cols-3 sm:grid-cols-6 gap-2" id="iconSelector">
+              <!-- Búza / Gabonafélék -->
+              <button type="button" onclick="setIcon('wheat')" data-icon="wheat" class="icon-btn p-2 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-800 flex flex-col items-center text-center">
+                <span class="text-2xl">🌾</span>
+                <span class="text-[10px] font-bold mt-1">Gabona</span>
+              </button>
+              <!-- Hüvelyes / Borsó -->
+              <button type="button" onclick="setIcon('pea')" data-icon="pea" class="icon-btn p-2 rounded-xl border-2 border-green-200 bg-white text-slate-700 flex flex-col items-center text-center hover:bg-emerald-50">
+                <span class="text-2xl">🫛</span>
+                <span class="text-[10px] font-bold mt-1">Hüvelyes</span>
+              </button>
+              <!-- Gyökérzöldség -->
+              <button type="button" onclick="setIcon('carrot')" data-icon="carrot" class="icon-btn p-2 rounded-xl border-2 border-green-200 bg-white text-slate-700 flex flex-col items-center text-center hover:bg-emerald-50">
+                <span class="text-2xl">🥕</span>
+                <span class="text-[10px] font-bold mt-1">Gyökérzöldség</span>
+              </button>
+              <!-- Leveles zöldség -->
+              <button type="button" onclick="setIcon('cabbage')" data-icon="cabbage" class="icon-btn p-2 rounded-xl border-2 border-green-200 bg-white text-slate-700 flex flex-col items-center text-center hover:bg-emerald-50">
+                <span class="text-2xl">🥬</span>
+                <span class="text-[10px] font-bold mt-1">Leveles</span>
+              </button>
+              <!-- Csíra / Palánta -->
+              <button type="button" onclick="setIcon('sprout')" data-icon="sprout" class="icon-btn p-2 rounded-xl border-2 border-green-200 bg-white text-slate-700 flex flex-col items-center text-center hover:bg-emerald-50">
+                <span class="text-2xl">🌱</span>
+                <span class="text-[10px] font-bold mt-1">Palánta</span>
+              </button>
+              <!-- Természet & Eszköz -->
+              <button type="button" onclick="setIcon('sun')" data-icon="sun" class="icon-btn p-2 rounded-xl border-2 border-green-200 bg-white text-slate-700 flex flex-col items-center text-center hover:bg-emerald-50">
+                <span class="text-2xl">☀️</span>
+                <span class="text-[10px] font-bold mt-1">Napfény</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Színek és Díszítés -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+            <div>
+              <label class="block text-xs font-bold uppercase text-emerald-900 mb-1">Alap Háttérszín</label>
+              <div class="flex items-center gap-2">
+                <input type="color" id="badgeBgColor" value="#15803d" class="h-9 w-12 rounded-lg cursor-pointer border border-gray-300" oninput="updateLogo()">
+                <div class="flex gap-1">
+                  <span onclick="setQuickColor('badgeBgColor', '#15803d')" class="w-6 h-6 rounded-full bg-green-700 cursor-pointer border hover:scale-110"></span>
+                  <span onclick="setQuickColor('badgeBgColor', '#eab308')" class="w-6 h-6 rounded-full bg-yellow-500 cursor-pointer border hover:scale-110"></span>
+                  <span onclick="setQuickColor('badgeBgColor', '#854d0e')" class="w-6 h-6 rounded-full bg-amber-800 cursor-pointer border hover:scale-110"></span>
+                  <span onclick="setQuickColor('badgeBgColor', '#0f766e')" class="w-6 h-6 rounded-full bg-teal-700 cursor-pointer border hover:scale-110"></span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold uppercase text-emerald-900 mb-1">Keret Színe</label>
+              <div class="flex items-center gap-2">
+                <input type="color" id="badgeBorderColor" value="#fef08a" class="h-9 w-12 rounded-lg cursor-pointer border border-gray-300" oninput="updateLogo()">
+                <div class="flex gap-1">
+                  <span onclick="setQuickColor('badgeBorderColor', '#fef08a')" class="w-6 h-6 rounded-full bg-yellow-200 cursor-pointer border hover:scale-110"></span>
+                  <span onclick="setQuickColor('badgeBorderColor', '#ffffff')" class="w-6 h-6 rounded-full bg-white cursor-pointer border hover:scale-110"></span>
+                  <span onclick="setQuickColor('badgeBorderColor', '#fdba74')" class="w-6 h-6 rounded-full bg-orange-300 cursor-pointer border hover:scale-110"></span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold uppercase text-emerald-900 mb-1">Díszítés / Keretkoszorú</label>
+              <select id="wreathType" class="w-full px-3 py-2 rounded-xl border-2 border-green-200 text-sm font-semibold text-slate-700 focus:outline-none" onchange="updateLogo()">
+                <option value="leaves">🌿 Levélkoszorú</option>
+                <option value="stars">✨ Csillagok / Magok</option>
+                <option value="none">Egyszerű / Nincs dísz</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Finomhangoló csúszkák -->
+          <div class="grid grid-cols-2 gap-4 pt-3 border-t border-green-100">
+            <div>
+              <div class="flex justify-between text-xs font-bold text-emerald-900 mb-1">
+                <span>Ikon méret</span>
+                <span id="iconScaleVal">100%</span>
+              </div>
+              <input type="range" id="iconScale" min="70" max="140" value="100" class="w-full accent-emerald-600" oninput="updateLogo()">
+            </div>
+            <div>
+              <div class="flex justify-between text-xs font-bold text-emerald-900 mb-1">
+                <span>Ikon dőlésszög</span>
+                <span id="iconRotateVal">0°</span>
+              </div>
+              <input type="range" id="iconRotate" min="-45" max="45" value="0" class="w-full accent-emerald-600" oninput="updateLogo()">
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Kártya: Google Apps Script Webhook Beállítás -->
+        <div class="bg-white/90 backdrop-blur rounded-3xl p-6 shadow-md border-2 border-green-200">
+          <h2 class="text-lg font-bold text-emerald-800 flex items-center justify-between gap-2 mb-3">
+            <span class="flex items-center gap-2">
+              <span class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm font-bold">3</span>
+              Google Táblázat Beküldés (Apps Script)
+            </span>
+            <span class="text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-lg border border-emerald-300">Live Post</span>
+          </h2>
+          <p class="text-xs text-slate-600 mb-3">
+            Illeszd be a Google Apps Script Web App közzétételi URL-edet. A csapat adatai és a komplett SVG logó azonnal bekerülnek a táblázatba!
+          </p>
+          <div class="flex flex-col sm:flex-row gap-2">
+            <input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/AKfycb.../exec"
+              class="flex-grow px-3.5 py-2 rounded-xl border-2 border-green-200 text-xs sm:text-sm font-mono focus:border-emerald-500 focus:outline-none">
+            <button type="button" onclick="saveWebhookUrl()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition border border-slate-300">
+              Mentés
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- JOBB OLDAL: Élő Előnézet, Letöltés, Beküldés (5 oszlop) -->
+      <section class="lg:col-span-5 space-y-6 lg:sticky lg:top-24">
+        
+        <div class="bg-white rounded-3xl p-6 shadow-xl border-4 border-emerald-300 text-center relative overflow-hidden">
+          
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full">
+              Élő Logó Előnézet
+            </span>
+            <span class="text-xs text-slate-400">Vektoros SVG (360x360)</span>
+          </div>
+
+          <!-- SVG Előnézet konténer -->
+          <div class="flex justify-center items-center py-2">
+            <div id="svgContainer" class="badge-preview-shadow transition-transform hover:scale-105 duration-300 max-w-[280px] w-full">
+              <!-- Ide generálódik a tiszta SVG -->
+            </div>
+          </div>
+
+          <!-- Csapat Kártya Összegző -->
+          <div class="mt-4 p-3 bg-emerald-50/70 rounded-2xl border border-emerald-200 text-left text-xs space-y-1">
+            <div class="font-bold text-emerald-900 text-sm flex items-center justify-between">
+              <span id="previewTeamTitle">Káposzta Bajnokok</span>
+              <span class="text-[11px] font-normal text-emerald-600" id="previewMemberCount">3 csapattag</span>
+            </div>
+            <p class="text-slate-600 truncate" id="previewSchool">Napraforgó Általános Iskola, 4.b</p>
+            <p class="text-emerald-700 font-semibold italic" id="previewMotto">"Mindig a nap felé fordulunk!"</p>
+          </div>
+
+          <!-- Akció gombok: Letöltések -->
+          <div class="mt-4 grid grid-cols-2 gap-2">
+            <button onclick="downloadSVG()" class="flex items-center justify-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 py-2.5 px-3 rounded-xl font-bold text-xs transition">
+              <i class="fa-solid fa-file-code text-sm"></i>
+              <span>Letöltés SVG</span>
+            </button>
+            <button onclick="downloadPNG()" class="flex items-center justify-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 py-2.5 px-3 rounded-xl font-bold text-xs transition">
+              <i class="fa-solid fa-file-image text-sm"></i>
+              <span>Letöltés PNG</span>
+            </button>
+          </div>
+
+          <!-- Beküldés Gomb -->
+          <div class="mt-3">
+            <button id="submitBtn" onclick="submitToGoogleSheet()" class="w-full bg-gradient-to-r from-emerald-500 via-green-600 to-emerald-700 hover:from-emerald-600 hover:to-emerald-800 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg hover:shadow-xl transition transform active:scale-98 flex items-center justify-center gap-2 text-base">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <span>Csapat Nevezése a Bajnokságba!</span>
+            </button>
+          </div>
+
+          <p class="text-[11px] text-slate-400 mt-2">A regisztráció után a csapat azonnal bekerül az összesítő táblázatba.</p>
+        </div>
+
+        <!-- Segítő tippdoboz -->
+        <div class="bg-amber-50 rounded-2xl p-4 border border-amber-200 flex items-start gap-3">
+          <span class="text-2xl">💡</span>
+          <div class="text-xs text-amber-900 leading-relaxed">
+            <strong class="font-bold">Vetésforgó Tipp:</strong> A jó vetésforgóban a tápanyagigényes növényeket (káposzta, kukorica) nitrogénkötő hüvelyesek (borsó, bab), majd mélygyökerű fajok követik, hogy a talaj mindig egészséges és termékeny maradjon!
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Lábléc -->
+  <footer class="mt-12 bg-white/70 border-t border-green-200 py-4 text-center text-xs text-slate-500">
+    <p>Vetésforgó Bajnokság Gyerekeknek &bull; Interaktív Mezőgazdasági & Növénytani Oktatóprogram</p>
+  </footer>
+
+  <!-- MODAL: Apps Script Kód Segédlet -->
+  <div id="scriptModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border-2 border-emerald-400 overflow-hidden">
+      
+      <div class="p-5 bg-emerald-600 text-white flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-file-code text-xl text-yellow-300"></i>
+          <h3 class="font-bold text-lg">Google Apps Script Telepítési Útmutató</h3>
+        </div>
+        <button onclick="closeScriptModal()" class="text-white hover:text-yellow-300 text-xl font-bold">&times;</button>
+      </div>
+
+      <div class="p-6 overflow-y-auto custom-scroll space-y-4 text-sm text-slate-700">
+        <ol class="list-decimal pl-5 space-y-2 text-xs sm:text-sm">
+          <li>Hozz létre egy új <strong class="text-emerald-700">Google Táblázatot</strong> (Google Sheets).</li>
+          <li>Kattints a menüben: <strong>Bővítmények &gt; Apps Script</strong>.</li>
+          <li>Másold be az alábbi kódot a szerkesztőbe a meglévő helyére:</li>
+        </ol>
+
+        <div class="relative">
+          <pre class="bg-slate-900 text-emerald-400 p-4 rounded-xl text-xs font-mono overflow-x-auto select-all max-h-60" id="appsScriptCode">
+function doPost(e) {
+  var lock = LockService.getScriptLock();
+  lock.tryLock(10000);
+  
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    
+    // Ha üres a táblázat, hozzuk létre a fejléceket
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow([
+        "Időbélyeg", 
+        "Csapat Neve", 
+        "Csapattagok", 
+        "Iskola / Osztály", 
+        "Mottó", 
+        "Fő Növényi Ikon", 
+        "Alapforma", 
+        "SVG Kód"
+      ]);
+    }
+    
+    var data = JSON.parse(e.postData.contents);
+    
+    sheet.appendRow([
+      new Date(),
+      data.teamName || "Névtelen",
+      (data.members || []).join(", "),
+      data.school || "",
+      data.motto || "",
+      data.symbol || "",
+      data.shape || "",
+      data.svgCode || ""
+    ]);
+    
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: "success", message: "Csapat sikeresen rögzítve!" }))
+      .setMimeType(ContentService.MimeType.JSON);
+      
+  } catch (error) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: "error", message: error.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } finally {
+    lock.releaseLock();
+  }
+}
+          </pre>
+          <button onclick="copyAppsScriptCode()" class="absolute top-2 right-2 bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow">
+            <i class="fa-regular fa-copy"></i> Másolás
+          </button>
+        </div>
+
+        <ol start="4" class="list-decimal pl-5 space-y-2 text-xs sm:text-sm">
+          <li>Kattints a kék <strong>Központi telepítés (Deploy) &gt; Új telepítés (New deployment)</strong> gombra.</li>
+          <li>Válaszd ki a típust: <strong>Webalkalmazás (Web app)</strong>.</li>
+          <li>Hozzáférési jog (Who has access): <strong>Bárki (Anyone)</strong>.</li>
+          <li>Másold ki a kapott <strong>Web App URL-t</strong>, és illeszd be a fenti <em>Google Táblázat Beküldés</em> mezőbe!</li>
+        </ol>
+      </div>
+
+      <div class="p-4 bg-slate-50 border-t border-slate-200 text-right">
+        <button onclick="closeScriptModal()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm">Értem, rendben!</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- JavaScript Logika -->
+  <script>
+    // Állapot kezelés
+    const state = {
+      teamName: "Káposzta Bajnokok",
+      school: "Napraforgó Általános Iskola, 4.b",
+      motto: "Mindig a nap felé fordulunk!",
+      members: ["Nagy Bence", "Kovács Lilla", "Tóth Áron"],
+      shape: "circle",      // circle, shield, leaf, hexagon, pot
+      icon: "wheat",        // wheat, pea, carrot, cabbage, sprout, sun
+      bgColor: "#15803d",
+      borderColor: "#fef08a",
+      wreath: "leaves",
+      scale: 100,
+      rotate: 0,
+      scriptUrl: ""
+    };
+
+    // SVG Ikon grafikai definíciók (Child-friendly, tiszta vektoros rajzok)
+    const SVG_ICONS = {
+      wheat: `
+        <g id="icon-wheat">
+          <!-- Búzakalász szárak és szemek -->
+          <path d="M 0 50 Q 5 10 0 -50" stroke="#fef08a" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <!-- Magvak -->
+          <ellipse cx="-12" cy="-25" rx="7" ry="14" transform="rotate(-30 -12 -25)" fill="#facc15" stroke="#ca8a04" stroke-width="2"/>
+          <ellipse cx="12" cy="-25" rx="7" ry="14" transform="rotate(30 12 -25)" fill="#fde047" stroke="#ca8a04" stroke-width="2"/>
+          <ellipse cx="-14" cy="-5" rx="7" ry="14" transform="rotate(-35 -14 -5)" fill="#facc15" stroke="#ca8a04" stroke-width="2"/>
+          <ellipse cx="14" cy="-5" rx="7" ry="14" transform="rotate(35 14 -5)" fill="#fde047" stroke="#ca8a04" stroke-width="2"/>
+          <ellipse cx="-12" cy="15" rx="7" ry="14" transform="rotate(-40 -12 15)" fill="#facc15" stroke="#ca8a04" stroke-width="2"/>
+          <ellipse cx="12" cy="15" rx="7" ry="14" transform="rotate(40 12 15)" fill="#fde047" stroke="#ca8a04" stroke-width="2"/>
+          <ellipse cx="0" cy="-45" rx="6" ry="12" fill="#fef08a" stroke="#ca8a04" stroke-width="2"/>
+          <!-- Búzaszálkák -->
+          <path d="M -12 -35 L -26 -52 M 12 -35 L 26 -52 M 0 -55 L 0 -72" stroke="#ca8a04" stroke-width="2" stroke-linecap="round"/>
+        </g>
+      `,
+      pea: `
+        <g id="icon-pea">
+          <!-- Borsóhüvely hajlított forma -->
+          <path d="M -45 10 C -25 45 35 40 50 -10 C 25 15 -20 15 -45 10 Z" fill="#22c55e" stroke="#15803d" stroke-width="3"/>
+          <path d="M -45 10 C -15 -25 40 -20 50 -10 C 35 -5 -15 -10 -45 10 Z" fill="#4ade80" stroke="#15803d" stroke-width="3"/>
+          <!-- 3 kövér zöldborsó szem mosollyal -->
+          <circle cx="-16" cy="1" r="11" fill="#86efac" stroke="#16a34a" stroke-width="2.5"/>
+          <circle cx="6" cy="1" r="11" fill="#a7f3d0" stroke="#16a34a" stroke-width="2.5"/>
+          <circle cx="28" cy="-1" r="9.5" fill="#86efac" stroke="#16a34a" stroke-width="2.5"/>
+          <!-- Csillogás a borsókon -->
+          <circle cx="-19" cy="-3" r="2.5" fill="#ffffff"/>
+          <circle cx="3" cy="-3" r="2.5" fill="#ffffff"/>
+          <circle cx="25" cy="-4" r="2" fill="#ffffff"/>
+        </g>
+      `,
+      carrot: `
+        <g id="icon-carrot">
+          <!-- Zöld répatollak -->
+          <path d="M 0 -15 C -20 -45 -15 -55 0 -35 C 15 -55 20 -45 0 -15" fill="#22c55e" stroke="#15803d" stroke-width="2"/>
+          <path d="M -5 -20 C -30 -35 -25 -50 -10 -30" fill="#4ade80" stroke="#16a34a" stroke-width="2"/>
+          <path d="M 5 -20 C 30 -35 25 -50 10 -30" fill="#4ade80" stroke="#16a34a" stroke-width="2"/>
+          <!-- Sárgarépa test kúpos -->
+          <path d="M -22 -15 Q 0 -18 22 -15 Q 12 25 0 52 Q -12 25 -22 -15 Z" fill="#f97316" stroke="#c2410c" stroke-width="3.5"/>
+          <!-- Barázdák -->
+          <path d="M -10 -2 Q 0 0 8 -4 M -12 14 Q -3 16 6 12 M -6 30 Q 0 32 4 29" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round"/>
+        </g>
+      `,
+      cabbage: `
+        <g id="icon-cabbage">
+          <!-- Káposzta / Fejes saláta kunkorodó levelekkel -->
+          <circle cx="0" cy="5" r="38" fill="#15803d" stroke="#14532d" stroke-width="3"/>
+          <circle cx="0" cy="5" r="30" fill="#22c55e" stroke="#166534" stroke-width="2.5"/>
+          <path d="M -25 -10 Q 0 20 25 -10 Q 30 25 0 32 Q -30 25 -25 -10 Z" fill="#4ade80" stroke="#15803d" stroke-width="2"/>
+          <circle cx="0" cy="6" r="16" fill="#86efac" stroke="#16a34a" stroke-width="2"/>
+          <!-- Levélerek -->
+          <path d="M 0 -10 L 0 25 M -12 5 Q 0 10 12 5 M -8 18 Q 0 22 8 18" stroke="#bbf7d0" stroke-width="2.5" stroke-linecap="round"/>
+        </g>
+      `,
+      sprout: `
+        <g id="icon-sprout">
+          <!-- Földdombocska -->
+          <path d="M -35 40 Q 0 28 35 40 Z" fill="#78350f" stroke="#451a03" stroke-width="2"/>
+          <!-- Hajtás szára -->
+          <path d="M 0 32 Q -5 10 0 -10" stroke="#4ade80" stroke-width="5" stroke-linecap="round" fill="none"/>
+          <!-- Bal levélke -->
+          <path d="M -2 -8 C -30 -22 -35 5 -2 5 Z" fill="#22c55e" stroke="#15803d" stroke-width="2.5"/>
+          <!-- Jobb levélke -->
+          <path d="M 0 -10 C 30 -28 36 -2 0 3 Z" fill="#86efac" stroke="#16a34a" stroke-width="2.5"/>
+          <!-- Harmatcsepp -->
+          <circle cx="16" cy="-12" r="3" fill="#38bdf8"/>
+        </g>
+      `,
+      sun: `
+        <g id="icon-sun">
+          <!-- Sugarak -->
+          <g stroke="#f59e0b" stroke-width="4" stroke-linecap="round">
+            <line x1="0" y1="-44" x2="0" y2="-55" />
+            <line x1="0" y1="44" x2="0" y2="55" />
+            <line x1="-44" y1="0" x2="-55" y2="0" />
+            <line x1="44" y1="0" x2="55" y2="0" />
+            <line x1="-31" y1="-31" x2="-39" y2="-39" />
+            <line x1="31" y1="-31" x2="39" y2="-39" />
+            <line x1="-31" y1="31" x2="-39" y2="39" />
+            <line x1="31" y1="31" x2="39" y2="39" />
+          </g>
+          <!-- Napocska teste mosollyal -->
+          <circle cx="0" cy="0" r="34" fill="#fbbf24" stroke="#d97706" stroke-width="3"/>
+          <ellipse cx="-10" cy="-6" rx="3.5" ry="5" fill="#78350f"/>
+          <ellipse cx="10" cy="-6" rx="3.5" ry="5" fill="#78350f"/>
+          <circle cx="-9" cy="-8" r="1.5" fill="#ffffff"/>
+          <circle cx="11" cy="-8" r="1.5" fill="#ffffff"/>
+          <!-- Piros orcák -->
+          <circle cx="-16" cy="3" r="4" fill="#f87171" opacity="0.6"/>
+          <circle cx="16" cy="3" r="4" fill="#f87171" opacity="0.6"/>
+          <!-- Mosoly -->
+          <path d="M -10 8 Q 0 18 10 8" stroke="#78350f" stroke-width="3" stroke-linecap="round" fill="none"/>
+        </g>
+      `
+    };
+
+    // Alapformák rajzolása SVG koordinátákkal (Középpont: 180, 160)
+    function getShieldPath(shapeType) {
+      switch(shapeType) {
+        case 'shield':
+          return "M 180 30 Q 280 30 280 140 C 280 230 180 275 180 285 C 180 275 80 230 80 140 Q 80 30 180 30 Z";
+        case 'leaf':
+          return "M 180 25 C 295 50 300 230 180 285 C 60 230 65 50 180 25 Z";
+        case 'hexagon':
+          return "M 180 28 L 275 82 L 275 228 L 180 282 L 85 228 L 85 82 Z";
+        case 'pot':
+          return "M 95 65 L 265 65 L 255 105 L 245 270 L 115 270 L 105 105 Z";
+        case 'circle':
+        default:
+          return "M 180 30 A 125 125 0 1 0 180.01 30 Z";
+      }
+    }
+
+    // Díszítőelemek (Koszorú vagy csillagok)
+    function getWreathMarkup(type, borderColor) {
+      if (type === 'none') return '';
+      
+      if (type === 'stars') {
+        return `
+          <g fill="${borderColor}" opacity="0.9">
+            <polygon points="180,48 183,56 191,56 185,61 187,69 180,64 173,69 175,61 169,56 177,56" />
+            <circle cx="110" cy="85" r="4"/>
+            <circle cx="250" cy="85" r="4"/>
+            <circle cx="85" cy="155" r="3.5"/>
+            <circle cx="275" cy="155" r="3.5"/>
+            <circle cx="110" cy="225" r="4"/>
+            <circle cx="250" cy="225" r="4"/>
+          </g>
+        `;
+      }
+
+      // 'leaves' opció (koszorú ágacskák a szélén)
+      return `
+        <g stroke="${borderColor}" fill="${borderColor}" opacity="0.85">
+          <!-- Bal koszorú ív -->
+          <path d="M 100 220 C 65 160 75 100 115 65" fill="none" stroke-width="2.5" stroke-linecap="round"/>
+          <ellipse cx="86" cy="180" rx="4" ry="9" transform="rotate(-30 86 180)"/>
+          <ellipse cx="78" cy="140" rx="4" ry="9" transform="rotate(-15 78 140)"/>
+          <ellipse cx="86" cy="100" rx="4" ry="9" transform="rotate(15 86 100)"/>
+          
+          <!-- Jobb koszorú ív -->
+          <path d="M 260 220 C 295 160 285 100 245 65" fill="none" stroke-width="2.5" stroke-linecap="round"/>
+          <ellipse cx="274" cy="180" rx="4" ry="9" transform="rotate(30 274 180)"/>
+          <ellipse cx="282" cy="140" rx="4" ry="9" transform="rotate(15 282 140)"/>
+          <ellipse cx="274" cy="100" rx="4" ry="9" transform="rotate(-15 274 100)"/>
+        </g>
+      `;
+    }
+
+    // Teljes SVG összeállító függvény
+    function generateFullSVG() {
+      const shieldPath = getShieldPath(state.shape);
+      const iconMarkup = SVG_ICONS[state.icon] || SVG_ICONS.wheat;
+      const wreathMarkup = getWreathMarkup(state.wreath, state.borderColor);
+      const scaleFactor = state.scale / 100;
+      
+      // Íves szöveg vagy alsó szalag
+      const safeTeamName = escapeHtml(state.teamName.trim() || "Vetésforgó Csapat");
+
+      return `
+<svg id="teamBadgeSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 360" width="100%" height="100%">
+  <defs>
+    <!-- Színátmenet háttérhez -->
+    <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="${state.bgColor}" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="${state.bgColor}" stop-opacity="1" />
+    </linearGradient>
+
+    <!-- Szalag arany átmenet -->
+    <linearGradient id="ribbonGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ca8a04" />
+      <stop offset="50%" stop-color="#fef08a" />
+      <stop offset="100%" stop-color="#ca8a04" />
+    </linearGradient>
+
+    <!-- Felső hajlított pálya az íves szövegnek -->
+    <path id="textArcTop" d="M 70 170 A 110 110 0 0 1 290 170" fill="none" />
+  </defs>
+
+  <!-- Fő forma és keret -->
+  <path d="${shieldPath}" fill="url(#badgeGrad)" stroke="${state.borderColor}" stroke-width="8" stroke-linejoin="round" />
+  
+  <!-- Belső vékony díszcsík -->
+  <path d="${shieldPath}" fill="none" stroke="${state.borderColor}" stroke-width="1.8" stroke-dasharray="6,4" opacity="0.6" transform="scale(0.92) translate(15.6, 13)" />
+
+  <!-- Díszítő koszorú/csillag elemek -->
+  ${wreathMarkup}
+
+  <!-- Központi növénytani ikon csoport skálázással és forgatással -->
+  <g transform="translate(180, 145) scale(${scaleFactor}) rotate(${state.rotate})">
+    ${iconMarkup}
+  </g>
+
+  <!-- Alsó dekoratív szalag a csapatnévnek -->
+  <g id="ribbonGroup" transform="translate(0, 4)">
+    <!-- Szalag végek -->
+    <path d="M 40 305 L 75 285 L 75 325 Z" fill="#a16207" />
+    <path d="M 320 305 L 285 285 L 285 325 Z" fill="#a16207" />
+    
+    <!-- Szalag fő teste -->
+    <rect x="58" y="285" width="244" height="38" rx="10" fill="url(#ribbonGrad)" stroke="#a16207" stroke-width="2" />
+    
+    <!-- Csapatnév a szalagon -->
+    <text x="180" y="310" text-anchor="middle" font-family="'Fredoka', 'Arial Rounded MT Bold', sans-serif" font-weight="700" font-size="16" fill="#451a03" letter-spacing="0.5">
+      ${safeTeamName.toUpperCase()}
+    </text>
+  </g>
+
+  <!-- Finom fénypont a logón -->
+  <circle cx="120" cy="70" r="16" fill="#ffffff" opacity="0.12"/>
+</svg>
+      `.trim();
+    }
+
+    // HTML segédfüggvény
+    function escapeHtml(text) {
+      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+      return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+
+    // Előnézet és UI frissítése
+    function updateLogo() {
+      // Értékek szinkronizálása a state objektumba
+      state.teamName = document.getElementById('teamName').value || "Káposzta Bajnokok";
+      state.school = document.getElementById('schoolName').value;
+      state.motto = document.getElementById('mascotPlant').value;
+      state.bgColor = document.getElementById('badgeBgColor').value;
+      state.borderColor = document.getElementById('badgeBorderColor').value;
+      state.wreath = document.getElementById('wreathType').value;
+      state.scale = parseInt(document.getElementById('iconScale').value, 10);
+      state.rotate = parseInt(document.getElementById('iconRotate').value, 10);
+
+      document.getElementById('iconScaleVal').innerText = state.scale + '%';
+      document.getElementById('iconRotateVal').innerText = state.rotate + '°';
+
+      // SVG generálás és beillesztés
+      const svgMarkup = generateFullSVG();
+      document.getElementById('svgContainer').innerHTML = svgMarkup;
+
+      // Összegző kártya frissítése
+      document.getElementById('previewTeamTitle').innerText = state.teamName;
+      document.getElementById('previewSchool').innerText = state.school || "Iskola nincs megadva";
+      document.getElementById('previewMotto').innerText = state.motto ? `"${state.motto}"` : "";
+      document.getElementById('previewMemberCount').innerText = `${state.members.length} csapattag`;
+    }
+
+    // Pajzsforma választó
+    function setShield(shape) {
+      state.shape = shape;
+      document.querySelectorAll('.shape-btn').forEach(btn => {
+        if (btn.getAttribute('data-shape') === shape) {
+          btn.className = "shape-btn flex flex-col items-center justify-center p-2 rounded-2xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 transition";
+        } else {
+          btn.className = "shape-btn flex flex-col items-center justify-center p-2 rounded-2xl border-2 border-green-200 bg-white text-slate-700 transition hover:bg-emerald-50";
+        }
+      });
+      updateLogo();
+    }
+
+    // Ikon választó
+    function setIcon(iconKey) {
+      state.icon = iconKey;
+      document.querySelectorAll('.icon-btn').forEach(btn => {
+        if (btn.getAttribute('data-icon') === iconKey) {
+          btn.className = "icon-btn p-2 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-800 flex flex-col items-center text-center";
+        } else {
+          btn.className = "icon-btn p-2 rounded-xl border-2 border-green-200 bg-white text-slate-700 flex flex-col items-center text-center hover:bg-emerald-50";
+        }
+      });
+      updateLogo();
+    }
+
+    // Gyors színbeállító gombok
+    function setQuickColor(inputId, colorHex) {
+      document.getElementById(inputId).value = colorHex;
+      updateLogo();
+    }
+
+    // Csapattagok dinamikus kezelése
+    function renderMembers() {
+      const container = document.getElementById('membersContainer');
+      container.innerHTML = '';
+
+      state.members.forEach((member, index) => {
+        const row = document.createElement('div');
+        row.className = "flex items-center gap-2";
+        row.innerHTML = `
+          <div class="w-6 h-6 rounded-full bg-emerald-200 text-emerald-800 text-xs font-bold flex items-center justify-center flex-shrink-0">
+            ${index + 1}
+          </div>
+          <input type="text" value="${escapeHtml(member)}" placeholder="Tag neve (pl. Kiss Anna)"
+            oninput="updateMemberName(${index}, this.value)"
+            class="flex-grow px-3 py-1.5 rounded-xl border border-green-200 text-sm focus:border-emerald-500 focus:outline-none">
+          ${state.members.length > 1 ? `
+            <button type="button" onclick="removeMember(${index})" class="text-rose-400 hover:text-rose-600 p-1.5 transition" title="Törlés">
+              <i class="fa-solid fa-trash-can text-sm"></i>
+            </button>
+          ` : '<div class="w-7"></div>'}
+        `;
+        container.appendChild(row);
+      });
+
+      const addBtn = document.getElementById('addMemberBtn');
+      const notice = document.getElementById('memberNotice');
+      if (state.members.length >= 5) {
+        addBtn.classList.add('opacity-50', 'pointer-events-none');
+        notice.classList.remove('hidden');
+      } else {
+        addBtn.classList.remove('opacity-50', 'pointer-events-none');
+        notice.classList.add('hidden');
+      }
+      
+      updateLogo();
+    }
+
+    function addMember() {
+      if (state.members.length < 5) {
+        state.members.push(`Csapattag ${state.members.length + 1}`);
+        renderMembers();
+      }
+    }
+
+    function removeMember(index) {
+      if (state.members.length > 1) {
+        state.members.splice(index, 1);
+        renderMembers();
+      }
+    }
+
+    function updateMemberName(index, val) {
+      state.members[index] = val;
+      updateLogo();
+    }
+
+    // Véletlenszerű / Meglepetés logó és csapatnév generáló
+    function randomizeAll() {
+      const funnyNames = [
+        "Vetésforgó Varázslók", "Katicabogár Kommandó", "Gyorscsírázók",
+        "BioBorsó Bajnokok", "Napfény Kertészei", "Magvető Mókusok",
+        "Humusz Hősök", "Aranykalász Akadémia", "Sárgarépa Szövetség"
+      ];
+      const mottos = [
+        "Egészséges talaj, egészséges élet!",
+        "Körbe-körbe forog a vetemény!",
+        "A magtól a bőséges termésig!",
+        "Tápanyagok harmóniája a kertben!"
+      ];
+      const shapes = ['circle', 'shield', 'leaf', 'hexagon', 'pot'];
+      const icons = ['wheat', 'pea', 'carrot', 'cabbage', 'sprout', 'sun'];
+      const bgColors = ['#15803d', '#166534', '#0f766e', '#854d0e', '#ca8a04', '#1e3a8a'];
+      const borderColors = ['#fef08a', '#ffffff', '#fdba74', '#86efac'];
+
+      // Randomizáció
+      const randomName = funnyNames[Math.floor(Math.random() * funnyNames.length)];
+      const randomMotto = mottos[Math.floor(Math.random() * mottos.length)];
+      const randomShape = shapes[Math.floor(Math.random() * shapes.length)];
+      const randomIcon = icons[Math.floor(Math.random() * icons.length)];
+      const randomBg = bgColors[Math.floor(Math.random() * bgColors.length)];
+      const randomBorder = borderColors[Math.floor(Math.random() * borderColors.length)];
+
+      document.getElementById('teamName').value = randomName;
+      document.getElementById('mascotPlant').value = randomMotto;
+      document.getElementById('badgeBgColor').value = randomBg;
+      document.getElementById('badgeBorderColor').value = randomBorder;
+      
+      setShield(randomShape);
+      setIcon(randomIcon);
+      showToast("Új meglepetés logó elkészítve! 🎲");
+    }
+
+    // Letöltés SVG formátumban
+    function downloadSVG() {
+      const svgData = generateFullSVG();
+      const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+      const svgUrl = URL.createObjectURL(svgBlob);
+      const downloadLink = document.createElement("a");
+      downloadLink.href = svgUrl;
+      const fileName = (state.teamName.trim().replace(/\s+/g, '_') || 'vetesforgo_logo') + ".svg";
+      downloadLink.download = fileName;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      URL.revokeObjectURL(svgUrl);
+      showToast("SVG logó sikeresen letöltve! 📁");
+    }
+
+    // Letöltés PNG formátumban (Canvas segítségével szép felbontásban)
+    function downloadPNG() {
+      const svgString = generateFullSVG();
+      const svgBlob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+      const URLObj = window.URL || window.webkitURL || window;
+      const blobURL = URLObj.createObjectURL(svgBlob);
+      
+      const image = new Image();
+      image.onload = function() {
+        const canvas = document.createElement("canvas");
+        // Nagyobb felbontású 720x720 PNG
+        canvas.width = 720;
+        canvas.height = 720;
+        const context = canvas.getContext("2d");
+        context.drawImage(image, 0, 0, 720, 720);
+        
+        const pngUrl = canvas.toDataURL("image/png");
+        const downloadLink = document.createElement("a");
+        const fileName = (state.teamName.trim().replace(/\s+/g, '_') || 'vetesforgo_logo') + ".png";
+        downloadLink.href = pngUrl;
+        downloadLink.download = fileName;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        URLObj.revokeObjectURL(blobURL);
+        showToast("PNG logó elkészült és letöltve! 🖼️");
+      };
+      image.src = blobURL;
+    }
+
+    // Google Sheets mentés / beküldés
+    async function submitToGoogleSheet() {
+      const submitBtn = document.getElementById('submitBtn');
+      const scriptUrl = (document.getElementById('scriptUrl').value || state.scriptUrl).trim();
+
+      // Alap validálás
+      if (!state.teamName.trim()) {
+        showToast("Kérlek adj meg egy csapatnevet!", true);
+        return;
+      }
+
+      // Payload összeállítása
+      const payload = {
+        teamName: state.teamName.trim(),
+        school: state.school.trim(),
+        motto: state.motto.trim(),
+        members: state.members.filter(m => m.trim().length > 0),
+        symbol: state.icon,
+        shape: state.shape,
+        svgCode: generateFullSVG()
+      };
+
+      // Gomb állapot frissítés
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Beküldés folyamatban...</span>`;
+
+      if (!scriptUrl) {
+        // Ha még nincs megadva webhook URL, demonstrációs módban szimuláljuk
+        setTimeout(() => {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> <span>Csapat Nevezése a Bajnokságba!</span>`;
+          showToast("✨ Minta beküldés kész! (Valós mentéshez add meg a Google Web App linket a 3. pontban)");
+        }, 900);
+        return;
+      }
+
+      try {
+        // Google Apps Script no-cors módban fogadja el a hívást böngészőből
+        await fetch(scriptUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        showToast("🎉 Csapat és logó sikeresen elküldve a Google Táblázatba!");
+      } catch (err) {
+        console.error("Beküldési hiba:", err);
+        showToast("Hiba történt a beküldéskor. Ellenőrizd a Web App URL-t!", true);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> <span>Csapat Nevezése a Bajnokságba!</span>`;
+      }
+    }
+
+    // Webhook URL mentése localStorage-ba
+    function saveWebhookUrl() {
+      const url = document.getElementById('scriptUrl').value.trim();
+      state.scriptUrl = url;
+      localStorage.setItem('vetesforgo_script_url', url);
+      showToast("Apps Script Web App URL elmentve!");
+    }
+
+    // Értesítés (Toast) buborék megjelenítője
+    function showToast(msg, isError = false) {
+      const toast = document.getElementById('statusToast');
+      const text = document.getElementById('toastMessage');
+      const icon = document.getElementById('toastIcon');
+
+      text.innerText = msg;
+      if (isError) {
+        toast.className = "fixed bottom-6 right-6 z-50 bg-rose-600 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 border-2 border-rose-400";
+        icon.className = "fa-solid fa-triangle-exclamation text-xl text-yellow-300";
+      } else {
+        toast.className = "fixed bottom-6 right-6 z-50 bg-emerald-600 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 border-2 border-emerald-400";
+        icon.className = "fa-solid fa-circle-check text-xl text-yellow-300";
+      }
+
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 4200);
+    }
+
+    // Apps Script Modal nyitás/zárás
+    function openScriptModal() {
+      document.getElementById('scriptModal').classList.remove('hidden');
+    }
+
+    function closeScriptModal() {
+      document.getElementById('scriptModal').classList.add('hidden');
+    }
+
+    function copyAppsScriptCode() {
+      const code = document.getElementById('appsScriptCode').innerText;
+      const tempTextArea = document.createElement("textarea");
+      tempTextArea.value = code;
+      document.body.appendChild(tempTextArea);
+      tempTextArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempTextArea);
+      showToast("Apps Script kód vágólapra másolva!");
+    }
+
+    // Kezdőállapot betöltése
+    window.onload = function() {
+      const savedUrl = localStorage.getItem('vetesforgo_script_url');
+      if (savedUrl) {
+        state.scriptUrl = savedUrl;
+        document.getElementById('scriptUrl').value = savedUrl;
+      }
+      renderMembers();
+      updateLogo();
+    };
+  </script>
+</body>
+</html>
