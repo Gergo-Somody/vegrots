@@ -702,7 +702,18 @@
   
   <header>
     <div class="header-left">
-      <span class="badge">VegRots Iskolakerti Rendszer • microbes4athu</span>
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap;">
+        <a href="index.html" class="btn" style="text-decoration:none; padding:4px 10px; font-size:0.8rem; background:rgba(16,185,129,0.15); color:var(--green); border:1px solid rgba(16,185,129,0.3); border-radius:8px; font-weight:700; display:inline-flex; align-items:center; gap:4px;">
+          ⬅ Vissza a Hub-ra
+        </a>
+        <a href="csapattervezo.html" class="btn" style="text-decoration:none; padding:4px 10px; font-size:0.8rem; background:rgba(250,204,21,0.15); color:var(--amber); border:1px solid rgba(250,204,21,0.3); border-radius:8px; font-weight:700; display:inline-flex; align-items:center; gap:4px;">
+          🎨 Csapattervező
+        </a>
+        <a href="tanari_nezet_bajnoksag.html" class="btn" style="text-decoration:none; padding:4px 10px; font-size:0.8rem; background:rgba(56,189,248,0.15); color:var(--blue); border:1px solid rgba(56,189,248,0.3); border-radius:8px; font-weight:700; display:inline-flex; align-items:center; gap:4px;">
+          🎓 Tanári Monitor
+        </a>
+        <span class="badge">VegRots Iskolakerti Rendszer • microbes4athu</span>
+      </div>
       <h1>🌱 3 Éves Kerti Vetésforgó Bajnokság (Profi)</h1>
       <p>Kora tavasztól télig: 3 szakasz / év. Vigyázz a fagyra, a kártevőkre és építs regeneratív takaró-keverékeket!</p>
     </div>
@@ -713,6 +724,7 @@
       </button>
 
       <div class="team-select-box">
+        <div id="teamBadgePreview" style="width:32px; height:32px; display:none; flex-shrink:0;"></div>
         <span>Csapat:</span>
         <select id="teamSelector">
           <option value="Magágyúsok">1. Ágyás – Magágyúsok</option>
@@ -728,9 +740,12 @@
   </header>
 
   <div class="baseline-banner" id="baselineBanner">
-    <div>
-      <span>Induló állapot (2026. októberi vetés): </span>
-      <strong id="baseCoverName">Dús rozs + lóbab + borsó + lucerna</strong>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div id="baselineTeamBadge" style="width:48px; height:48px; display:none; flex-shrink:0;"></div>
+      <div>
+        <span>Induló állapot (2026. októberi vetés): </span>
+        <strong id="baseCoverName">Dús rozs + lóbab + borsó + lucerna</strong>
+      </div>
     </div>
     <div class="baseline-tags" id="baseTags"></div>
   </div>
@@ -1230,6 +1245,16 @@ const CROPS = [
 
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby6nNEj7Spkrm8aH2hvXvT2mhRGOLWx8qZqrRPfGKJwIRfIlSsYkVwLBO8fMzCUtjsSAw/exec";
 
+const OFFICIAL_DEFAULT_TEAMS = [
+  'Magágyúsok',
+  'Gémorr fúrók',
+  'Zöld lándzsások',
+  'Vitorlázó jávaiak',
+  'Mag páncélosok',
+  'Hangya-taxik',
+  'Kemény magok'
+];
+
 const BED_NEIGHBORS = {
   'Gémorr fúrók': ['Zöld lándzsások'],
   'Zöld lándzsások': ['Gémorr fúrók'],
@@ -1240,15 +1265,57 @@ const BED_NEIGHBORS = {
   'Kemény magok': []
 };
 
-let allTeamsGardenData = {
-  'Magágyúsok': { years: { 1: null, 2: null, 3: null }, allCrops: [] },
-  'Gémorr fúrók': { years: { 1: null, 2: null, 3: null }, allCrops: [] },
-  'Zöld lándzsások': { years: { 1: null, 2: null, 3: null }, allCrops: [] },
-  'Vitorlázó jávaiak': { years: { 1: null, 2: null, 3: null }, allCrops: [] },
-  'Mag páncélosok': { years: { 1: null, 2: null, 3: null }, allCrops: [] },
-  'Hangya-taxik': { years: { 1: null, 2: null, 3: null }, allCrops: [] },
-  'Kemény magok': { years: { 1: null, 2: null, 3: null }, allCrops: [] }
-};
+let allTeamsGardenData = {};
+
+function ensureTeamData(teamName, profile = null) {
+  if (!allTeamsGardenData[teamName]) {
+    allTeamsGardenData[teamName] = {
+      years: { 1: null, 2: null, 3: null },
+      allCrops: [],
+      profile: profile || null
+    };
+  } else if (profile && !allTeamsGardenData[teamName].profile) {
+    allTeamsGardenData[teamName].profile = profile;
+  }
+}
+
+// Inicializáljuk a 7 alapértelmezett iskolakerti ágyást
+OFFICIAL_DEFAULT_TEAMS.forEach(t => ensureTeamData(t));
+
+// Betöltjük a helyben regisztrált csapatokat is a gyors és offline használhatóságért
+function loadLocalRegisteredTeams() {
+  try {
+    const stored = JSON.parse(localStorage.getItem('vegrots_registered_teams') || '{}');
+    Object.keys(stored).forEach(name => {
+      const item = stored[name];
+      ensureTeamData(name, {
+        registeredAt: item.timestamp,
+        school: item.school,
+        members: item.members,
+        motto: item.motto,
+        logoSvg: item.svgCode,
+        symbol: item.symbol,
+        shape: item.shape
+      });
+    });
+  } catch (e) {
+    console.warn("Helyi csapatok beolvasási hiba:", e);
+  }
+}
+loadLocalRegisteredTeams();
+
+function getTeamBaseline(teamName) {
+  if (TEAM_BASELINES[teamName]) {
+    return TEAM_BASELINES[teamName];
+  }
+  return {
+    name: 'Kiegyensúlyozott kerti keverék (Rozs + Bíborhere + Facélia)',
+    families: ['poaceae', 'fabaceae', 'boraginaceae'],
+    nitrogen: 3,
+    restrictions: [],
+    bonuses: ['Dinamikus csapat: Jó mikrobiom aktivitás, szabad vetésterv!']
+  };
+}
 
 let gameState = {
   currentYear: 1,
@@ -1272,6 +1339,50 @@ const slotEarly = document.getElementById('slotEarlySpring');
 const slotSummer = document.getElementById('slotSummer');
 const slotWinter = document.getElementById('slotWinter');
 const slotBoxes = [slotEarly, slotSummer, slotWinter];
+
+function refreshTeamSelector(selectedTeamToKeep = null) {
+  const urlTeam = new URLSearchParams(window.location.search).get('team');
+  const storedTeam = localStorage.getItem('vegrots_current_team');
+  const currentVal = selectedTeamToKeep || teamSelector.value || urlTeam || storedTeam;
+
+  const allTeamNames = Object.keys(allTeamsGardenData);
+  const customTeams = allTeamNames.filter(t => !OFFICIAL_DEFAULT_TEAMS.includes(t));
+  const officialTeams = allTeamNames.filter(t => OFFICIAL_DEFAULT_TEAMS.includes(t));
+
+  teamSelector.innerHTML = '';
+
+  if (customTeams.length > 0) {
+    const optgroupCustom = document.createElement('optgroup');
+    optgroupCustom.label = '📋 Regisztrált Csapatok (Táblázat / Csapattervező)';
+    customTeams.forEach(tName => {
+      const opt = document.createElement('option');
+      opt.value = tName;
+      opt.textContent = `⭐ ${tName}`;
+      optgroupCustom.appendChild(opt);
+    });
+    teamSelector.appendChild(optgroupCustom);
+  }
+
+  const optgroupOfficial = document.createElement('optgroup');
+  optgroupOfficial.label = '🌱 Iskolakerti Alap Ágyások';
+  officialTeams.forEach(tName => {
+    const opt = document.createElement('option');
+    opt.value = tName;
+    opt.textContent = tName;
+    optgroupOfficial.appendChild(opt);
+  });
+  teamSelector.appendChild(optgroupOfficial);
+
+  if (currentVal && allTeamNames.includes(currentVal)) {
+    teamSelector.value = currentVal;
+  } else if (customTeams.length > 0 && !selectedTeamToKeep) {
+    teamSelector.value = customTeams[0];
+  } else {
+    teamSelector.value = officialTeams[0] || 'Magágyúsok';
+  }
+
+  updateTeamBaseline();
+}
 
 // HIBABIZTOS ADATMENTÉS GOOGLE SPREADSHEETBE (CORS mentes POST)
 async function syncYearToSpreadsheet() {
@@ -1301,35 +1412,51 @@ async function syncYearToSpreadsheet() {
   }
 }
 
-// OSZTÁLYSZINTŰ ADATOK LEKÉRÉSE
+// OSZTÁLYSZINTŰ ADATOK LEKÉRÉSE A SPREADSHEETBŐL
 async function fetchAndAnalyzeGardenNetwork() {
   try {
     const res = await fetch(APPS_SCRIPT_URL);
     const result = await res.json();
 
     if (result && result.status === "success" && result.teams) {
+      const prevSelected = teamSelector.value;
       Object.keys(result.teams).forEach(tName => {
-        if (allTeamsGardenData[tName]) {
-          const remoteYears = result.teams[tName].years || {};
+        const remoteTeam = result.teams[tName];
+        ensureTeamData(tName, remoteTeam.profile);
+        const remoteYears = remoteTeam.years || {};
 
-          // Beemeljük az 1., 2. és 3. évet a táblázatból
-          [1, 2, 3].forEach(y => {
-            if (remoteYears[y]) {
-              allTeamsGardenData[tName].years[y] = {
-                early: remoteYears[y].early,
-                summer: remoteYears[y].summer,
-                winter: remoteYears[y].winter
-              };
-            }
-          });
-        }
+        // Beemeljük az 1., 2. és 3. évet a táblázatból
+        [1, 2, 3].forEach(y => {
+          if (remoteYears[y]) {
+            allTeamsGardenData[tName].years[y] = {
+              early: remoteYears[y].early,
+              summer: remoteYears[y].summer,
+              winter: remoteYears[y].winter
+            };
+          }
+        });
       });
+
+      refreshTeamSelector(prevSelected);
     }
   } catch (err) {
     console.warn("A központi adatok lekérése helyi módban folytatódik.", err);
   }
 
   evaluateGardenEcology();
+}
+
+function getTeamMainCrop(tData) {
+  if (!tData) return null;
+  if (tData.cropsY3) return tData.cropsY3;
+  if (tData.years) {
+    for (let y = 3; y >= 1; y--) {
+      if (tData.years[y] && tData.years[y].summer && tData.years[y].summer !== '—') {
+        return tData.years[y].summer.split('+')[0].split(',')[0].trim();
+      }
+    }
+  }
+  return null;
 }
 
 function evaluateGardenEcology() {
@@ -1339,7 +1466,7 @@ function evaluateGardenEcology() {
   // 1. Kertszintű számláló csak a már kiválasztott növényekre
   const familyCount = {};
   teams.forEach(t => {
-    const cropName = allTeamsGardenData[t].cropsY3;
+    const cropName = getTeamMainCrop(allTeamsGardenData[t]);
     const crop = CROPS.find(c => c.name === cropName);
     if (crop && crop.family) {
       familyCount[crop.family] = (familyCount[crop.family] || 0) + 1;
@@ -1353,7 +1480,8 @@ function evaluateGardenEcology() {
   teams.forEach(tName => {
     const data = allTeamsGardenData[tName];
     const isCurrent = tName === currentTeam;
-    const currentCrop = CROPS.find(c => c.name === data.cropsY3);
+    const cropName = getTeamMainCrop(data);
+    const currentCrop = CROPS.find(c => c.name === cropName);
     const neighbors = BED_NEIGHBORS[tName] || [];
 
     let strongConflict = false;
@@ -1366,9 +1494,13 @@ function evaluateGardenEcology() {
     } else {
       // Csak akkor vizsgálunk szomszédot, ha a szomszédnak is van már zöldsége
       neighbors.forEach(nName => {
-        const neighborCrop = CROPS.find(c => c.name === allTeamsGardenData[nName].cropsY3);
-        if (neighborCrop && currentCrop.family === neighborCrop.family) {
-          strongConflict = true;
+        const nData = allTeamsGardenData[nName];
+        if (nData) {
+          const nCropName = getTeamMainCrop(nData);
+          const neighborCrop = CROPS.find(c => c.name === nCropName);
+          if (neighborCrop && currentCrop.family === neighborCrop.family) {
+            strongConflict = true;
+          }
         }
       });
 
@@ -1427,7 +1559,9 @@ function calculateClassPantry(teams) {
   let grain = 0;
 
   teams.forEach(tName => {
-    const crops = allTeamsGardenData[tName].allCrops || [];
+    const tData = allTeamsGardenData[tName];
+    if (!tData) return;
+    const crops = tData.allCrops || [];
     
     crops.forEach(crop => {
       // Gyümölcstermők (pl. paradicsom, paprika, cukkini)
@@ -1441,6 +1575,27 @@ function calculateClassPantry(teams) {
       // Gabona / Szénhidrát (pl. kukorica)
       if (crop.family === 'poaceae') grain += 3;
     });
+
+    // Ha a táblázatból érkeztek a körök és nincs helyi allCrops tömb:
+    if (crops.length === 0 && tData.years) {
+      [1, 2, 3].forEach(y => {
+        const yData = tData.years[y];
+        if (yData && yData.summer) {
+          const names = yData.summer.split('+').concat(yData.early ? yData.early.split('+') : []);
+          names.forEach(n => {
+            const trimmed = n.trim();
+            const crop = CROPS.find(c => c.name === trimmed);
+            if (crop) {
+              if (crop.family === 'solanaceae' || crop.family === 'cucurbitaceae') fruit += 3;
+              if (crop.family === 'apiaceae' || crop.id === 'retek') root += 2;
+              if (crop.family === 'fabaceae') legume += 2;
+              if (crop.family === 'amaryllidaceae' || crop.family === 'amaranthaceae' || crop.id === 'kaposzta') allium += 2;
+              if (crop.family === 'poaceae') grain += 3;
+            }
+          });
+        }
+      });
+    }
   });
 
   document.getElementById('pantryFruit').textContent = `${fruit} kosár`;
@@ -1474,9 +1629,60 @@ function calculateClassPantry(teams) {
 
 function updateTeamBaseline() {
   const team = teamSelector.value;
-  const base = TEAM_BASELINES[team] || TEAM_BASELINES['Magágyúsok'];
+  const base = getTeamBaseline(team);
   baseCoverName.textContent = base.name;
   baseTags.innerHTML = '';
+
+  const teamData = allTeamsGardenData[team];
+  const profile = teamData ? teamData.profile : null;
+
+  // Jelvény / Címer megjelenítése a bannerben és a fejlécben
+  const badgeWrap = document.getElementById('baselineTeamBadge');
+  const previewBadge = document.getElementById('teamBadgePreview');
+  if (profile && profile.logoSvg) {
+    if (badgeWrap) {
+      badgeWrap.innerHTML = profile.logoSvg;
+      badgeWrap.style.display = 'block';
+    }
+    if (previewBadge) {
+      previewBadge.innerHTML = profile.logoSvg;
+      previewBadge.style.display = 'block';
+    }
+  } else {
+    if (badgeWrap) {
+      badgeWrap.innerHTML = '';
+      badgeWrap.style.display = 'none';
+    }
+    if (previewBadge) {
+      previewBadge.innerHTML = '';
+      previewBadge.style.display = 'none';
+    }
+  }
+
+  if (profile) {
+    if (profile.motto) {
+      const p = document.createElement('span');
+      p.className = 'bonus-pill';
+      p.style.borderColor = 'var(--cyan)';
+      p.style.color = 'var(--cyan)';
+      p.textContent = `💬 "${profile.motto}"`;
+      baseTags.appendChild(p);
+    }
+    if (profile.members && profile.members.length > 0) {
+      const p = document.createElement('span');
+      p.className = 'bonus-pill';
+      const mText = Array.isArray(profile.members) ? profile.members.join(', ') : profile.members;
+      p.textContent = `👥 ${mText}`;
+      baseTags.appendChild(p);
+    }
+    if (profile.school) {
+      const p = document.createElement('span');
+      p.className = 'bonus-pill';
+      p.style.color = '#cbd5e1';
+      p.textContent = `🏫 ${profile.school}`;
+      baseTags.appendChild(p);
+    }
+  }
 
   base.restrictions.forEach(r => {
     const p = document.createElement('span');
@@ -1710,7 +1916,7 @@ function inspectCropRotationWarning() {
   const summerCrop = gameState.currentPlan.summer[0];
   const earlyCrop = gameState.currentPlan.early[0];
   const team = teamSelector.value;
-  const base = TEAM_BASELINES[team];
+  const base = getTeamBaseline(team);
 
   let prevFamilies = [];
   if (gameState.currentYear === 1) {
@@ -1758,7 +1964,7 @@ btnCommit.addEventListener('click', () => {
   const plan = gameState.currentPlan;
   const year = gameState.currentYear;
   const team = teamSelector.value;
-  const base = TEAM_BASELINES[team];
+  const base = getTeamBaseline(team);
   let logs = [];
 
   let prevFamilies = [];
@@ -1928,6 +2134,7 @@ btnCommit.addEventListener('click', () => {
   }
 
   // Eltároljuk az adott év részleteit
+  ensureTeamData(team);
   allTeamsGardenData[team].years[year] = {
     early: plan.early.map(c => c.name).join(', ') || '—',
     summer: plan.summer.map(c => c.name).join(', ') || '—',
@@ -1936,6 +2143,9 @@ btnCommit.addEventListener('click', () => {
 
   // Hozzáfűzzük a teljes 3 éves listához
   allTeamsGardenData[team].allCrops.push(...harvestedThisYear);
+  if (year === 3) {
+    allTeamsGardenData[team].cropsY3 = plan.summer[0] ? plan.summer[0].name : (plan.early[0] ? plan.early[0].name : null);
+  }
 
   logs.forEach(l => {
     const d = document.createElement('div');
@@ -1988,7 +2198,7 @@ function updateDashboard() {
 function showGameOver(isBankrupt = false) {
   const modal = document.getElementById('endGameModal');
   const team = teamSelector.value;
-  const base = TEAM_BASELINES[team] || TEAM_BASELINES['Magágyúsok'];
+  const base = getTeamBaseline(team);
   const total = isBankrupt ? 0 : ((gameState.soilHealth || 0) + (gameState.totalYield || 0));
 
   document.getElementById('modalTeamName').textContent = `${team} csapata`;
@@ -2066,7 +2276,7 @@ function enableClassroomTuning() {
 
 function generateTextReport() {
   const team = teamSelector.value;
-  const base = TEAM_BASELINES[team] || TEAM_BASELINES['Magágyúsok'];
+  const base = getTeamBaseline(team);
   const total = gameState.soilHealth <= 15 ? 0 : (gameState.soilHealth + gameState.totalYield);
 
   let text = `========================================================\n`;
@@ -2267,8 +2477,10 @@ function updateTimelineRibbons() {
   }
 }
 
-updateTeamBaseline();
+refreshTeamSelector();
 renderPalette();
+fetchAndAnalyzeGardenNetwork();
+setInterval(fetchAndAnalyzeGardenNetwork, 15000);
 </script>
 
 </body>

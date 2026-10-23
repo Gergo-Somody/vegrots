@@ -287,7 +287,11 @@
       <h1>VEGROTS // SULIKERT HUB</h1>
       <span>Rábapatona Petőfi S. Ált. Iskola • 4. Osztály</span>
     </div>
-    <div id="auth-status" style="font-size: 0.9rem; color: #94a3b8;">Diák üzemmód</div>
+    <div id="auth-status" style="font-size: 0.9rem; color: #94a3b8; display: flex; align-items: center; gap: 8px;">
+      <span>Diák üzemmód</span>
+      <a href="csapattervezo.html" class="btn-touch green" style="padding: 6px 12px; font-size: 0.8rem;">🎨 Csapattervező</a>
+      <a href="bajnoksag.html" class="btn-touch gold" style="padding: 6px 12px; font-size: 0.8rem;">🌱 Bajnokság</a>
+    </div>
   </header>
 
   <nav class="nav-tabs">
@@ -334,7 +338,10 @@
         <h2 style="color:var(--gold);">Mester Irányítópult (Tanár)</h2>
         <span style="font-size:0.85rem; color:#94a3b8;">Hangvezérlés és felhő-szinkronizálás aktív</span>
       </div>
-      <button class="btn-touch gray" onclick="lockMaster()">Kilépés / Zárolás</button>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <a href="tanari_nezet_bajnoksag.html" class="btn-touch cyan" style="font-size:0.85rem; padding:8px 14px;">🎓 Bajnokság Tanári Monitor</a>
+        <button class="btn-touch gray" onclick="lockMaster()">Kilépés / Zárolás</button>
+      </div>
     </div>
     <div class="grid" id="masterControlGrid"></div>
   </main>
@@ -393,13 +400,14 @@
     ];
 
     const FELADATOK = [
+      { id: "csapattervezo", title: "Csapattervező & Logóműhely", file: "csapattervezo.html", desc: "Készítsétek el a csapatotok profilját, címerét és egyedi SVG logóját a bajnoksághoz!", icon: "🎨", reward: "+50 XP" },
+      { id: "bajnoksag", title: "Vetésforgó Bajnokság", file: "bajnoksag.html", desc: "3 éves kerti vetésforgó szimuláció, talaj-mikrobiom és osztályszintű kooperáció.", icon: "🌱", reward: "+100 XP" },
       { id: "detektiv", title: "11 Mag Rejtélye Teszt", file: "#", desc: "Azonosítsátok a tálcán lévő mintákat a saját laborotokban! (10 +1 pont)", icon: "🔍", reward: "+100 XP" },
-       { id: "1_teszt", title: "Tananyag teszt", file: "teszt.html", desc: "Első teszt", icon: "🔍", reward: "+50 XP" },
+      { id: "1_teszt", title: "Tananyag teszt", file: "teszt.html", desc: "Első teszt", icon: "📝", reward: "+50 XP" },
       { id: "vetes", title: "Vetésmélység Szimulátor", file: "feladatok/vetesmelyseg_szimulator.html", desc: "Állítsd be az ujjperceket! Ne hagyd kifulladni a magot a sötétben.", icon: "🎮", reward: "+50 XP" },
       { id: "bomba", title: "Magbomba Keverő (3:1 Pindstrup)", file: "feladatok/magbomba_labor.html", desc: "100g Pindstrup + 30g agyag. Nem csinálunk kőgolyót!", icon: "💣", reward: "+80 XP" },
       { id: "kaviar", title: "Magkaviár Készítő & Számláló", file: "feladatok/magkaviar_szamlalo.html", desc: "Számoljátok meg a csapat által gömbölyített kaviárokat!", icon: "🧪", reward: "+60 XP" },
-       { id: "kaviar", title: "Iskolakert térkép", file: "iskolakert_interakt_v_t_rk_p_s_tervez.html", desc: "Iskolakert megfigyelések", icon: "🔍", reward: "+60 XP" },
-       { id: "kaviar", title: "Bajnokság", file: "bajnoksag.html", desc: "Vetésforgó bajnokság", icon: "🔍", reward: "+60 XP" }
+      { id: "terkep", title: "Iskolakert térkép & tervező", file: "iskolakert_interakt_v_t_rk_p_s_tervez.html", desc: "Iskolakerti parcellák és megfigyelések", icon: "🗺️", reward: "+60 XP" }
     ];
 
     const SEED_QUESTIONS = [

@@ -252,7 +252,16 @@
 
   <header>
     <div class="header-left">
-      <div style="display:flex; align-items:center; gap:8px;">
+      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px;">
+        <a href="index.html" class="btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+          ⬅ Vissza a Hub-ra
+        </a>
+        <a href="bajnoksag.html" class="btn btn-primary" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+          🌱 Diák Bajnokság
+        </a>
+        <a href="csapattervezo.html" class="btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; color:var(--amber);">
+          🎨 Csapattervező
+        </a>
         <span class="badge-teacher">🎓 Tanári Vezérlőpult</span>
         <span style="font-size:0.75rem; color:var(--text-muted);">VegRots Rábapatona</span>
       </div>
@@ -370,7 +379,10 @@ async function fetchData() {
   }
 }
 
+let cachedTeamsObj = {};
+
 function processData(teamsObj) {
+  cachedTeamsObj = teamsObj || {};
   latestPerTeam = {};
   rawLogRows = [];
 
@@ -420,23 +432,39 @@ function renderLatestCards() {
   const container = document.getElementById('viewLatest');
   container.innerHTML = '';
 
-  OFFICIAL_TEAMS.forEach(teamName => {
+  const allTeamNames = Array.from(new Set([
+    ...OFFICIAL_TEAMS,
+    ...Object.keys(latestPerTeam),
+    ...Object.keys(cachedTeamsObj || {})
+  ]));
+
+  allTeamNames.forEach(teamName => {
     const data = latestPerTeam[teamName];
+    const profile = cachedTeamsObj && cachedTeamsObj[teamName] ? cachedTeamsObj[teamName].profile : null;
     const card = document.createElement('div');
     card.className = 'team-card';
+
+    const logoHtml = profile && profile.logoSvg 
+      ? `<div style="width:38px; height:38px; flex-shrink:0;">${profile.logoSvg}</div>` 
+      : '';
+    const mottoHtml = profile && profile.motto 
+      ? `<div style="font-size:0.75rem; color:var(--blue); font-style:italic;">"${profile.motto}"</div>` 
+      : '';
 
     if (!data) {
       // Még nincs beküldés ebből az ágyásból
       card.innerHTML = `
-        <div class="team-card-header">
-          <div>
+        <div class="team-card-header" style="display:flex; align-items:center; gap:10px;">
+          ${logoHtml}
+          <div style="flex:1;">
             <div class="team-title">${teamName}</div>
+            ${mottoHtml}
             <span style="font-size:0.75rem; color:var(--text-muted);">Még nem indított szimulációt</span>
           </div>
           <span style="font-size:0.72rem; color:var(--text-muted); background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:6px;">Inaktív</span>
         </div>
         <div style="padding:20px 0; text-align:center; color:var(--text-muted); font-size:0.8rem; font-style:italic;">
-          Várakozás a csapat első évének lezárására...
+          Várakozás a csapat első évének lezárására a bajnokságban...
         </div>
       `;
       container.appendChild(card);
@@ -450,9 +478,11 @@ function renderLatestCards() {
     const completedYears = Object.keys(data.allYears).map(y => `${y}. Év`).join(', ');
 
     card.innerHTML = `
-      <div class="team-card-header">
-        <div>
+      <div class="team-card-header" style="display:flex; align-items:center; gap:10px;">
+        ${logoHtml}
+        <div style="flex:1;">
           <div class="team-title">${teamName}</div>
+          ${mottoHtml}
           <span style="font-size:0.75rem; color:var(--text-muted);">Utolsó rögzített kör: <strong>${cur.year}. Év</strong> (${cur.timestamp.toLocaleTimeString('hu-HU')})</span>
         </div>
         <span class="team-latest-tag">${completedYears} lezárva</span>
@@ -553,7 +583,8 @@ function renderHistoryList() {
 
 function updateTeacherSummary() {
   const activeTeamsCount = Object.keys(latestPerTeam).length;
-  document.getElementById('statActiveBeds').textContent = `${activeTeamsCount} / ${OFFICIAL_TEAMS.length}`;
+  const totalKnown = Math.max(OFFICIAL_TEAMS.length, Object.keys(cachedTeamsObj || {}).length, activeTeamsCount);
+  document.getElementById('statActiveBeds').textContent = `${activeTeamsCount} / ${totalKnown}`;
 
   if (activeTeamsCount === 0) return;
 

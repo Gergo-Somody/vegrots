@@ -49,6 +49,14 @@
         </div>
       </div>
       <div class="flex items-center gap-2">
+        <a href="index.html" class="bg-white/20 hover:bg-white/30 text-white px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold shadow transition flex items-center gap-1.5">
+          <i class="fa-solid fa-house"></i>
+          <span>Hub Főoldal</span>
+        </a>
+        <a href="bajnoksag.html" class="bg-emerald-950/40 hover:bg-emerald-950/60 text-white px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold shadow transition flex items-center gap-1.5">
+          <i class="fa-solid fa-trophy text-yellow-300"></i>
+          <span>Bajnokság</span>
+        </a>
         <button onclick="randomizeAll()" class="bg-amber-400 hover:bg-amber-300 text-emerald-950 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold shadow-md transition transform active:scale-95 flex items-center gap-1.5">
           <i class="fa-solid fa-dice"></i>
           <span>Meglepetés!</span>
@@ -322,7 +330,28 @@
     <p>Vetésforgó Bajnokság Gyerekeknek &bull; Interaktív Mezőgazdasági & Növénytani Oktatóprogram</p>
   </footer>
 
-  <!-- MODAL: Apps Script Kód Segédlet -->
+  <!-- SIKERES NEVEZÉS MODAL -->
+  <div id="successModal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 text-center shadow-2xl border-4 border-emerald-400 transform animate-bounce-once">
+      <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+        🎉
+      </div>
+      <h3 class="text-xl font-bold text-emerald-950 mb-2">Csapat Sikeresen Nevezve!</h3>
+      <p class="text-slate-600 text-sm mb-4">
+        A(z) <strong id="successTeamName" class="text-emerald-700"></strong> bekerült a felhőbeli táblázatba és elérhető a bajnokságban!
+      </p>
+      <div id="successBadgePreview" class="w-28 h-28 mx-auto mb-5 drop-shadow-md"></div>
+      <div class="space-y-2">
+        <a id="btnGoToChampionship" href="bajnoksag.html" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-5 rounded-2xl shadow-lg transition flex items-center justify-center gap-2 text-sm">
+          <i class="fa-solid fa-trophy text-yellow-300"></i>
+          <span>Tovább a Bajnokságra ezzel a csapattal! 🚀</span>
+        </a>
+        <button onclick="closeSuccessModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 px-4 rounded-xl text-xs transition">
+          Maradok a csapattervezőben
+        </button>
+      </div>
+    </div>
+  </div>
 
 
   <!-- JavaScript Logika -->
@@ -763,7 +792,7 @@
 
     // Google Sheets mentés / beküldés
     async function submitToGoogleSheet() {
-      const scriptUrl = "https://script.google.com/macros/s/AKfycby6nNEj7Spkrm8aH2hvXvT2mhRGOLWx8qZqrRPfGKJwIRfIlSsYkVwLBO8fMzCUtjsSAw/exec";
+      const scriptUrl = state.scriptUrl || "https://script.google.com/macros/s/AKfycby6nNEj7Spkrm8aH2hvXvT2mhRGOLWx8qZqrRPfGKJwIRfIlSsYkVwLBO8fMzCUtjsSAw/exec";
       const submitBtn = document.getElementById('submitBtn');
 
       // Alap validálás
@@ -781,8 +810,19 @@
         members: state.members.filter(m => m.trim().length > 0),
         symbol: state.icon,
         shape: state.shape,
-        svgCode: generateFullSVG()
+        svgCode: generateFullSVG(),
+        timestamp: new Date().toISOString()
       };
+
+      // Mentés azonnal helyi tárolóba is (offline használathoz és azonnali bajnokság-eléréshez)
+      try {
+        const stored = JSON.parse(localStorage.getItem('vegrots_registered_teams') || '{}');
+        stored[payload.teamName] = payload;
+        localStorage.setItem('vegrots_registered_teams', JSON.stringify(stored));
+        localStorage.setItem('vegrots_current_team', payload.teamName);
+      } catch (e) {
+        console.warn("Helyi mentési figyelmeztetés:", e);
+      }
 
       // Gomb állapot frissítés
       submitBtn.disabled = true;
@@ -794,19 +834,32 @@
           method: 'POST',
           mode: 'no-cors',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'text/plain;charset=utf-8'
           },
           body: JSON.stringify(payload)
         });
 
         showToast("🎉 Csapat és logó sikeresen elküldve a Google Táblázatba!");
+        openSuccessModal(payload.teamName, payload.svgCode);
       } catch (err) {
         console.error("Beküldési hiba:", err);
-        showToast("Hiba történt a beküldéskor. Ellenőrizd a Web App URL-t!", true);
+        showToast("Figyelmeztetés a felhő beküldéskor, de a csapat helyben mentve!", true);
+        openSuccessModal(payload.teamName, payload.svgCode);
       } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> <span>Csapat Nevezése a Bajnokságba!</span>`;
       }
+    }
+
+    function openSuccessModal(teamName, svgCode) {
+      document.getElementById('successTeamName').textContent = teamName;
+      document.getElementById('successBadgePreview').innerHTML = svgCode;
+      document.getElementById('btnGoToChampionship').href = `bajnoksag.html?team=${encodeURIComponent(teamName)}`;
+      document.getElementById('successModal').classList.remove('hidden');
+    }
+
+    function closeSuccessModal() {
+      document.getElementById('successModal').classList.add('hidden');
     }
 
     // Webhook URL mentése localStorage-ba
