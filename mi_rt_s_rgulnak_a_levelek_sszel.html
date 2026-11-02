@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Miért színesednek a falevelek ősszel? – 4. osztályos természetbúvár labor</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        forest: {
+                            50: '#f2f7f4',
+                            100: '#e1ede5',
+                            500: '#2d6a4f',
+                            700: '#1b4332',
+                            800: '#081c15',
+                        },
+                        autumn: {
+                            gold: '#e09f3e',
+                            amber: '#d97706',
+                            orange: '#d45d19',
+                            scarlet: '#c1292e',
+                            crimson: '#9b1d20',
+                            plum: '#5c1d47'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @media print {
+            body * {
+                visibility: hidden !important;
+            }
+            #printable-protocol, #printable-protocol * {
+                visibility: visible !important;
+            }
+            #printable-protocol {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 15mm !important;
+                background: white !important;
+                color: black !important;
+                display: block !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+        .liquid-fluid {
+            transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .drop-animation {
+            animation: fallDrop 0.8s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards;
+        }
+        @keyframes fallDrop {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            70% { transform: translateY(110px) scale(0.9); opacity: 0.9; }
+            100% { transform: translateY(130px) scale(1.4); opacity: 0; }
+        }
+        .pestle-grind {
+            animation: grindMotion 1.4s ease-in-out infinite alternate;
+        }
+        @keyframes grindMotion {
+            0% { transform: translate(-10px, -5px) rotate(-15deg); }
+            50% { transform: translate(5px, 8px) rotate(5deg); }
+            100% { transform: translate(-5px, 12px) rotate(20deg); }
+        }
+    </style>
+</head>
+<body class="bg-[#fbfaf6] text-stone-800 font-sans selection:bg-amber-200 min-h-screen flex flex-col antialiased">
+
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-50 bg-[#fbfaf6]/95 backdrop-blur-md border-b border-stone-200">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-700 flex items-center justify-center text-xl shadow-sm">
+                    🍂
+                </span>
+                <div>
+                    <h1 class="font-display font-extrabold text-lg sm:text-xl text-stone-900 tracking-tight leading-none">
+                        Miért színesednek a falevelek ősszel?
+                    </h1>
+                    <p class="text-xs text-stone-500 mt-1 font-medium">4. osztályos természettudományos felfedező és kutatólaboratórium</p>
+                </div>
+            </div>
+
+            <!-- Tab Buttons -->
+            <nav class="flex items-center p-1 bg-stone-200/70 rounded-2xl text-xs sm:text-sm font-semibold text-stone-600 gap-1 shadow-inner">
+                <button onclick="switchTab('tab-trees')" id="btn-tab-trees" class="tab-button px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 bg-white text-stone-900 shadow-sm">
+                    <span>🍁</span>
+                    <span class="hidden md:inline">1. Fafajok &</span> Lombszínek
+                </button>
+                <button onclick="switchTab('tab-antho')" id="btn-tab-antho" class="tab-button px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 text-stone-600 hover:text-stone-900">
+                    <span>🍇</span>
+                    <span class="hidden md:inline">2. Az</span> Antociánok
+                </button>
+                <button onclick="switchTab('tab-lab')" id="btn-tab-lab" class="tab-button px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 text-stone-600 hover:text-stone-900">
+                    <span>🧪</span>
+                    <span class="hidden md:inline">3.</span> Gyakorlati Labor
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 py-8">
+
+        <!-- ========================================================================= -->
+        <!-- TAB 1: ŐSZI LOMBSZÍNEK & FAFAJOK ÖSSZEHASONLÍTÁSA (FŐLAP) -->
+        <!-- ========================================================================= -->
+        <section id="tab-trees" class="tab-pane space-y-12">
+            
+            <!-- Hero / Problem Framing Banner -->
+            <div class="relative overflow-hidden bg-gradient-to-br from-amber-900 via-amber-800 to-amber-950 text-white rounded-3xl p-6 sm:p-10 shadow-xl border border-amber-700/30">
+                <div class="relative z-10 max-w-2xl">
+                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/20 text-amber-200 text-xs font-bold uppercase tracking-wider mb-4 border border-amber-400/30">
+                        <span>🔬</span> A lombkorona nagy rejtélye
+                    </span>
+                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold tracking-tight mb-4 leading-tight">
+                        Hová tűnik a zöld, és miből lesz az arany meg a lángoló vörös?
+                    </h2>
+                    <p class="text-amber-100/90 text-sm sm:text-base leading-relaxed mb-6">
+                        Nyáron a fák leveleit a zöld <strong>klorofill</strong> uralja, amely a napfény erejével készít cukrot (táplálékot) a fának. Ősszel a nappalok rövidülnek, hűvösek lesznek az éjszakák. A fa takarékoskodni kezd: a zöld klorofillt lebontja, és a benne lévő értékes tápanyagokat visszaszívja a törzsébe és a gyökereibe.
+                    </p>
+                    <div class="flex flex-wrap items-center gap-4 text-xs font-semibold">
+                        <div class="bg-amber-800/80 px-4 py-2 rounded-xl border border-amber-600/50 flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                            Sárga és narancs: egész nyáron rejtőzködött
+                        </div>
+                        <div class="bg-red-950/80 px-4 py-2 rounded-xl border border-red-500/50 flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                            Bíborvörös: csak az őszi fagyos napokon képződik frissen!
+                        </div>
+                    </div>
+                </div>
+                <!-- Autumn leaf SVG background element -->
+                <div class="absolute -right-8 -bottom-12 opacity-15 pointer-events-none w-80 h-80 text-amber-300">
+                    <svg viewBox="0 0 200 200" fill="currentColor">
+                        <path d="M100 10 C80 50 30 60 20 95 C10 130 40 160 70 170 C75 190 85 195 100 200 C115 195 125 190 130 170 C160 160 190 130 180 95 C170 60 120 50 100 10 Z"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Fafajok összehasonlítása: Sárga vs Vörös -->
+            <div class="space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-stone-200 pb-4">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-700">Faismereti Körkép</span>
+                        <h3 class="text-2xl font-display font-extrabold text-stone-900">Melyik fa milyen őszi ruhát ölt magára?</h3>
+                    </div>
+                    <p class="text-xs sm:text-sm text-stone-500 max-w-md">Nem minden fa egyformán öltözködik ősszel: a fafaj sejtjeitől függ, melyik pigment alkotja a lombját.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- SÁRGA & ARANY LOMBÚ FÁK -->
+                    <div class="bg-amber-50/60 rounded-3xl p-6 sm:p-7 border-2 border-amber-200 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="w-10 h-10 rounded-2xl bg-amber-400 text-stone-900 flex items-center justify-center text-xl shadow-sm font-bold">
+                                    💛
+                                </span>
+                                <div>
+                                    <h4 class="font-display font-bold text-xl text-stone-900">Arany és Sárga Lombú Fák</h4>
+                                    <p class="text-xs font-semibold text-amber-800">Fő pigment: Karotinoidok & Xantofill (egész évben ott rejtőztek)</p>
+                                </div>
+                            </div>
+                            <p class="text-sm text-stone-600 mb-6 leading-relaxed">
+                                Ezekben a fákban a klorofill lebomlása után a sárga pigmentek válnak láthatóvá. A fa nem készít új vörös pigmentet, hanem leleplezi az addig megbújó arany fényeket.
+                            </p>
+
+                            <!-- Tree List Cards -->
+                            <div class="space-y-3">
+                                <div class="bg-white p-3.5 rounded-2xl border border-amber-200/80 shadow-sm flex items-start gap-3">
+                                    <span class="text-2xl">⚪</span>
+                                    <div>
+                                        <h5 class="text-sm font-bold text-stone-900">Közönséges nyírfa <span class="text-xs font-medium text-stone-500">(Betula pendula)</span></h5>
+                                        <p class="text-xs text-stone-600 mt-0.5">Jellegzetes fehér törzse és apró, fűrészes szélű levelei tündöklő aranysárga koronát képeznek.</p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white p-3.5 rounded-2xl border border-amber-200/80 shadow-sm flex items-start gap-3">
+                                    <span class="text-2xl">🌱</span>
+                                    <div>
+                                        <h5 class="text-sm font-bold text-stone-900">Mezei juhar és Bükk <span class="text-xs font-medium text-stone-500">(Fagus sylvatica)</span></h5>
+                                        <p class="text-xs text-stone-600 mt-0.5">Európa erdeinek urai. A bükkösök először élénk sárgára, majd meleg bronzbarnára érnek az őszi szélben.</p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white p-3.5 rounded-2xl border border-amber-200/80 shadow-sm flex items-start gap-3">
+                                    <span class="text-2xl">🍂</span>
+                                    <div>
+                                        <h5 class="text-sm font-bold text-stone-900">Páfrányfenyő / Ginkgo biloba</h5>
+                                        <p class="text-xs text-stone-600 mt-0.5">Különleges legyező alakú levelei szinte egyszerre válnak ragyogó neonsárgává, majd egyetlen fagyos éjszaka alatt arany szőnyeget alkotva hullanak le.</p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white p-3.5 rounded-2xl border border-amber-200/80 shadow-sm flex items-start gap-3">
+                                    <span class="text-2xl">💧</span>
+                                    <div>
+                                        <h5 class="text-sm font-bold text-stone-900">Fehér fűz és Nyárfa</h5>
+                                        <p class="text-xs text-stone-600 mt-0.5">Vízpartok lakói: finom, lágy sárgás-világosbarna lombozattal búcsúztatják a meleg évszakot.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 pt-4 border-t border-amber-200/60 flex items-center justify-between text-xs font-bold text-amber-900">
+                            <span>Jellemző táj: Közép- és Észak-Európa erdei</span>
+                            <span class="bg-amber-200/80 px-2.5 py-1 rounded-lg">Domináns szín: Sárga</span>
+                        </div>
+                    </div>
+
+                    <!-- VÖRÖS & BÍBOR LOMBÚ FÁK -->
+                    <div class="bg-rose-50/60 rounded-3xl p-6 sm:p-7 border-2 border-rose-200 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="w-10 h-10 rounded-2xl bg-rose-600 text-white flex items-center justify-center text-xl shadow-sm font-bold">
+                                    ❤️
+                                </span>
+                                <div>
+                                    <h4 class="font-display font-bold text-xl text-stone-900">Lángoló Vörös és Bordó Lombú Fák</h4>
+                                    <p class="text-xs font-semibold text-rose-800">Fő pigment: Antocián (aktívan termelődik a hidegben)</p>
+                                </div>
+                            </div>
+                            <p class="text-sm text-stone-600 mb-6 leading-relaxed">
+                                Ezek a növények ősszel rengeteg új <strong>antocián</strong> pigmentet szintetizálnak a levélben rekedt cukrokból. A vörös festék pajzsként óvja a levél sejtjeit a hideg, napos őszi napokon!
+                            </p>
+
+                            <!-- Tree List Cards -->
+                            <div class="space-y-3">
+                                <div class="bg-white p-3.5 rounded-2xl border border-rose-200/80 shadow-sm flex items-start gap-3">
+                                    <span class="text-2xl">🍁</span>
+                                    <div>
+                                        <h5 class="text-sm font-bold text-stone-900">Cukorjuhar <span class="text-xs font-medium text-stone-500">(Acer saccharum)</span></h5>
+                                        <p class="text-xs text-stone-600 mt-0.5">Kanada és az USA jelképe. Édes nedve adja a juharszirupot, őszi lombja pedig a tűzvöröstől a mély bíborig káprázatosan ragyog.</p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white p-3.5 rounded-2xl border border-rose-200/80 shadow-sm flex items-start gap-3">
+                                    <span class="text-2xl">🪵</span>
+                                    <div>
+                                        <h5 class="text-sm font-bold text-stone-900">Vörös tölgy <span class="text-xs font-medium text-stone-500">(Quercus rubra)</span></h5>
+                                        <p class="text-xs text-stone-600 mt-0.5">Nagy, karéjos, hegyes csúcsú levelei késő ősszel mélybordóvá és rőt-vörössé színeződnek, sokáig az ágon maradva.</p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white p-3.5 rounded-2xl border border-rose-200/80 shadow-sm flex items-start gap-3">
+                                    <span class="text-2xl">🌿</span>
+                                    <div>
+                                        <h5 class="text-sm font-bold text-stone-900">Ecetfa és Vadgesztenye (részben)</h5>
+                                        <p class="text-xs text-stone-600 mt-0.5">Az ecetfa tollszerűen összetett levelei skarlátvörösre pirulnak, szinte világítanak a kertekben és parkokban.</p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white p-3.5 rounded-2xl border border-rose-200/80 shadow-sm flex items-start gap-3">
+                                    <span class="text-2xl">🍇</span>
+                                    <div>
+                                        <h5 class="text-sm font-bold text-stone-900">Vadszőlő és Borostyánfélék</h5>
+                                        <p class="text-xs text-stone-600 mt-0.5">A kerítéseken és házfalakon felfutó vadszőlő már az első októberi fagyok után lila és vérvörös szőnyeggé változik.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 pt-4 border-t border-rose-200/60 flex items-center justify-between text-xs font-bold text-rose-900">
+                            <span>Jellemző táj: Észak-Amerika (Új-Anglia) és díszkertek</span>
+                            <span class="bg-rose-200/80 px-2.5 py-1 rounded-lg">Domináns szín: Skarlátvörös</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FÖLDRAJZI & EVOLÚCIÓS ÖSSZEHASONLÍTÁS: Észak-Amerika vs. Európa -->
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200 shadow-sm">
+                <div class="max-w-3xl mb-6">
+                    <span class="text-xs font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">
+                        🌎 Földrajzi Nyomozás
+                    </span>
+                    <h3 class="text-2xl font-display font-extrabold text-stone-900 mt-3">
+                        Miért lángol vörösen Amerika, miközben Európa aranysárgában pompázik?
+                    </h3>
+                    <p class="text-sm text-stone-600 mt-2">
+                        Gondolkodtál már azon, miért híres az észak-amerikai <strong>„Indian Summer”</strong> (vénasszonyok nyara) a hihetetlen skarlátvörös erdőkről, miközben Magyarországon és Európában a sárgás-barna bükkösök és tölgyesek uralkodnak?
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-rose-50/50 rounded-2xl p-5 border border-rose-200">
+                        <div class="flex items-center gap-2 mb-2 font-display font-bold text-rose-900 text-lg">
+                            <span>🇺🇸 🇨🇦</span> Észak-Amerika (A Hegyek Észak-Dél iránya)
+                        </div>
+                        <p class="text-xs sm:text-sm text-stone-700 leading-relaxed mb-3">
+                            A Sziklás-hegység és az Appalache <strong>észak–déli</strong> irányban húzódik. A jégkorszakok idején a növények és a fák kártevő rovarai könnyen menekülhettek délre a hideg elől, majd visszahúzódtak északra.
+                        </p>
+                        <div class="bg-white p-3 rounded-xl border border-rose-200 text-xs text-rose-900">
+                            <strong>A védekező trükk:</strong> A fáknak mindmáig védekezniük kell az őszi rovarok (pl. levéltetvek) ellen. A ragyogó vörös szín „elriasztja” a kártevőket, mert azt jelzi: <em>„Mérgező vagyok, nincsenek bennem már finom tápanyagok!”</em>
+                        </div>
+                    </div>
+
+                    <div class="bg-amber-50/50 rounded-2xl p-5 border border-amber-200">
+                        <div class="flex items-center gap-2 mb-2 font-display font-bold text-amber-900 text-lg">
+                            <span>🇪🇺 🇭🇺</span> Európa (A Kelet-Nyugati Hegyfalak)
+                        </div>
+                        <p class="text-xs sm:text-sm text-stone-700 leading-relaxed mb-3">
+                            Európában az Alpok és a Kárpátok hegyvonulatai <strong>kelet–nyugati</strong> irányúak. Amikor a jégkorszak fagyai lecsaptak, a hegyek csapdába ejtették a fajokat, így sok növény és kártevő rovar kipusztult.
+                        </p>
+                        <div class="bg-white p-3 rounded-xl border border-amber-200 text-xs text-amber-900">
+                            <strong>A túlélés útja:</strong> Mivel a fákra leselkedő rovarok jó része eltűnt, az európai fafajoknak (bükk, nyír, tölgy) nem kellett energiát pazarolniuk a drága vörös védőfesték gyártására. Megmaradt a természetes sárga lombkorona!
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INTERAKTÍV PAPÍRKROMATOGRAM SZEMLÉLTETŐ -->
+            <div class="bg-gradient-to-br from-stone-900 to-stone-800 text-white rounded-3xl p-6 sm:p-8 shadow-xl">
+                <div class="max-w-2xl mb-6">
+                    <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Laboratóriumi Elválasztástechnika</span>
+                    <h3 class="text-2xl font-display font-extrabold text-white mt-1">
+                        A Levélfestékek Kromatogramja (Papírkromatográfia)
+                    </h3>
+                    <p class="text-xs sm:text-sm text-stone-300 mt-2">
+                        Ha egy zöld falevelet mozsárban szétzúzunk, és egy speciális szűrőpapírcsíkra cseppentjük, majd alkoholos oldószerbe állítjuk, a festékek a papíron különböző sebességgel kúsznak felfelé. Ezzel a módszerrel <strong>különválaszthatók a rejtőzködő színek</strong>!
+                    </p>
+                </div>
+
+                <!-- Chromatogram Interactive Layout -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+                    <!-- The Chromatography Strip (Visual) -->
+                    <div class="md:col-span-4 flex justify-center">
+                        <div class="bg-stone-100 rounded-2xl p-4 w-44 shadow-inner border-2 border-stone-700 text-stone-800 relative">
+                            <div class="text-[10px] font-bold uppercase text-stone-400 text-center mb-1">Oldószerfront (Tető)</div>
+                            
+                            <!-- The Paper Strip -->
+                            <div class="w-28 mx-auto h-72 bg-[#f4f1ea] border border-stone-300 rounded-sm relative flex flex-col justify-between py-3 px-1 shadow-sm">
+                                <!-- Band 4: Carotene (Orange) -->
+                                <div onclick="selectPigment('carotene')" id="band-carotene" class="w-full h-4 bg-amber-500 rounded cursor-pointer transition-all hover:scale-105 border border-amber-600 flex items-center justify-center text-[9px] font-bold text-white shadow-sm">
+                                    Karotin
+                                </div>
+                                <!-- Band 3: Xanthophyll (Yellow) -->
+                                <div onclick="selectPigment('xantho')" id="band-xantho" class="w-full h-4 bg-yellow-400 rounded cursor-pointer transition-all hover:scale-105 border border-yellow-500 flex items-center justify-center text-[9px] font-bold text-stone-900 shadow-sm mt-3">
+                                    Xantofill
+                                </div>
+                                <!-- Band 2: Chlorophyll-a (Blue-green) -->
+                                <div onclick="selectPigment('chla')" id="band-chla" class="w-full h-5 bg-emerald-600 rounded cursor-pointer transition-all hover:scale-105 border border-emerald-700 flex items-center justify-center text-[9px] font-bold text-white shadow-sm mt-6">
+                                    Klorofill-a
+                                </div>
+                                <!-- Band 1: Chlorophyll-b (Olive-green) -->
+                                <div onclick="selectPigment('chlb')" id="band-chlb" class="w-full h-5 bg-lime-700 rounded cursor-pointer transition-all hover:scale-105 border border-lime-800 flex items-center justify-center text-[9px] font-bold text-white shadow-sm mt-2">
+                                    Klorofill-b
+                                </div>
+                                
+                                <!-- Starting point dot -->
+                                <div class="mt-auto pt-2 border-t border-dashed border-stone-400 text-center">
+                                    <div class="w-2.5 h-2.5 bg-stone-700 rounded-full mx-auto"></div>
+                                    <span class="text-[8px] text-stone-500 font-bold">Startvonal</span>
+                                </div>
+                            </div>
+                            <div class="text-[9px] font-bold text-stone-500 text-center mt-2">Kromatográfiás papírcsík</div>
+                        </div>
+                    </div>
+
+                    <!-- Pigment Detailed Inspector -->
+                    <div class="md:col-span-8 bg-stone-800/90 rounded-2xl p-6 border border-stone-700">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs uppercase tracking-wider font-bold text-amber-400">Vizsgált festékanyag:</span>
+                            <span id="pigment-badge" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500 text-white">
+                                Narancssárga Karotin
+                            </span>
+                        </div>
+                        <h4 id="pigment-title" class="font-display font-bold text-xl text-white mb-2">
+                            Karotin (Narancssárga pigment)
+                        </h4>
+                        <p id="pigment-desc" class="text-xs sm:text-sm text-stone-300 leading-relaxed mb-4">
+                            Mivel a karotin oldódik a legjobban a futtató oldószerben, és a legkisebb mértékben tapad a papír rostjaihoz, ez jut el a legmesszebbre (legmagasabbra) a startvonaltól! Ugyanez a festékanyag adja a sárgarépa és a narancs színét is.
+                        </p>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs mb-4">
+                            <div class="bg-stone-900/80 p-3 rounded-xl border border-stone-700">
+                                <span class="text-stone-400 block text-[10px] uppercase">Látható színe:</span>
+                                <strong id="pigment-color" class="text-amber-400">Narancssárga</strong>
+                            </div>
+                            <div class="bg-stone-900/80 p-3 rounded-xl border border-stone-700">
+                                <span class="text-stone-400 block text-[10px] uppercase">Helye a sejtben:</span>
+                                <strong id="pigment-location" class="text-stone-200">Zsíroldható (kloroplasztisz)</strong>
+                            </div>
+                            <div class="bg-stone-900/80 p-3 rounded-xl border border-stone-700 col-span-2 sm:col-span-1">
+                                <span class="text-stone-400 block text-[10px] uppercase">Őszi viselkedés:</span>
+                                <strong id="pigment-fate" class="text-stone-200">Megmarad a levélben</strong>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap gap-2 text-xs">
+                            <span class="text-stone-400 self-center">Kattints egy sávra:</span>
+                            <button onclick="selectPigment('carotene')" class="px-2 py-1 bg-stone-700 hover:bg-stone-600 rounded text-amber-300 font-medium">Karotin</button>
+                            <button onclick="selectPigment('xantho')" class="px-2 py-1 bg-stone-700 hover:bg-stone-600 rounded text-yellow-300 font-medium">Xantofill</button>
+                            <button onclick="selectPigment('chla')" class="px-2 py-1 bg-stone-700 hover:bg-stone-600 rounded text-emerald-400 font-medium">Klorofill-a</button>
+                            <button onclick="selectPigment('chlb')" class="px-2 py-1 bg-stone-700 hover:bg-stone-600 rounded text-lime-400 font-medium">Klorofill-b</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 2: AZ ANTOCIÁNOK ÉS VÍZOLDHATÓ FESTÉKANYAGOK (ELMÉLET) -->
+        <!-- ========================================================================= -->
+        <section id="tab-antho" class="tab-pane hidden space-y-10">
+            <!-- Header Banner -->
+            <div class="bg-gradient-to-r from-purple-900 via-rose-900 to-indigo-950 text-white rounded-3xl p-6 sm:p-10 shadow-lg">
+                <span class="inline-block bg-purple-400/20 text-purple-200 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3 border border-purple-400/30">
+                    2. Rész • Növényi Biokémia Érthetően
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-display font-extrabold mb-3">
+                    Az Antociánok: A növényvilág titokzatos kaméleonjai
+                </h2>
+                <p class="text-purple-100 text-sm sm:text-base max-w-2xl leading-relaxed">
+                    Tudtad, hogy a vörösbor, az áfonya, a szilva, a vöröskáposzta és a lángoló őszi falevél ugyanazzal a varázslatos festékanyaggal színeződik? Ismerd meg a növényi sejtek vízben oldódó szuperhősét!
+                </p>
+            </div>
+
+            <!-- 1. Vízoldható vs Zsíroldható pigmentek -->
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200 shadow-sm space-y-6">
+                <div class="border-b border-stone-200 pb-3">
+                    <span class="text-xs font-bold text-purple-700 uppercase tracking-wider">Sejttani Alapismeret</span>
+                    <h3 class="text-2xl font-display font-bold text-stone-900">Hol laknak a színek a levélsejtben?</h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Zsíroldható festékek -->
+                    <div class="bg-emerald-50/60 rounded-2xl p-5 border border-emerald-200 space-y-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-2xl">🥑</span>
+                            <h4 class="font-display font-bold text-lg text-emerald-950">1. Zsíroldható festékek (Klorofill, Karotin)</h4>
+                        </div>
+                        <p class="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                            Ezek a festékek a kloroplasztisz nevű zöld színtestek zsíros membránjába vannak beágyazva. <strong>Vízben nem oldódnak!</strong> Ha a zöld levelet vízbe dobod, a víz tiszta marad. Csak zsírokban vagy alkoholban tudnak feloldódni.
+                        </p>
+                        <div class="text-xs font-semibold text-emerald-900 bg-white/80 p-2.5 rounded-xl border border-emerald-200">
+                            Példák: Klorofill (zöld), Béta-karotin (sárgarépa), Likopin (paradicsompiros).
+                        </div>
+                    </div>
+
+                    <!-- Vízoldható festékek (Antociánok) -->
+                    <div class="bg-purple-50/60 rounded-2xl p-5 border border-purple-200 space-y-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-2xl">💧</span>
+                            <h4 class="font-display font-bold text-lg text-purple-950">2. Vízoldható festékek (Antociánok)</h4>
+                        </div>
+                        <p class="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                            Az antociánok a növényi sejt <strong>sejtnedvüregében (vakuólumában)</strong> laknak, amely tele van vizes oldattal. Ezért ha forró vízbe teszel lilakáposztát vagy hibiszkuszt, a víz azonnal mélylila vagy vörös színűvé válik!
+                        </p>
+                        <div class="text-xs font-semibold text-purple-900 bg-white/80 p-2.5 rounded-xl border border-purple-200">
+                            Példák: Cékla, lilakáposzta, szeder, vörös őszi juharlevél, pipacs.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Név eredete és szerepe: Naptej és fagyálló -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Név eredete -->
+                <div class="bg-white rounded-3xl p-6 border border-stone-200 shadow-sm space-y-3">
+                    <span class="text-xs font-bold text-stone-400 uppercase tracking-wider">Szófejtő Nyelvészkedés</span>
+                    <h4 class="font-display font-bold text-xl text-stone-900">Honnan kapta a nevét az antocián?</h4>
+                    <p class="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                        A szó két görög kifejezés összetételéből született:
+                    </p>
+                    <div class="flex items-center justify-around bg-stone-50 p-4 rounded-2xl border border-stone-200 font-display">
+                        <div class="text-center">
+                            <span class="text-sm font-bold text-rose-600 block">ánthos (ἄνθος)</span>
+                            <span class="text-xs text-stone-500 font-sans">= Virág</span>
+                        </div>
+                        <span class="text-xl text-stone-400">+</span>
+                        <div class="text-center">
+                            <span class="text-sm font-bold text-indigo-600 block">kyanós (κυανός)</span>
+                            <span class="text-xs text-stone-500 font-sans">= Sötétkék / cian</span>
+                        </div>
+                    </div>
+                    <p class="text-xs text-stone-500">
+                        Tehát szó szerint <strong>„kék virágfestéket”</strong> jelent, holott a rózsaszíntől a mélybordón át a liláig szinte minden színben pompázhat!
+                    </p>
+                </div>
+
+                <!-- Miért termeli a fa ősszel? -->
+                <div class="bg-white rounded-3xl p-6 border border-stone-200 shadow-sm space-y-3">
+                    <span class="text-xs font-bold text-stone-400 uppercase tracking-wider">A Fa Túlélőcsomagja</span>
+                    <h4 class="font-display font-bold text-xl text-stone-900">Miért költ energiát a fa az antociánra ősszel?</h4>
+                    <div class="space-y-2 text-xs sm:text-sm text-stone-600">
+                        <div class="flex items-start gap-2">
+                            <span class="text-base text-amber-500">☀️</span>
+                            <p><strong>1. Természetes naptej (Fényvédelem):</strong> Amikor a klorofill lebomlik, a levél védtelen a sugárzás ellen. Az antocián elnyeli a felesleges fényt, megóvva a sejteket az égéstől.</p>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="text-base text-cyan-500">❄️</span>
+                            <p><strong>2. Fagyálló pajzs:</strong> A cukrokból képződő antocián csökkenti a levélsejtek fagyáspontját, így az első őszi fagyok sem teszik tönkre a lombot azonnal.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. pH-függés: A Kémiai Kaméleon bemutatása -->
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200 shadow-sm">
+                <div class="text-center max-w-xl mx-auto mb-6">
+                    <span class="text-xs font-bold text-rose-600 uppercase tracking-wider">Színváltoztató Varázslat</span>
+                    <h3 class="text-2xl font-display font-bold text-stone-900">A pH-kaméleon: Miért váltogatja a színét?</h3>
+                    <p class="text-xs sm:text-sm text-stone-500 mt-1">
+                        Az antocián molekula olyan, mint egy érzékeny mérleg. Ha savas közegbe kerül (pl. citromsav), a molekula szerkezete megváltozik, és vörössé válik. Ha lúgos közegbe kerül (pl. mosószóda), zölddé vagy kékké alakul!
+                    </p>
+                </div>
+
+                <!-- pH Scale Interactive Visual -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-rose-50 border-2 border-rose-300 rounded-2xl p-5 text-center">
+                        <div class="w-12 h-12 bg-rose-500 text-white rounded-2xl flex items-center justify-center text-xl mx-auto mb-2 shadow-sm font-bold">
+                            🍋
+                        </div>
+                        <h4 class="font-display font-bold text-rose-950 text-base">Savas Környezet</h4>
+                        <span class="text-xs bg-rose-200/80 text-rose-900 font-bold px-2 py-0.5 rounded">pH: 1 – 3</span>
+                        <p class="text-xs text-rose-900/80 mt-2">
+                            <strong>Színe:</strong> Élénk piros, ciklámen vagy rubinvörös.<br>
+                            <em>Pl. citromlé, ecet, savanyú alma.</em>
+                        </p>
+                    </div>
+
+                    <div class="bg-purple-50 border-2 border-purple-300 rounded-2xl p-5 text-center">
+                        <div class="w-12 h-12 bg-purple-600 text-white rounded-2xl flex items-center justify-center text-xl mx-auto mb-2 shadow-sm font-bold">
+                            💧
+                        </div>
+                        <h4 class="font-display font-bold text-purple-950 text-base">Semleges Környezet</h4>
+                        <span class="text-xs bg-purple-200/80 text-purple-900 font-bold px-2 py-0.5 rounded">pH: 6 – 7</span>
+                        <p class="text-xs text-purple-900/80 mt-2">
+                            <strong>Színe:</strong> Mélylila, ibolyaszín vagy szilvakék.<br>
+                            <em>Pl. tiszta csapvíz, esővíz.</em>
+                        </p>
+                    </div>
+
+                    <div class="bg-emerald-50 border-2 border-emerald-300 rounded-2xl p-5 text-center">
+                        <div class="w-12 h-12 bg-emerald-600 text-white rounded-2xl flex items-center justify-center text-xl mx-auto mb-2 shadow-sm font-bold">
+                            🧼
+                        </div>
+                        <h4 class="font-display font-bold text-emerald-950 text-base">Lúgos Környezet</h4>
+                        <span class="text-xs bg-emerald-200/80 text-emerald-900 font-bold px-2 py-0.5 rounded">pH: 8 – 11</span>
+                        <p class="text-xs text-emerald-900/80 mt-2">
+                            <strong>Színe:</strong> Smaragdzöld, kékeszöld, majd sárga.<br>
+                            <em>Pl. szódabikarbóna, szappanos víz.</em>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 3: LABORATÓRIUMI GYAKORLAT (A 45 PERCES TANÓRA GYAKORLATI RÉSZE) -->
+        <!-- ========================================================================= -->
+        <section id="tab-lab" class="tab-pane hidden space-y-12">
+            
+            <!-- Lab intro banner -->
+            <div class="bg-gradient-to-r from-stone-900 to-forest-800 text-white rounded-3xl p-6 sm:p-8 shadow-md border border-stone-700 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="space-y-2">
+                    <span class="inline-block bg-emerald-500/20 text-emerald-300 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full border border-emerald-500/30">
+                        Tanórai Csoportmunka (4 fős asztalok)
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-display font-extrabold text-white">
+                        Kísérlet: Antocián Kinyerése és Kémcsöves Színtesztje
+                    </h2>
+                    <p class="text-xs sm:text-sm text-stone-300 max-w-xl">
+                        Ebben a gyakorlatban valódi dörzsmozsárral törjük fel a növényi sejteket, kinyerjük a tiszta antociánt, majd kémcsövekben sav-bázis reakciót hajtunk végre.
+                    </p>
+                </div>
+                <button onclick="window.print()" class="no-print whitespace-nowrap bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold py-3 px-5 rounded-2xl shadow-md transition-all flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                    </svg>
+                    <span>Jegyzőkönyv Nyomtatása (A4)</span>
+                </button>
+            </div>
+
+            <!-- ESZKÖZÖK ÉS REAGENSEK LISTÁJA -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Eszközök -->
+                <div class="bg-white rounded-3xl p-6 border border-stone-200 shadow-sm">
+                    <h4 class="font-display font-bold text-lg text-stone-900 flex items-center gap-2 mb-4">
+                        <span>🥣</span> Szükséges Laboratóriumi Eszközök
+                    </h4>
+                    <ul class="space-y-2.5 text-xs sm:text-sm text-stone-700">
+                        <li class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-forest-500"></span>
+                            <strong>Porcelán dörzsmozsár törővel (pisztillussal)</strong>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-forest-500"></span>
+                            <strong>Tiszta kvarchomok:</strong> dörzsanyagként segít szétzúzni az erős cellulóz sejtfalakat.
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-forest-500"></span>
+                            <strong>Szűrőtölcsér és szűrőpapír</strong> (vagy sűrű szövésű teaszűrő)
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-forest-500"></span>
+                            <strong>Kémcsőállvány 3 darab számozott kémcsővel</strong> (1., 2., 3.)
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-forest-500"></span>
+                            <strong>3 darab műanyag Pasteur-pipetta</strong> (cseppentő)
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Anyagok & Reagensek -->
+                <div class="bg-white rounded-3xl p-6 border border-stone-200 shadow-sm">
+                    <h4 class="font-display font-bold text-lg text-stone-900 flex items-center gap-2 mb-4">
+                        <span>🧪</span> Anyagok és Reagensek (Biztonságos Vegyszerek)
+                    </h4>
+                    <ul class="space-y-2.5 text-xs sm:text-sm text-stone-700">
+                        <li class="flex items-start gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5"></span>
+                            <span><strong>Növényi minta:</strong> Lilakáposzta-darabka VAGY gyűjtött őszi vörös levél (vadszőlő, ecetfa).</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1.5"></span>
+                            <span><strong>1. Reagens (Sav):</strong> 10%-os ételecet vagy frissen facsart citromlé.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5"></span>
+                            <span><strong>2. Reagens (Semleges kontroll):</strong> Desztillált víz vagy sima tiszta csapvíz.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5"></span>
+                            <span><strong>3. Reagens (Lúg):</strong> 1 evőkanál szódabikarbóna feloldva 1 dl vízben (vagy enyhe szappanos víz).</span>
+                        </li>
+                    </ul>
+                    <div class="mt-4 bg-amber-50 border-l-4 border-amber-400 p-2.5 text-xs text-amber-800 rounded-r-xl">
+                        ⚠️ <em>A laboratóriumi szabályzat 1. pontja: Bár háztartási anyagokkal dolgozunk, semmit nem kóstolunk meg!</em>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PONTOS RECEPT: LÉPÉSRŐL LÉPÉSRE -->
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200 shadow-sm space-y-6">
+                <div class="border-b border-stone-200 pb-3">
+                    <span class="text-xs font-bold uppercase tracking-wider text-forest-700">Gyakorlati Teendők</span>
+                    <h3 class="text-2xl font-display font-extrabold text-stone-900">A kísérlet pontos laboratóriumi menete</h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-stone-50 p-4 rounded-2xl border border-stone-200 relative flex flex-col justify-between">
+                        <div>
+                            <span class="w-7 h-7 rounded-full bg-forest-700 text-white font-bold flex items-center justify-center text-xs mb-3">1</span>
+                            <h5 class="font-display font-bold text-sm text-stone-900 mb-1">Aprítás & Mozsár</h5>
+                            <p class="text-xs text-stone-600">
+                                Tépkedj bélyegnyi darabokra a növény leveléből a dörzsmozsárba. Szórj rá egy csipet homokot, és adj hozzá kb. 15-20 ml langyos vizet.
+                            </p>
+                        </div>
+                        <span class="text-2xl mt-4 self-end">🥣</span>
+                    </div>
+
+                    <div class="bg-stone-50 p-4 rounded-2xl border border-stone-200 relative flex flex-col justify-between">
+                        <div>
+                            <span class="w-7 h-7 rounded-full bg-forest-700 text-white font-bold flex items-center justify-center text-xs mb-3">2</span>
+                            <h5 class="font-display font-bold text-sm text-stone-900 mb-1">Zúzás (Sejtfeltárás)</h5>
+                            <p class="text-xs text-stone-600">
+                                A pisztillussal erősen, körkörös mozdulatokkal zúzd a leveleket legalább 2 percen át, amíg a víz mélylila/vörös színűvé nem válik!
+                            </p>
+                        </div>
+                        <span class="text-2xl mt-4 self-end">💪</span>
+                    </div>
+
+                    <div class="bg-stone-50 p-4 rounded-2xl border border-stone-200 relative flex flex-col justify-between">
+                        <div>
+                            <span class="w-7 h-7 rounded-full bg-forest-700 text-white font-bold flex items-center justify-center text-xs mb-3">3</span>
+                            <h5 class="font-display font-bold text-sm text-stone-900 mb-1">Szűrés a kémcsövekbe</h5>
+                            <p class="text-xs text-stone-600">
+                                Helyezd a szűrőt a kémcső fölé. Szűrd le az oldatot, majd ossz szét belőle egyenlő mennyiséget (kb. 2-2 ujjnyit) mindhárom kémcsőbe.
+                            </p>
+                        </div>
+                        <span class="text-2xl mt-4 self-end">🧪</span>
+                    </div>
+
+                    <div class="bg-stone-50 p-4 rounded-2xl border border-stone-200 relative flex flex-col justify-between">
+                        <div>
+                            <span class="w-7 h-7 rounded-full bg-forest-700 text-white font-bold flex items-center justify-center text-xs mb-3">4</span>
+                            <h5 class="font-display font-bold text-sm text-stone-900 mb-1">Cseppentés & Feljegyzés</h5>
+                            <p class="text-xs text-stone-600">
+                                1. kémcső: 5 csepp ecet.<br>
+                                2. kémcső: 5 csepp víz (kontroll).<br>
+                                3. kémcső: 5 csepp szódabikarbóna.<br>
+                                Rázd össze finoman, és figyeld a változást!
+                            </p>
+                        </div>
+                        <span class="text-2xl mt-4 self-end">📝</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INTERAKTÍV VIRTUÁLIS KÉMCSŐ-ÁLLVÁNY (SZIMULÁTOR) -->
+            <div class="bg-stone-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-stone-700">
+                <div class="text-center max-w-xl mx-auto mb-8">
+                    <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Interaktív Kémcsőállvány</span>
+                    <h3 class="text-2xl font-display font-bold text-white mt-1">Virtuális Laboratóriumi Próba</h3>
+                    <p class="text-xs sm:text-sm text-stone-300 mt-1">
+                        Próbáld ki a cseppentést a digitális laborban is! Kattints a cseppentő gombokra a reagensek hozzáadásához!
+                    </p>
+                </div>
+
+                <!-- Rack Visualization with 3 Tubes -->
+                <div class="max-w-3xl mx-auto bg-stone-800/90 rounded-2xl p-6 sm:p-8 border border-stone-700">
+                    <div class="grid grid-cols-3 gap-4 sm:gap-8 items-end justify-items-center mb-8 pt-6">
+                        
+                        <!-- TUBE 1: SAV -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-xs font-bold text-stone-300 mb-2">1. Kémcső (Sav)</span>
+                            <!-- Animated falling drop target -->
+                            <div class="relative w-16 h-48 sm:w-20 sm:h-56 border-4 border-stone-400/50 rounded-b-full rounded-t-md bg-white/5 backdrop-blur-sm overflow-hidden flex flex-col justify-end p-1">
+                                <div id="drop-1" class="absolute top-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-rose-500 rounded-full hidden"></div>
+                                <div id="fluid-1" class="liquid-fluid w-full h-2/5 rounded-b-full bg-purple-700 relative">
+                                    <div class="text-[9px] text-white/70 text-center font-bold pt-1" id="label-tube-1">Lila</div>
+                                </div>
+                            </div>
+                            <span class="mt-3 text-xs font-semibold text-rose-300" id="status-1">+0 csepp ecet</span>
+                            <button onclick="addDrop(1, 'acid')" class="mt-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold py-1.5 px-3 rounded-xl transition-all shadow-sm active:scale-95">
+                                🍋 + Cseppentés
+                            </button>
+                        </div>
+
+                        <!-- TUBE 2: KONTROLL -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-xs font-bold text-stone-300 mb-2">2. Kémcső (Kontroll)</span>
+                            <div class="relative w-16 h-48 sm:w-20 sm:h-56 border-4 border-stone-400/50 rounded-b-full rounded-t-md bg-white/5 backdrop-blur-sm overflow-hidden flex flex-col justify-end p-1">
+                                <div id="drop-2" class="absolute top-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-blue-400 rounded-full hidden"></div>
+                                <div id="fluid-2" class="liquid-fluid w-full h-2/5 rounded-b-full bg-purple-700 relative">
+                                    <div class="text-[9px] text-white/70 text-center font-bold pt-1" id="label-tube-2">Lila</div>
+                                </div>
+                            </div>
+                            <span class="mt-3 text-xs font-semibold text-blue-300" id="status-2">+0 csepp víz</span>
+                            <button onclick="addDrop(2, 'water')" class="mt-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-1.5 px-3 rounded-xl transition-all shadow-sm active:scale-95">
+                                💧 + Cseppentés
+                            </button>
+                        </div>
+
+                        <!-- TUBE 3: LÚG -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-xs font-bold text-stone-300 mb-2">3. Kémcső (Lúg)</span>
+                            <div class="relative w-16 h-48 sm:w-20 sm:h-56 border-4 border-stone-400/50 rounded-b-full rounded-t-md bg-white/5 backdrop-blur-sm overflow-hidden flex flex-col justify-end p-1">
+                                <div id="drop-3" class="absolute top-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-emerald-400 rounded-full hidden"></div>
+                                <div id="fluid-3" class="liquid-fluid w-full h-2/5 rounded-b-full bg-purple-700 relative">
+                                    <div class="text-[9px] text-white/70 text-center font-bold pt-1" id="label-tube-3">Lila</div>
+                                </div>
+                            </div>
+                            <span class="mt-3 text-xs font-semibold text-emerald-300" id="status-3">+0 csepp szóda</span>
+                            <button onclick="addDrop(3, 'base')" class="mt-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-1.5 px-3 rounded-xl transition-all shadow-sm active:scale-95">
+                                🧼 + Cseppentés
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <!-- Rack wooden footer stand bar -->
+                    <div class="w-full h-4 bg-stone-700 rounded-lg shadow-md mb-4"></div>
+
+                    <!-- Experiment Observation Log Live Output -->
+                    <div id="lab-observation-box" class="bg-stone-900 p-4 rounded-xl text-center text-xs sm:text-sm text-stone-300 border border-stone-700">
+                        Kattints a pipettákra, és figyeld meg, hogyan változik meg a kémcsövekben lévő antocián folyadék színe!
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button onclick="resetLabSimulator()" class="text-xs text-stone-400 hover:text-stone-200 underline">
+                            ↺ Kémcsövek kiürítése és újrakezdés
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KITÖLTHETŐ DIGITÁLIS JEGYZŐKÖNYV (A KÉPERNYŐN IS TÖLTHETŐ) -->
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200 shadow-sm space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-200 pb-3">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-700">Dokumentáció</span>
+                        <h4 class="font-display font-bold text-xl text-stone-900">Megfigyelési Jegyzőkönyv (Képernyőn tölthető)</h4>
+                    </div>
+                    <span class="text-xs text-stone-500">A kitöltött adatokat kinyomtathatod a fenti gombbal!</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
+                    <div>
+                        <label class="block font-bold text-stone-700 mb-1">A kutató diák / csoport neve:</label>
+                        <input type="text" id="input-student-name" placeholder="pl. Erdei Felfedezők Csoport" class="w-full p-2.5 rounded-xl border border-stone-300 bg-stone-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-stone-700 mb-1">Felhasznált növényi minta:</label>
+                        <input type="text" id="input-plant-sample" placeholder="pl. Vöröskáposzta-levél vagy Vadszőlő" class="w-full p-2.5 rounded-xl border border-stone-300 bg-stone-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    </div>
+                </div>
+
+                <!-- Data Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs sm:text-sm border-collapse">
+                        <thead>
+                            <tr class="bg-stone-100 text-stone-700">
+                                <th class="p-3 rounded-l-xl font-bold">Kémcső</th>
+                                <th class="p-3 font-bold">Hozzáadott reagens</th>
+                                <th class="p-3 font-bold">Kémhatás</th>
+                                <th class="p-3 font-bold">Kezdeti szín</th>
+                                <th class="p-3 rounded-r-xl font-bold">Megfigyelt új szín & reakció</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-stone-200">
+                            <tr>
+                                <td class="p-3 font-bold text-rose-700">1. Kémcső</td>
+                                <td class="p-3">Citromlé / Ecet</td>
+                                <td class="p-3"><span class="bg-rose-100 text-rose-800 px-2 py-0.5 rounded text-xs font-bold">Savas</span></td>
+                                <td class="p-3 text-stone-500">Ibolyalila</td>
+                                <td class="p-3">
+                                    <input type="text" placeholder="Írd le a színt (pl. rubinpiros)..." class="w-full p-1.5 border border-stone-300 rounded-lg text-xs">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-blue-700">2. Kémcső</td>
+                                <td class="p-3">Tiszta víz (Kontroll)</td>
+                                <td class="p-3"><span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-bold">Semleges</span></td>
+                                <td class="p-3 text-stone-500">Ibolyalila</td>
+                                <td class="p-3">
+                                    <input type="text" placeholder="Írd le a színt (pl. változatlan lila)..." class="w-full p-1.5 border border-stone-300 rounded-lg text-xs">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-emerald-700">3. Kémcső</td>
+                                <td class="p-3">Szódabikarbóna oldat</td>
+                                <td class="p-3"><span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-xs font-bold">Lúgos</span></td>
+                                <td class="p-3 text-stone-500">Ibolyalila</td>
+                                <td class="p-3">
+                                    <input type="text" placeholder="Írd le a színt (pl. smaragdzöld)..." class="w-full p-1.5 border border-stone-300 rounded-lg text-xs">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Scientific Conclusion -->
+                <div>
+                    <label class="block font-bold text-stone-700 text-xs sm:text-sm mb-1">Tudományos következtetés (4. osztályos szinten):</label>
+                    <textarea rows="2" placeholder="Mit bizonyítottunk a kísérlettel? (pl. Az antocián egy természetes kémhatás-jelző festékanyag, amely sav hatására pirosra, lúg hatására zöldre változik...)" class="w-full p-2.5 rounded-xl border border-stone-300 bg-stone-50 focus:bg-white text-xs sm:text-sm focus:outline-none"></textarea>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-stone-100 border-t border-stone-200 py-6 mt-12 text-center text-xs text-stone-500">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p>Készült a 4. osztályos természettudományos oktatáshoz • Végre egy óra stílusban</p>
+            <p class="font-medium text-stone-600">Ökológiai & Laboratóriumi Tananyag</p>
+        </div>
+    </footer>
+
+    <!-- PRINTABLE WORKSHEET (A4 FORMAL PROTOCOL - VISIBLE ONLY WHEN PRINTING) -->
+    <div id="printable-protocol" class="hidden">
+        <div style="border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                <div>
+                    <h1 style="font-size: 20pt; font-weight: bold; margin: 0; text-transform: uppercase;">Kísérleti Jegyzőkönyv</h1>
+                    <p style="font-size: 11pt; margin: 4px 0 0 0; color: #333;">Téma: Őszi növényi pigmentek és az antociánok kémhatás-vizsgálata</p>
+                </div>
+                <div style="text-align: right; font-size: 10pt;">
+                    <p style="margin: 0;"><strong>Osztály:</strong> 4. _____</p>
+                    <p style="margin: 4px 0 0 0;"><strong>Dátum:</strong> 2026. _____ . _____</p>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 15px; font-size: 11pt;">
+            <p><strong>A kutatócsoport tagjai:</strong> ____________________________________________________________________</p>
+            <p style="margin-top: 8px;"><strong>Felhasznált növényi minta:</strong> ________________________________________________________</p>
+        </div>
+
+        <h3 style="font-size: 12pt; font-weight: bold; margin-top: 20px; border-bottom: 1px solid #666; padding-bottom: 4px;">1. Kísérlet: Antocián kinyerése dörzsmozsárral</h3>
+        <p style="font-size: 10pt; line-height: 1.4;">
+            Miért adtunk tiszta homokot a mozsárba a levelek aprításakor?<br>
+            Válasz: ____________________________________________________________________________________<br>
+            Milyen színű lett a szűrés után kinyert törzsoldat? ___________________________________________
+        </p>
+
+        <h3 style="font-size: 12pt; font-weight: bold; margin-top: 20px; border-bottom: 1px solid #666; padding-bottom: 4px;">2. Kémcsöves vizsgálat mérési táblázata</h3>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 10.5pt; text-align: center;" border="1">
+            <thead>
+                <tr style="background-color: #f0f0f0;">
+                    <th style="padding: 8px;">Kémcső</th>
+                    <th style="padding: 8px;">Hozzáadott anyag</th>
+                    <th style="padding: 8px;">Kémhatás</th>
+                    <th style="padding: 8px;">Kezdeti szín</th>
+                    <th style="padding: 8px;">Tapasztalat (új szín)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 10px; font-weight: bold;">1. Kémcső</td>
+                    <td style="padding: 10px;">Citromlé / ecet</td>
+                    <td style="padding: 10px;">Savas</td>
+                    <td style="padding: 10px;">Mélylila</td>
+                    <td style="padding: 10px;">___________________</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; font-weight: bold;">2. Kémcső</td>
+                    <td style="padding: 10px;">Víz (Kontroll)</td>
+                    <td style="padding: 10px;">Semleges</td>
+                    <td style="padding: 10px;">Mélylila</td>
+                    <td style="padding: 10px;">___________________</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; font-weight: bold;">3. Kémcső</td>
+                    <td style="padding: 10px;">Szódabikarbóna</td>
+                    <td style="padding: 10px;">Lúgos</td>
+                    <td style="padding: 10px;">Mélylila</td>
+                    <td style="padding: 10px;">___________________</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3 style="font-size: 12pt; font-weight: bold; margin-top: 25px; border-bottom: 1px solid #666; padding-bottom: 4px;">3. Rajzos feladat és következtetés</h3>
+        <div style="display: flex; gap: 20px; margin-top: 10px;">
+            <div style="border: 1px dashed #444; width: 48%; height: 130px; text-align: center; padding: 10px; font-size: 9pt;">
+                <span>1. Kémcső színe (sav)</span>
+            </div>
+            <div style="border: 1px dashed #444; width: 48%; height: 130px; text-align: center; padding: 10px; font-size: 9pt;">
+                <span>3. Kémcső színe (lúg)</span>
+            </div>
+        </div>
+
+        <p style="font-size: 10pt; margin-top: 20px; line-height: 1.5;">
+            <strong>A kísérlet tanulsága:</strong> Az antocián nevű vízoldható festékanyag egy természetes indikátor (színváltó kaméleon), mert ___________________________________________________________________________________.
+        </p>
+        <div style="margin-top: 35px; text-align: right; font-size: 10pt;">
+            <span>Tanári értékelés: ⭐️ ⭐️ ⭐️ ⭐️ ⭐️ &nbsp;&nbsp;&nbsp;&nbsp; Aláírás: _____________________</span>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- 1. TAB NAVIGATION SWITCHING ---
+        function switchTab(tabId) {
+            // Hide all tabs
+            const panes = document.querySelectorAll('.tab-pane');
+            panes.forEach(pane => pane.classList.add('hidden'));
+
+            // Show selected tab
+            const activePane = document.getElementById(tabId);
+            if (activePane) {
+                activePane.classList.remove('hidden');
+            }
+
+            // Update Tab Button Styles
+            const btnTrees = document.getElementById('btn-tab-trees');
+            const btnAntho = document.getElementById('btn-tab-antho');
+            const btnLab = document.getElementById('btn-tab-lab');
+
+            const inactiveStyle = "tab-button px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 text-stone-600 hover:text-stone-900";
+            const activeStyle = "tab-button px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 bg-white text-stone-900 shadow-sm font-bold";
+
+            btnTrees.className = (tabId === 'tab-trees') ? activeStyle : inactiveStyle;
+            btnAntho.className = (tabId === 'tab-antho') ? activeStyle : inactiveStyle;
+            btnLab.className = (tabId === 'tab-lab') ? activeStyle : inactiveStyle;
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- 2. CHROMATOGRAM SELECTION LOGIC ---
+        const pigmentData = {
+            carotene: {
+                title: "Karotin (Narancssárga festék)",
+                color: "Narancssárga",
+                badge: "Narancssárga Karotin",
+                badgeBg: "bg-amber-500",
+                location: "Zsíroldható (Kloroplasztiszban)",
+                fate: "Egész évben jelen van, ősszel előbukkan",
+                desc: "Mivel a legkönnyebben oldódik a futtató elegyben és nem tapad le a szűrőpapír cellulózrostjaira, ez vándorol a legmagasabbra. A sárgarépában, sütőtökben és az őszi levelekben is ez adja az élénk narancssárga színt."
+            },
+            xantho: {
+                title: "Xantofill (Sárga festék)",
+                color: "Élénksárga",
+                badge: "Citromsárga Xantofill",
+                badgeBg: "bg-yellow-500",
+                location: "Zsíroldható (Kloroplasztiszban)",
+                fate: "Nyáron a zöld eltakarja, ősszel lelepleződik",
+                desc: "A xantofill (a görög 'xanthos' = sárga és 'phyllon' = levél szóból) molekula kissé nehezebben halad a papíron, mint a karotin. A nyírfák, páfrányfenyők és fűzfák ragyogó arany őszi színéért ez a vegyület felelős."
+            },
+            chla: {
+                title: "Klorofill-a (Kékeszöld klorofill)",
+                color: "Kékeszöld",
+                badge: "Klorofill-a",
+                badgeBg: "bg-emerald-600",
+                location: "Zsíroldható (Kloroplasztisz tilakoid membrán)",
+                fate: "Ősszel a fa lebontja és visszaszívja a tápanyagokat",
+                desc: "A fotoszintézis legfontosabb fényelnyelő pigmentje. Elnyeli a vörös és a kék fényt, a zöldet viszont visszaveri, ezért látjuk a leveleket zöldnek. Ősszel a hideg és a fényhiány miatt lebomlik."
+            },
+            chlb: {
+                title: "Klorofill-b (Sárgászöld / olívazöld klorofill)",
+                color: "Olívazöld",
+                badge: "Klorofill-b",
+                badgeBg: "bg-lime-700",
+                location: "Zsíroldható (Kloroplasztisz)",
+                fate: "Ősszel elsőként ez kezd lebomlani",
+                desc: "Kiegészítő festékanyag, amely segít még több fényt összegyűjteni a fotoszintézishez. Erősen tapad a papírhoz, ezért a startvonalhoz legközelebb eső sávban látható."
+            }
+        };
+
+        function selectPigment(key) {
+            const data = pigmentData[key];
+            if (!data) return;
+
+            document.getElementById('pigment-title').innerText = data.title;
+            document.getElementById('pigment-desc').innerText = data.desc;
+            document.getElementById('pigment-color').innerText = data.color;
+            document.getElementById('pigment-location').innerText = data.location;
+            document.getElementById('pigment-fate').innerText = data.fate;
+
+            const badge = document.getElementById('pigment-badge');
+            badge.innerText = data.badge;
+            badge.className = `px-2.5 py-1 rounded-lg text-xs font-bold text-white ${data.badgeBg}`;
+        }
+
+        // --- 3. VIRTUAL LAB TEST-TUBE SIMULATION ---
+        const tubeState = {
+            1: { drops: 0, reagent: 'acid' },
+            2: { drops: 0, reagent: 'water' },
+            3: { drops: 0, reagent: 'base' }
+        };
+
+        function addDrop(tubeNum, reagentType) {
+            const state = tubeState[tubeNum];
+            state.drops += 1;
+
+            // Trigger drop animation
+            const dropEl = document.getElementById(`drop-${tubeNum}`);
+            dropEl.classList.remove('hidden', 'drop-animation');
+            void dropEl.offsetWidth; // Trigger reflow
+            dropEl.classList.add('drop-animation');
+
+            const fluidEl = document.getElementById(`fluid-${tubeNum}`);
+            const labelEl = document.getElementById(`label-tube-${tubeNum}`);
+            const statusEl = document.getElementById(`status-${tubeNum}`);
+            const obsBox = document.getElementById('lab-observation-box');
+
+            if (reagentType === 'acid') {
+                statusEl.innerText = `+${state.drops} csepp ecet (sav)`;
+                if (state.drops === 1) {
+                    fluidEl.style.backgroundColor = '#e11d48'; // Rosy crimson
+                    labelEl.innerText = 'Rózsaszín';
+                    obsBox.innerHTML = '🧪 <strong>1. Kémcső:</strong> A sav hatására a lilás antocián élénk ciklámen-rózsaszínre váltott!';
+                } else {
+                    fluidEl.style.backgroundColor = '#be123c'; // Ruby red
+                    labelEl.innerText = 'Rubinvörös';
+                    obsBox.innerHTML = '🧪 <strong>1. Kémcső:</strong> További sav hozzáadásával ragyogó, mély rubinvörös lett a kémcső tartalma!';
+                }
+            } else if (reagentType === 'water') {
+                statusEl.innerText = `+${state.drops} csepp víz`;
+                fluidEl.style.backgroundColor = '#6b21a8'; // Keep neutral purple
+                labelEl.innerText = 'Változatlan Lila';
+                obsBox.innerHTML = '💧 <strong>2. Kémcső (Kontroll):</strong> A semleges víz hatására nem történt színváltás, az antocián megőrizte mélylila színét.';
+            } else if (reagentType === 'base') {
+                statusEl.innerText = `+${state.drops} csepp szóda (lúg)`;
+                if (state.drops === 1) {
+                    fluidEl.style.backgroundColor = '#0d9488'; // Teal
+                    labelEl.innerText = 'Kékeszöld';
+                    obsBox.innerHTML = '🧼 <strong>3. Kémcső:</strong> A szódabikarbóna lúgos hatására a lila oldat azonnal kékeszöldre (türkizre) változott!';
+                } else {
+                    fluidEl.style.backgroundColor = '#15803d'; // Emerald green
+                    labelEl.innerText = 'Smaragdzöld';
+                    obsBox.innerHTML = '🧼 <strong>3. Kémcső:</strong> További lúg hatására mély smaragdzöld szín alakult ki a kémcsőben!';
+                }
+            }
+        }
+
+        function resetLabSimulator() {
+            for (let i = 1; i <= 3; i++) {
+                tubeState[i].drops = 0;
+                const fluidEl = document.getElementById(`fluid-${i}`);
+                const labelEl = document.getElementById(`label-tube-${i}`);
+                const statusEl = document.getElementById(`status-${i}`);
+                
+                fluidEl.style.backgroundColor = '#6b21a8';
+                labelEl.innerText = 'Lila';
+                if (i === 1) statusEl.innerText = '+0 csepp ecet';
+                if (i === 2) statusEl.innerText = '+0 csepp víz';
+                if (i === 3) statusEl.innerText = '+0 csepp szóda';
+            }
+            document.getElementById('lab-observation-box').innerHTML = 'A kémcsöveket kimosuk. Ismét tiszta lila növényi kivonat várja a vizsgálatot!';
+        }
+    </script>
+</body>
+</html>
