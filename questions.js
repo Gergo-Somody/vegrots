@@ -352,12 +352,6 @@ const QUESTIONS_DB = [
   },
   {
     category: "Kibírja a telet?",
-    question: "Kibírja-e a szabadföldben a téli kemény fagyokat a narancsfa vagy a banánfa?",
-    options: ["Igen, semmi bajuk nem lesz a hó alatt", "Nem, melegebb éghajlatról származnak, megfagynának", "Csak a jégcsapokat kell leszedni róluk"],
-    correct: "Nem, melegebb éghajlatról származnak, megfagynának"
-  },
-  {
-    category: "Kibírja a telet?",
     question: "Hogyan éli túl a telet a hóvirág és a tulipán a szabadban?",
     options: ["A talaj mélyén lévő hagymájukban biztonságban átvészelik a fagyot", "Minden ősszel maguktól elköltöznek délre", "Leveleikkel betakaróznak a föld felszínén"],
     correct: "A talaj mélyén lévő hagymájukban biztonságban átvészelik a fagyot"
