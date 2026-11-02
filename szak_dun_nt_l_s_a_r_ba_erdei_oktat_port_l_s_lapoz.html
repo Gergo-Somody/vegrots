@@ -1,0 +1,1693 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Észak-Dunántúl és a Rába-vidék erdőségei – 4. osztályos természetismeret</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        forest: {
+                            50: '#f1f8f4',
+                            100: '#dceee2',
+                            200: '#bbdec8',
+                            500: '#2d6a4f',
+                            600: '#1b4332',
+                            700: '#143628',
+                            800: '#0b241a',
+                            900: '#061610',
+                        },
+                        river: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            400: '#38bdf8',
+                            600: '#0284c7',
+                            800: '#075985',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @media print {
+            body * {
+                visibility: hidden !important;
+            }
+            #printable-protocol, #printable-protocol * {
+                visibility: visible !important;
+            }
+            #printable-protocol {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 12mm !important;
+                background: white !important;
+                color: black !important;
+                display: block !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 9999px;
+        }
+        .map-region {
+            transition: all 0.25s ease;
+            cursor: pointer;
+        }
+        .map-region:hover {
+            filter: brightness(1.15) drop-shadow(0 4px 6px rgba(0,0,0,0.25));
+        }
+        .map-region.active-region {
+            stroke: #f59e0b !important;
+            stroke-width: 3.5px !important;
+            filter: brightness(1.25);
+        }
+    </style>
+</head>
+<body class="bg-[#fbfaf6] text-stone-800 font-sans selection:bg-emerald-200 min-h-screen flex flex-col antialiased">
+
+    <!-- FEJLÉC ÉS NAVIGÁCIÓ -->
+    <header class="sticky top-0 z-50 bg-[#fbfaf6]/95 backdrop-blur-md border-b border-stone-200 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-2xl bg-emerald-600/10 border border-emerald-600/30 text-emerald-800 flex items-center justify-center text-xl shadow-sm">
+                    🌲
+                </span>
+                <div>
+                    <h1 class="font-display font-extrabold text-lg sm:text-xl text-stone-900 tracking-tight leading-none">
+                        Észak-Dunántúl és a Rába Erdei
+                    </h1>
+                    <p class="text-xs text-stone-500 mt-1 font-medium">4. osztályos felfedező labor • Helyi tájak, határozó és természetvédelem</p>
+                </div>
+            </div>
+
+            <!-- Fő fülek -->
+            <nav class="flex items-center p-1 bg-stone-200/80 rounded-2xl text-xs sm:text-sm font-semibold text-stone-600 gap-1 shadow-inner overflow-x-auto max-w-full">
+                <button onclick="switchTab('tab-map')" id="btn-tab-map" class="tab-button px-3 py-2 rounded-xl transition-all flex items-center gap-1.5 bg-white text-stone-900 shadow-sm whitespace-nowrap font-bold">
+                    <span>🗺️</span> 1. Térkép & Éghajlat
+                </button>
+                <button onclick="switchTab('tab-flood')" id="btn-tab-flood" class="tab-button px-3 py-2 rounded-xl transition-all flex items-center gap-1.5 text-stone-600 hover:text-stone-900 whitespace-nowrap">
+                    <span>🌊</span> 2. Rába & Ártér
+                </button>
+                <button onclick="switchTab('tab-catalog')" id="btn-tab-catalog" class="tab-button px-3 py-2 rounded-xl transition-all flex items-center gap-1.5 text-stone-600 hover:text-stone-900 whitespace-nowrap">
+                    <span>📖</span> 3. Képes Határozó
+                </button>
+                <button onclick="switchTab('tab-parks')" id="btn-tab-parks" class="tab-button px-3 py-2 rounded-xl transition-all flex items-center gap-1.5 text-stone-600 hover:text-stone-900 whitespace-nowrap">
+                    <span>🏛️</span> 4. Parkfáink
+                </button>
+                <button onclick="switchTab('tab-invasive')" id="btn-tab-invasive" class="tab-button px-3 py-2 rounded-xl transition-all flex items-center gap-1.5 text-stone-600 hover:text-stone-900 whitespace-nowrap">
+                    <span>⚠️</span> 5. Inváziós Fajták
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- FŐ TARTALOM -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
+
+        <!-- ========================================================================= -->
+        <!-- 1. LAP: ÉSZAK-DUNÁNTÚL ERDŐSÉGEI & INTERAKTÍV TÉRKÉP -->
+        <!-- ========================================================================= -->
+        <section id="tab-map" class="tab-pane space-y-8">
+            <div class="relative overflow-hidden bg-gradient-to-br from-forest-800 via-forest-700 to-emerald-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-forest-600">
+                <div class="max-w-3xl relative z-10">
+                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-400/20 text-emerald-200 text-xs font-bold uppercase tracking-wider mb-3 border border-emerald-400/30">
+                        <span>🧭</span> Helyismereti felfedezés
+                    </span>
+                    <h2 class="text-2xl sm:text-4xl font-display font-extrabold tracking-tight mb-2">
+                        Hol milyenek az erdők a szülőföldünkön?
+                    </h2>
+                    <p class="text-emerald-100/90 text-xs sm:text-sm leading-relaxed mb-4">
+                        Észak-Dunántúl az ország egyik legváltozatosabb vidéke. A nyugati határszél és a hegyek hűvösek, csapadékosak, míg a Kisalföld lapályai szárazabbak és szelesebbek. <strong>Kattints a térkép tájegységeire</strong>, és vizsgáld meg a magasságot, a csapadékot és az ott élő erdőtípusokat!
+                    </p>
+                    <div class="flex flex-wrap gap-2 text-xs font-medium">
+                        <span class="bg-black/30 px-3 py-1 rounded-xl border border-white/20">🌧️ Nyugat: több eső (700–850 mm)</span>
+                        <span class="bg-black/30 px-3 py-1 rounded-xl border border-white/20">☀️ Kisalföld belső része: melegebb, kevesebb eső (~550 mm)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interaktív Térképes Modul -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <!-- SVG Térkép -->
+                <div class="lg:col-span-7 bg-white rounded-3xl p-5 border border-stone-200 shadow-sm flex flex-col items-center">
+                    <div class="w-full flex items-center justify-between mb-3 text-xs">
+                        <span class="font-bold uppercase tracking-wider text-stone-500">Kattints egy tájegységre:</span>
+                        <span class="text-emerald-700 font-semibold">📍 Rábapatona és környéke kiemelve</span>
+                    </div>
+
+                    <div class="w-full overflow-hidden flex justify-center">
+                        <svg viewBox="0 0 520 360" class="w-full max-w-lg h-auto select-none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="520" height="360" rx="20" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2"/>
+                            
+                            <!-- Duna -->
+                            <path d="M 120 40 Q 220 30 310 70 T 480 110" fill="none" stroke="#38bdf8" stroke-width="7" stroke-linecap="round" opacity="0.6"/>
+                            <text x="320" y="55" fill="#0284c7" font-size="10" font-weight="bold">DUNA</text>
+
+                            <!-- Rába folyó délnyugatról Győr felé -->
+                            <path d="M 60 300 Q 140 250 200 180 T 310 110" fill="none" stroke="#0ea5e9" stroke-width="6" stroke-linecap="round" stroke-dasharray="2 1"/>
+                            <text x="130" y="240" fill="#0369a1" font-size="11" font-weight="bold" transform="rotate(-30 130 240)">Rába-folyó ~~~</text>
+
+                            <!-- 1. Szigetköz -->
+                            <polygon id="reg-szigetkoz" onclick="showRegion('szigetkoz')" points="150,50 290,75 270,110 170,90" 
+                                class="map-region fill-emerald-200 stroke-emerald-600 stroke-2" />
+                            <text x="190" y="80" font-size="10" font-weight="bold" fill="#065f46" pointer-events="none">Szigetköz</text>
+
+                            <!-- 2. Rába-vidék & Kisalföld -->
+                            <polygon id="reg-raba" onclick="showRegion('raba')" points="120,130 290,120 330,180 200,240 100,190" 
+                                class="map-region active-region fill-amber-200 stroke-amber-600 stroke-2" />
+                            <text x="160" y="165" font-size="11" font-weight="bold" fill="#78350f" pointer-events="none">Rába-vidék & Kisalföld</text>
+
+                            <!-- Rábapatona kiemelt pont -->
+                            <g transform="translate(215, 145)" pointer-events="none">
+                                <circle cx="0" cy="0" r="6" fill="#ef4444" stroke="#ffffff" stroke-width="2"/>
+                                <text x="9" y="4" font-size="10" font-weight="bold" fill="#991b1b">Rábapatona (Iskolánk)</text>
+                            </g>
+
+                            <!-- 3. Kőszegi-hegység & Alpokalja -->
+                            <polygon id="reg-koszeg" onclick="showRegion('koszeg')" points="20,130 90,140 80,240 25,270" 
+                                class="map-region fill-emerald-500 stroke-emerald-800 stroke-2" />
+                            <text x="30" y="195" font-size="10" font-weight="bold" fill="#ffffff" pointer-events="none">Kőszegi-h.</text>
+
+                            <!-- 4. Bakony -->
+                            <polygon id="reg-bakony" onclick="showRegion('bakony')" points="240,220 380,180 430,270 300,320 220,270" 
+                                class="map-region fill-emerald-600 stroke-emerald-900 stroke-2" />
+                            <text x="310" y="255" font-size="12" font-weight="bold" fill="#ffffff" pointer-events="none">Bakony</text>
+
+                            <!-- 5. Vértes -->
+                            <polygon id="reg-vertes" onclick="showRegion('vertes')" points="390,140 480,130 490,210 400,200" 
+                                class="map-region fill-emerald-400 stroke-emerald-700 stroke-2" />
+                            <text x="420" y="170" font-size="10" font-weight="bold" fill="#14532d" pointer-events="none">Vértes</text>
+
+                            <!-- Iránytű -->
+                            <g transform="translate(470, 45)">
+                                <circle cx="0" cy="0" r="16" fill="white" stroke="#cbd5e1"/>
+                                <path d="M 0 -13 L 4 0 L -4 0 Z" fill="#ef4444"/>
+                                <path d="M 0 13 L 4 0 L -4 0 Z" fill="#64748b"/>
+                                <text x="-4" y="-15" font-size="8" font-weight="bold" fill="#ef4444">É</text>
+                            </g>
+                        </svg>
+                    </div>
+
+                    <div class="flex flex-wrap justify-center gap-2 mt-4 text-xs font-semibold">
+                        <button onclick="showRegion('raba')" class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 border border-amber-300">Rába-vidék & Kisalföld</button>
+                        <button onclick="showRegion('szigetkoz')" class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-900 border border-emerald-300">Szigetköz</button>
+                        <button onclick="showRegion('bakony')" class="px-2.5 py-1 rounded-lg bg-emerald-700 text-white">Bakony</button>
+                        <button onclick="showRegion('koszeg')" class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white">Kőszegi-hegység</button>
+                        <button onclick="showRegion('vertes')" class="px-2.5 py-1 rounded-lg bg-emerald-200 text-emerald-950 border border-emerald-400">Vértes</button>
+                    </div>
+                </div>
+
+                <!-- Régió infótábla -->
+                <div class="lg:col-span-5 bg-white rounded-3xl p-6 border border-stone-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span id="region-type" class="text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-100 px-2.5 py-1 rounded-md">
+                                Síkvidék & Ártéri zóna
+                            </span>
+                            <span id="region-alt" class="text-xs font-semibold text-stone-500">Tengerszint: 110–130 m</span>
+                        </div>
+                        <h3 id="region-title" class="font-display font-extrabold text-2xl text-stone-900 mb-2">
+                            Rába-vidék és a Kisalföld
+                        </h3>
+                        <p id="region-desc" class="text-xs sm:text-sm text-stone-600 leading-relaxed mb-4">
+                            Közvetlen lakókörnyezetünk! A Rába hordalékos, kanyargó völgye szeli át a tájat. Az évi csapadék kb. 550–600 mm. Az erdők zöme a vízjáráshoz kötődik: kanyargó puhafás fűz- és nyárligetek, kissé távolabb méltóságteljes kocsányos tölgyek és védett magyar kőrisek élnek itt.
+                        </p>
+
+                        <div class="space-y-2 bg-stone-50 p-4 rounded-2xl border border-stone-200 text-xs sm:text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-stone-500">🌧️ Évi csapadék:</span>
+                                <strong id="region-rain" class="text-stone-800">550 – 620 mm</strong>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-stone-500">🌲 Jellemző társulás:</span>
+                                <strong id="region-forest" class="text-emerald-700">Fűz-nyár liget & Tölgy-kőris-szil</strong>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-stone-500">🍃 Fő fafajok:</span>
+                                <strong id="region-trees" class="text-stone-800">Fehér fűz, fekete nyár, kocsányos tölgy</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Beszélgetésindító doboz -->
+                    <div class="mt-6 pt-4 border-t border-stone-200 bg-emerald-50/70 p-4 rounded-2xl border border-emerald-200/80">
+                        <div class="flex items-center gap-2 text-xs font-bold text-emerald-900 mb-1">
+                            <span>💬</span> „Ki járt már itt?” – Órai beszélgetéskérdés:
+                        </div>
+                        <p id="region-question" class="text-xs text-emerald-800 italic">
+                            „Ki sétált már a Rába partján Rábapatonán vagy Győrben? Milyen fákat láttatok a vízbe hajolni?”
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Magassági szintek áttekintése -->
+            <div class="bg-white rounded-3xl p-6 border border-stone-200 shadow-sm">
+                <h4 class="font-display font-bold text-lg text-stone-900 mb-3 flex items-center gap-2">
+                    <span>⛰️</span> Magasság és csapadék hatása az erdőtípusokra:
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs sm:text-sm">
+                    <div class="p-4 rounded-2xl bg-amber-50/60 border border-amber-200">
+                        <span class="font-bold text-amber-900 block text-sm">1. Síkságok & Folyópartok (0–200 m)</span>
+                        <p class="text-stone-600 mt-1">Melegebb klíma, sok talajvíz. <strong>Fűzesek, nyárligetek és tölgyesek</strong>. A Rábaköz és Rábapatona világa.</p>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200">
+                        <span class="font-bold text-emerald-900 block text-sm">2. Dombvidék (200–500 m)</span>
+                        <p class="text-stone-600 mt-1">Mérsékelt csapadék. <strong>Cseres-tölgyesek és gyertyános-tölgyesek</strong> hazája (pl. Sokoró, Bakonyalja).</p>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-teal-50/60 border border-teal-200">
+                        <span class="font-bold text-teal-900 block text-sm">3. Magashegység (500–800 m+)</span>
+                        <p class="text-stone-600 mt-1">Hűvös, páradús klíma, sok hó és eső. Pompás, sötét <strong>bükkösök</strong> és fenyvesek (Kőszegi-hg., Magas-Bakony).</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- 2. LAP: A RÁBA ÉS ÁRTÉRI ERDŐK -->
+        <!-- ========================================================================= -->
+        <section id="tab-flood" class="tab-pane hidden space-y-8">
+            <div class="bg-gradient-to-r from-blue-900 via-river-800 to-forest-800 text-white rounded-3xl p-6 sm:p-8 shadow-xl">
+                <span class="inline-block bg-sky-400/20 text-sky-200 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2 border border-sky-400/30">
+                    A Rába hullámterében
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-display font-extrabold mb-2">
+                    Ártéri erdők és szintek: Élet a víz sodrásában
+                </h2>
+                <p class="text-sky-100 text-xs sm:text-sm max-w-3xl leading-relaxed">
+                    Amikor az Alpokban tavasszal olvad a hó, a Rába heves árhullámmal érkezik meg. Az ártér fái elképesztő alkalmazkodással élik túl a hosszan tartó vízborítást és az iszaplerakódást!
+                </p>
+            </div>
+
+            <!-- Interaktív Magassági Keresztmetszet -->
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-200 pb-3">
+                    <div>
+                        <span class="text-xs font-bold text-river-600 uppercase tracking-wider">Interaktív Keresztmetszet</span>
+                        <h3 class="text-xl font-display font-bold text-stone-900">A folyómedertől a gátig: ki hol bírja a vizet?</h3>
+                    </div>
+                    <div class="text-xs text-stone-500">Kattints a folyóparti zónákra!</div>
+                </div>
+
+                <div class="w-full overflow-hidden bg-slate-50 rounded-2xl p-2 border border-slate-200">
+                    <svg viewBox="0 0 600 240" class="w-full h-auto select-none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="waterGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.8"/>
+                                <stop offset="100%" stop-color="#0284c7" stop-opacity="0.95"/>
+                            </linearGradient>
+                            <linearGradient id="floodGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.4"/>
+                                <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0.1"/>
+                            </linearGradient>
+                        </defs>
+
+                        <!-- Domborzati profil -->
+                        <path d="M 0 170 Q 60 170 90 200 Q 120 220 150 200 Q 180 180 260 150 Q 380 140 460 110 L 530 80 L 600 80 L 600 240 L 0 240 Z" fill="#e2d9cc"/>
+
+                        <!-- Víz a mederben -->
+                        <path d="M 75 190 Q 120 220 165 190 Z" fill="url(#waterGrad)"/>
+                        <text x="95" y="210" font-size="9" fill="white" font-weight="bold">Rába sodorvonal</text>
+
+                        <!-- Árvízszint -->
+                        <rect x="75" y="145" width="230" height="45" fill="url(#floodGrad)" stroke="#0284c7" stroke-width="1.5" stroke-dasharray="3 3"/>
+                        <text x="140" y="140" font-size="9" fill="#0369a1" font-weight="bold">Árvízszint (akár 30–60 nap vízborítás)</text>
+
+                        <!-- Kattintható Zónák -->
+                        <g onclick="selectRiverZone('river')" class="cursor-pointer">
+                            <circle cx="120" cy="180" r="18" fill="#38bdf8" opacity="0.2"/>
+                            <text x="90" y="230" font-size="10" font-weight="bold" fill="#0369a1">1. Folyómeder</text>
+                        </g>
+
+                        <!-- 2. Puhafás liget -->
+                        <g onclick="selectRiverZone('soft')" class="cursor-pointer">
+                            <path d="M 210 160 L 210 140 Q 210 120 200 110 Q 180 120 190 145" fill="none" stroke="#65a30d" stroke-width="3"/>
+                            <path d="M 210 140 Q 220 120 230 115 Q 235 135 220 150" fill="none" stroke="#65a30d" stroke-width="3"/>
+                            <circle cx="210" cy="120" r="14" fill="#84cc16" opacity="0.8"/>
+                            <circle cx="245" cy="115" r="16" fill="#65a30d" opacity="0.85"/>
+                            <rect x="242" y="130" width="6" height="22" fill="#78350f"/>
+                            <text x="190" y="95" font-size="10" font-weight="bold" fill="#3f6212">2. Puhafás liget</text>
+                            <text x="195" y="175" font-size="8" fill="#475569">Fűz & Nyár</text>
+                        </g>
+
+                        <!-- 3. Keményfás liget -->
+                        <g onclick="selectRiverZone('hard')" class="cursor-pointer">
+                            <rect x="365" y="130" width="10" height="22" fill="#5c4528"/>
+                            <circle cx="370" cy="105" r="24" fill="#15803d" opacity="0.9"/>
+                            <circle cx="430" cy="95" r="22" fill="#166534" opacity="0.9"/>
+                            <rect x="427" y="115" width="8" height="25" fill="#5c4528"/>
+                            <text x="365" y="70" font-size="10" font-weight="bold" fill="#14532d">3. Keményfás liget</text>
+                            <text x="375" y="155" font-size="8" fill="#475569">Tölgy, Kőris, Szil</text>
+                        </g>
+
+                        <!-- Gát -->
+                        <path d="M 500 115 L 530 80 L 560 80 L 580 115" fill="#a8a29e" stroke="#78716c" stroke-width="1.5"/>
+                        <text x="525" y="72" font-size="9" font-weight="bold" fill="#44403c">Gát (Töltés)</text>
+                    </svg>
+                </div>
+
+                <!-- Zóna Leírás -->
+                <div id="river-zone-card" class="bg-emerald-50/80 p-5 rounded-2xl border border-emerald-200">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span id="zone-badge" class="px-2.5 py-0.5 rounded text-xs font-bold bg-lime-600 text-white">Puhafás Ligeterdő</span>
+                        <span id="zone-water-level" class="text-xs font-semibold text-stone-600">Gyakori vízborítás: évi 30–80 nap!</span>
+                    </div>
+                    <h4 id="zone-name" class="font-display font-bold text-lg text-stone-900 mb-1">Fűz-nyár ligeterdő (Közvetlen folyópart)</h4>
+                    <p id="zone-info" class="text-xs sm:text-sm text-stone-700 leading-relaxed">
+                        A víz közvetlen szomszédságában élnek. Fáik fája lágy, könnyű és laza szerkezetű ("puhafa"). Vesszőik hihetetlenül rugalmasak: az áradó Rába sodrása sem töri le őket, hanem lehajlanak a hullámok alatt. Ha a törzsüket méteres iszap temeti be, a fa azonnal új pótgyökereket növeszt a törzséből!
+                    </p>
+                </div>
+            </div>
+
+            <!-- Két nagy ligettípus összehasonlítása -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-3xl p-6 border-2 border-lime-300 shadow-sm space-y-4">
+                    <div class="flex items-center gap-3">
+                        <span class="w-10 h-10 rounded-2xl bg-lime-100 text-lime-800 flex items-center justify-center text-xl font-bold">🌿</span>
+                        <div>
+                            <h4 class="font-display font-bold text-lg text-stone-900">Puhafás ligeterdő (Fűz & Nyár)</h4>
+                            <p class="text-xs text-lime-800 font-semibold">Alacsony hullámtér • Sok iszap és áradás</p>
+                        </div>
+                    </div>
+                    <ul class="space-y-2 text-xs sm:text-sm text-stone-600">
+                        <li><strong>Fehér fűz:</strong> Hosszúkás, ezüstösen csillogó levelek. Laza fája könnyen odvasodik, baglyoknak adva szállást.</li>
+                        <li><strong>Fekete és fehér nyár:</strong> Gyors növekedésű óriások, tavasszal vattaszerű magszöszöket repítenek.</li>
+                        <li><strong>Törékeny fűz:</strong> Ágai a tövüknél könnyen pattannak le az áradásban, a víz tovasodorja őket, és a homokpadon meggyökereznek!</li>
+                    </ul>
+                </div>
+
+                <div class="bg-white rounded-3xl p-6 border-2 border-emerald-700/30 shadow-sm space-y-4">
+                    <div class="flex items-center gap-3">
+                        <span class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-900 flex items-center justify-center text-xl font-bold">🌳</span>
+                        <div>
+                            <h4 class="font-display font-bold text-lg text-stone-900">Keményfás ligeterdő (Tölgy-kőris-szil)</h4>
+                            <p class="text-xs text-emerald-800 font-semibold">Magasabb ártéri szint • Ritka, rövid vízborítás</p>
+                        </div>
+                    </div>
+                    <ul class="space-y-2 text-xs sm:text-sm text-stone-600">
+                        <li><strong>Kocsányos tölgy:</strong> A ligeterdők fejedelme. Tömör keményfa, makkjai hosszú száron (kocsányon) csüngenek.</li>
+                        <li><strong>Magyar kőris:</strong> Pannon ritkaság! Kifejezetten a hazai völgyek ártéri viszonyaihoz alkalmazkodott védett fafaj.</li>
+                        <li><strong>Vénic-szil:</strong> Aszimmetrikus (ferde) levélvállú fafaj, a törzs tövénél támasztó deszkagyökerekkel.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- 3. LAP: DIGITÁLIS HATÁROZÓ ÉS LAPOZÓ (4 LETISZTULT KATEGÓRIÁVAL) -->
+        <!-- ========================================================================= -->
+        <section id="tab-catalog" class="tab-pane hidden space-y-6">
+            
+            <!-- Kategória szűrő sáv (Az 'Elegyfák' beolvasztva az Erdőalkotók közé!) -->
+            <div class="bg-white p-3 rounded-2xl border border-stone-200 shadow-sm flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-1.5 overflow-x-auto custom-scrollbar text-xs font-bold">
+                    <button onclick="filterCategory('all')" id="cat-all" class="cat-filter-btn px-3 py-1.5 rounded-xl bg-stone-900 text-white shadow-sm whitespace-nowrap">Mind (25 faj)</button>
+                    <button onclick="filterCategory('pionir')" id="cat-pionir" class="cat-filter-btn px-3 py-1.5 rounded-xl bg-stone-100 text-stone-700 hover:bg-amber-100 whitespace-nowrap">1. ☀️ Pionír fák (5)</button>
+                    <button onclick="filterCategory('cserje')" id="cat-cserje" class="cat-filter-btn px-3 py-1.5 rounded-xl bg-stone-100 text-stone-700 hover:bg-emerald-100 whitespace-nowrap">2. 🫐 Cserjék & Bokrok (6)</button>
+                    <button onclick="filterCategory('erdoalkoto')" id="cat-erdoalkoto" class="cat-filter-btn px-3 py-1.5 rounded-xl bg-stone-100 text-stone-700 hover:bg-green-100 whitespace-nowrap">3. 👑 Lombhullató erdőalkotók (10)</button>
+                    <button onclick="filterCategory('fenyo')" id="cat-fenyo" class="cat-filter-btn px-3 py-1.5 rounded-xl bg-stone-100 text-stone-700 hover:bg-teal-100 whitespace-nowrap">4. 🌲 Fenyők & Tűlevelűek (4)</button>
+                </div>
+                <!-- Keresőmező -->
+                <div class="relative">
+                    <input type="text" id="catalog-search" oninput="handleSearch(this.value)" placeholder="Keresés fajnévre..." class="text-xs py-1.5 pl-7 pr-3 rounded-xl border border-stone-300 bg-stone-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500 w-40 sm:w-52">
+                    <span class="absolute left-2 top-1.5 text-stone-400 text-xs">🔍</span>
+                </div>
+            </div>
+
+            <!-- Felső sáv: Pozíció és Gyorsugró -->
+            <div class="flex items-center justify-between text-xs text-stone-500 bg-white px-4 py-2.5 rounded-2xl border border-stone-200 shadow-sm">
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-stone-800" id="card-counter">1 / 25</span>
+                    <span class="text-stone-300">|</span>
+                    <span id="quick-cat-label" class="font-semibold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md">Pionír fafaj</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label for="species-select" class="hidden sm:inline font-medium">Ugrás a fajhoz:</label>
+                    <select id="species-select" onchange="jumpToSpecies(this.value)" class="text-xs bg-stone-50 border border-stone-300 rounded-lg py-1 px-2 focus:ring-1 focus:ring-emerald-500">
+                        <!-- JS tölti fel -->
+                    </select>
+                </div>
+            </div>
+
+            <!-- A FŐ KÁRTYA CONTAINER -->
+            <article id="main-card" class="bg-white rounded-3xl border border-stone-200 shadow-md p-5 sm:p-8 flex flex-col justify-between gap-6 relative overflow-hidden">
+                <!-- Név és azonosító pecsét -->
+                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-stone-100 pb-4">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span id="card-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold uppercase tracking-wide bg-amber-100 text-amber-900 border border-amber-300">
+                                Pionír fafaj
+                            </span>
+                            <span id="card-local-tag" class="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                                Rába partján gyakori
+                            </span>
+                        </div>
+                        <h2 id="card-hungarian-name" class="text-2xl sm:text-3xl font-display font-extrabold text-stone-900 tracking-tight">
+                            Közönséges nyírfa
+                        </h2>
+                        <p id="card-latin-name" class="text-xs sm:text-sm text-stone-500 italic mt-0.5 font-medium">
+                            Betula pendula
+                        </p>
+                    </div>
+                    <div class="w-10 h-10 rounded-2xl bg-stone-100 border border-stone-200 text-stone-700 flex items-center justify-center font-display font-extrabold text-base shadow-inner self-start">
+                        <span id="card-number-badge">#1</span>
+                    </div>
+                </div>
+
+                <!-- 3 KÉP HELYE (Egész fa, Törzs/Kéreg, Levél/Termés) -->
+                <!-- A képeket a speciesList tömbben az imgWhole, imgBark, imgLeaf elérési utak megadásával lehet beilleszteni -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <!-- 1. Egész fa (Habitus) -->
+                    <div class="flex flex-col bg-stone-50 rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
+                        <div class="relative w-full h-44 bg-gradient-to-b from-stone-100 to-stone-200 flex items-center justify-center overflow-hidden">
+                            <img id="img-whole" src="" alt="Egész fa alakja" class="w-full h-full object-cover hidden">
+                            <div id="ph-whole" class="flex flex-col items-center justify-center text-stone-400 p-4 text-center">
+                                <span class="text-3xl mb-1">🌳</span>
+                                <span class="text-[11px] font-bold text-stone-600">Egész fa / Habitus</span>
+                                <span class="text-[9px] text-stone-400 mt-0.5">800x600 px ajánlott</span>
+                            </div>
+                        </div>
+                        <div class="p-2.5 bg-white border-t border-stone-200 text-center">
+                            <span class="text-xs font-bold text-stone-800 block">1. Korona és termet</span>
+                            <span id="caption-whole" class="text-[10px] text-stone-500">Kecses, lecsüngő ágrendszer</span>
+                        </div>
+                    </div>
+
+                    <!-- 2. Törzs és Kéreg -->
+                    <div class="flex flex-col bg-stone-50 rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
+                        <div class="relative w-full h-44 bg-gradient-to-b from-stone-100 to-stone-200 flex items-center justify-center overflow-hidden">
+                            <img id="img-bark" src="" alt="Kéreg mintázat" class="w-full h-full object-cover hidden">
+                            <div id="ph-bark" class="flex flex-col items-center justify-center text-stone-400 p-4 text-center">
+                                <span class="text-3xl mb-1">🪵</span>
+                                <span class="text-[11px] font-bold text-stone-600">Törzs és Kéreg</span>
+                                <span class="text-[9px] text-stone-400 mt-0.5">Közeli kéregfotó</span>
+                            </div>
+                        </div>
+                        <div class="p-2.5 bg-white border-t border-stone-200 text-center">
+                            <span class="text-xs font-bold text-stone-800 block">2. Kéreg mintázat</span>
+                            <span id="caption-bark" class="text-[10px] text-stone-500">Hófehér, papírszerűen foszló</span>
+                        </div>
+                    </div>
+
+                    <!-- 3. Levél és Termés -->
+                    <div class="flex flex-col bg-stone-50 rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
+                        <div class="relative w-full h-44 bg-gradient-to-b from-stone-100 to-stone-200 flex items-center justify-center overflow-hidden">
+                            <img id="img-leaf" src="" alt="Levél és termés" class="w-full h-full object-cover hidden">
+                            <div id="ph-leaf" class="flex flex-col items-center justify-center text-stone-400 p-4 text-center">
+                                <span class="text-3xl mb-1">🍃</span>
+                                <span class="text-[11px] font-bold text-stone-600">Levél & Termés / Virág</span>
+                                <span class="text-[9px] text-stone-400 mt-0.5">Részletgazdag makró</span>
+                            </div>
+                        </div>
+                        <div class="p-2.5 bg-white border-t border-stone-200 text-center">
+                            <span class="text-xs font-bold text-stone-800 block">3. Levél és szaporítószerv</span>
+                            <span id="caption-leaf" class="text-[10px] text-stone-500">Rombusz alakú fűrészes levél</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tulajdonságok és leírások -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
+                    <div class="space-y-3 bg-stone-50/70 p-4 rounded-2xl border border-stone-200">
+                        <div>
+                            <strong class="text-stone-900 block font-bold text-xs uppercase tracking-wider text-emerald-800">🪵 Kéreg és Törzs jellege:</strong>
+                            <p id="desc-bark" class="text-stone-600 mt-1 leading-relaxed">
+                                Hófehér törzséről bárki azonnal megismeri. Idős korára a tuskó közelében vastag, fekete, mélyen hasadozott kéregpikkelyeket növeszt.
+                            </p>
+                        </div>
+                        <div class="pt-2 border-t border-stone-200/60">
+                            <strong class="text-stone-900 block font-bold text-xs uppercase tracking-wider text-emerald-800">🍃 Levél és Termés formája:</strong>
+                            <p id="desc-leaf" class="text-stone-600 mt-1 leading-relaxed">
+                                Apró, háromszög vagy rombusz alakú, fűrészes szélű levelek. Tavasszal lecsüngő barkavirágzatot, ősszel szárnyas magvakat érlel.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3 bg-stone-50/70 p-4 rounded-2xl border border-stone-200 flex flex-col justify-between">
+                        <div>
+                            <strong class="text-stone-900 block font-bold text-xs uppercase tracking-wider text-emerald-800">📍 Hol találkozhatsz vele a vidéken?</strong>
+                            <p id="desc-habitat" class="text-stone-600 mt-1 leading-relaxed">
+                                Fényimádó úttörő: tisztásokon, erdőszéleken, kavicsbányákban és erdei irtásokon elsőként telepszik meg egész Észak-Dunántúlon.
+                            </p>
+                        </div>
+                        <div class="bg-amber-50 border border-amber-300 p-3 rounded-xl mt-2">
+                            <span class="font-bold text-amber-900 flex items-center gap-1.5 text-xs mb-1">
+                                <span>💡</span> Tudtad-e?
+                            </span>
+                            <p id="desc-funfact" class="text-xs text-amber-950 leading-relaxed italic">
+                                A nyírfa kérge betulint tartalmaz, ami vízzáróvá teszi. Régen ebből kenukat és vízálló tetőlemezeket készítettek!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Alsó Lapozó Vezérlő -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+                <button onclick="prevCard()" class="w-full sm:w-auto px-6 py-3 bg-white hover:bg-stone-50 text-stone-800 rounded-2xl border border-stone-300 shadow-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95 text-sm">
+                    <span>◀</span>
+                    <span>Előző faj</span>
+                    <span class="text-xs text-stone-400 font-normal hidden md:inline">(Bal nyíl)</span>
+                </button>
+
+                <div id="dot-container" class="flex items-center gap-1.5 overflow-x-auto max-w-[280px] sm:max-w-md py-1 px-2">
+                    <!-- Pontok generálása -->
+                </div>
+
+                <button onclick="nextCard()" class="w-full sm:w-auto px-6 py-3 bg-emerald-700 hover:bg-emerald-600 text-white rounded-2xl shadow-md font-bold flex items-center justify-center gap-2 transition-all active:scale-95 text-sm">
+                    <span>Következő faj</span>
+                    <span>▶</span>
+                    <span class="text-xs text-emerald-200 font-normal hidden md:inline">(Jobb nyíl)</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- 4. LAP: VÁROSI ZÖLD SZIGETEK – PARKFÁINK -->
+        <!-- ========================================================================= -->
+        <section id="tab-parks" class="tab-pane hidden space-y-8">
+            <div class="bg-gradient-to-r from-emerald-800 to-teal-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl">
+                <span class="inline-block bg-teal-400/20 text-teal-200 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2 border border-teal-400/30">
+                    Városaink és Falvaink Hűsítő Óriásai
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-display font-extrabold mb-2">
+                    Parkfák világa: Őshonos kincsek és behozott vendégek
+                </h2>
+                <p class="text-teal-100 text-xs sm:text-sm max-w-3xl leading-relaxed">
+                    Győr terein, a rábapatonai templomkertben vagy kastélyparkokban olyan fák is állnak, amelyek nem a helyi erdőkből származnak, hanem más kontinensekről érkeztek hozzánk.
+                </p>
+            </div>
+
+            <!-- Szűrőgombok -->
+            <div class="flex items-center gap-2 text-xs font-semibold">
+                <span class="text-stone-500 mr-2">Szűrés származás szerint:</span>
+                <button onclick="filterParkTrees('all')" id="filter-all" class="px-3 py-1.5 rounded-xl bg-stone-900 text-white">Összes (5)</button>
+                <button onclick="filterParkTrees('native')" id="filter-native" class="px-3 py-1.5 rounded-xl bg-stone-200 text-stone-700 hover:bg-stone-300">🌿 Őshonos fák</button>
+                <button onclick="filterParkTrees('exotic')" id="filter-exotic" class="px-3 py-1.5 rounded-xl bg-stone-200 text-stone-700 hover:bg-stone-300">✈️ Behozott díszfák</button>
+            </div>
+
+            <!-- Parkfa kártyák -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="park-trees-container">
+                <div class="park-tree-card bg-white rounded-3xl p-6 border border-stone-200 shadow-sm flex flex-col justify-between" data-origin="exotic">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-bold px-2.5 py-1 rounded-md bg-amber-100 text-amber-800">✈️ Behozott (Balkán)</span>
+                            <span class="text-2xl">🌰</span>
+                        </div>
+                        <h4 class="font-display font-bold text-lg text-stone-900">Közönséges vadgesztenye</h4>
+                        <p class="text-xs text-stone-500 italic mb-2">Aesculus hippocastanum</p>
+                        <p class="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                            Májusban gyertyaszerű fehér virágfürtökkel díszít. Tenyeresen összetett levelei hatalmasak. Tüskés tokterméséből gurulnak ki a fényes barna gesztenyék, amikből figurákat készítünk ősszel!
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-stone-100 text-xs text-emerald-800 font-semibold">
+                        Gyakori: Falusi terek, fasorok, iskolakertek.
+                    </div>
+                </div>
+
+                <div class="park-tree-card bg-white rounded-3xl p-6 border border-stone-200 shadow-sm flex flex-col justify-between" data-origin="exotic">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-bold px-2.5 py-1 rounded-md bg-amber-100 text-amber-800">✈️ Hibrid (Kertészeti)</span>
+                            <span class="text-2xl">🏛️</span>
+                        </div>
+                        <h4 class="font-display font-bold text-lg text-stone-900">Juharlevelű platán</h4>
+                        <p class="text-xs text-stone-500 italic mb-2">Platanus acerifolia</p>
+                        <p class="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                            Akár 200–300 évig is él! Kérge nagy táblákban válik le, terepszínűvé téve a vastag törzset. Jól bírja a városi füstöt és port, hatalmas hűsítő sátrat ad a nyári hőségben.
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-stone-100 text-xs text-emerald-800 font-semibold">
+                        Gyakori: Győri Radó-sziget, kastélyparkok.
+                    </div>
+                </div>
+
+                <div class="park-tree-card bg-white rounded-3xl p-6 border border-stone-200 shadow-sm flex flex-col justify-between" data-origin="exotic">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-bold px-2.5 py-1 rounded-md bg-amber-100 text-amber-800">✈️ Kelet-Ázsia (Kína)</span>
+                            <span class="text-2xl">🪭</span>
+                        </div>
+                        <h4 class="font-display font-bold text-lg text-stone-900">Páfrányfenyő (Ginkgo)</h4>
+                        <p class="text-xs text-stone-500 italic mb-2">Ginkgo biloba</p>
+                        <p class="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                            <strong>Élő kövület!</strong> Már a dinoszauruszok korában is létezett. Bár van levele, valójában a nyitvatermők ősi rokona. Ősszel egyszerre válik tündöklő neonsárgává.
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-stone-100 text-xs text-emerald-800 font-semibold">
+                        Gyakori: Botanikus kertek, parkok.
+                    </div>
+                </div>
+
+                <div class="park-tree-card bg-white rounded-3xl p-6 border border-stone-200 shadow-sm flex flex-col justify-between" data-origin="native">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-bold px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800">🌿 Őshonos / Pannon</span>
+                            <span class="text-2xl">🍯</span>
+                        </div>
+                        <h4 class="font-display font-bold text-lg text-stone-900">Ezüst hárs</h4>
+                        <p class="text-xs text-stone-500 italic mb-2">Tilia tomentosa</p>
+                        <p class="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                            Levele mélyzöld, fonákja csillagszőröktől ezüstösen fénylik. Júniusban bódító illatú virágaival tele vannak a méhek. Remekül bírja a szárazabb nyarakat is.
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-stone-100 text-xs text-emerald-800 font-semibold">
+                        Gyakori: Templomkertek, faluhelyek, sétányok.
+                    </div>
+                </div>
+
+                <div class="park-tree-card bg-white rounded-3xl p-6 border border-stone-200 shadow-sm flex flex-col justify-between" data-origin="native">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-bold px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800">🌿 Őshonos fafaj</span>
+                            <span class="text-2xl">👑</span>
+                        </div>
+                        <h4 class="font-display font-bold text-lg text-stone-900">Kocsányos tölgy (Emlékfák)</h4>
+                        <p class="text-xs text-stone-500 italic mb-2">Quercus robur</p>
+                        <p class="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                            Gyakran ültették történelmi évfordulók emlékére (pl. Millenniumi fák). Terebélyes koronája alatt egész osztályok hűsölhetnek a nyári melegben.
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-stone-100 text-xs text-emerald-800 font-semibold">
+                        Gyakori: Falusi terek, védett ligetek.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- 5. LAP: VESZÉLYBEN AZ ERDEINK! – INVAZÍV FAJOK & ÁRTÉR ŐRE -->
+        <!-- ========================================================================= -->
+        <section id="tab-invasive" class="tab-pane hidden space-y-8">
+            <div class="bg-gradient-to-r from-red-950 via-rose-900 to-amber-950 text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-red-800/40">
+                <span class="inline-block bg-red-400/20 text-red-200 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2 border border-red-400/30">
+                    Ökológiai Veszélyhelyzet
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-display font-extrabold mb-2">
+                    A zöld hódítók: Miért szorulnak vissza az őshonos erdeink?
+                </h2>
+                <p class="text-red-100 text-xs sm:text-sm max-w-3xl leading-relaxed">
+                    Egy faj akkor <strong>inváziós (özönfaj)</strong>, ha más földrészről érkezett, nálunk nincsenek természetes kártevői, rendkívül agresszíven szaporodik, és kiszorítja a természetes növényzetet.
+                </p>
+            </div>
+
+            <!-- Körözési lista -->
+            <div class="space-y-4">
+                <h3 class="font-display font-bold text-xl text-stone-900 flex items-center gap-2">
+                    <span>🚨</span> Körözési lista a Rába-part és a térség erdeiből:
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white rounded-2xl p-5 border-2 border-red-200 shadow-sm flex gap-4 items-start">
+                        <span class="w-12 h-12 rounded-2xl bg-red-100 text-red-700 flex items-center justify-center text-2xl flex-shrink-0 font-bold">🌾</span>
+                        <div>
+                            <h4 class="font-display font-bold text-base text-stone-900">Cserjés gyalogakác (Amorpha fruticosa)</h4>
+                            <span class="text-[11px] font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded">Az ártér 1. számú ellensége!</span>
+                            <p class="text-xs text-stone-600 mt-2 leading-relaxed">
+                                Észak-Amerikából származó cserje. A Rába hullámterében áthatolhatatlan bozótot képez. Elnyomja a fűz- és nyárcsemetéket, így az erdő nem tud megújulni.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-5 border-2 border-red-200 shadow-sm flex gap-4 items-start">
+                        <span class="w-12 h-12 rounded-2xl bg-red-100 text-red-700 flex items-center justify-center text-2xl flex-shrink-0 font-bold">🍁</span>
+                        <div>
+                            <h4 class="font-display font-bold text-base text-stone-900">Amerikai kőris & Zöld juhar</h4>
+                            <span class="text-[11px] font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded">Ligeterdők kártevői</span>
+                            <p class="text-xs text-stone-600 mt-2 leading-relaxed">
+                                Kiszorítják a védett magyar kőrist. Milliónyi szárnyas lependéktermésük a vízen úszva minden szabad talajfoltot meghódít.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-5 border-2 border-red-200 shadow-sm flex gap-4 items-start">
+                        <span class="w-12 h-12 rounded-2xl bg-red-100 text-red-700 flex items-center justify-center text-2xl flex-shrink-0 font-bold">☠️</span>
+                        <div>
+                            <h4 class="font-display font-bold text-base text-stone-900">Mirigyes bálványfa (Ailanthus altissima)</h4>
+                            <span class="text-[11px] font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded">Kémiai hadviselő</span>
+                            <p class="text-xs text-stone-600 mt-2 leading-relaxed">
+                                Gyökereivel mérgező anyagot választ ki a talajba, ami megakadályozza más növények kicsírázását! Ha kivágják, rengeteg új gyökérsarjat hajt.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-5 border-2 border-amber-200 shadow-sm flex gap-4 items-start">
+                        <span class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center text-2xl flex-shrink-0 font-bold">⚖️</span>
+                        <div>
+                            <h4 class="font-display font-bold text-base text-stone-900">Fehér akác (Robinia pseudoacacia)</h4>
+                            <span class="text-[11px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded">Haszon és Veszély egyszerre</span>
+                            <p class="text-xs text-stone-600 mt-2 leading-relaxed">
+                                Kiváló tűzifa és a híres akácméz adója. Ugyanakkor ha bejut az őshonos tölgyeseinkbe, átalakítja a talajt és elszegényíti a természetes növényvilágot.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interaktív Ártér Őre Játék -->
+            <div class="bg-stone-900 text-white rounded-3xl p-6 sm:p-8 border border-stone-700">
+                <div class="max-w-2xl mb-4">
+                    <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Interaktív Természetvédelem</span>
+                    <h3 class="text-xl sm:text-2xl font-display font-bold text-white mt-1">„Légy te is az ártér őre!”</h3>
+                    <p class="text-xs sm:text-sm text-stone-300 mt-1">
+                        A Rába partján sétálsz. Melyik növénnyel mit tegyen a természetvédő?
+                    </p>
+                </div>
+
+                <div id="guardian-game-box" class="bg-stone-800/90 rounded-2xl p-5 border border-stone-700 text-xs sm:text-sm space-y-4">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl" id="game-plant-icon">🌾</span>
+                        <div>
+                            <strong class="text-amber-400 block text-base" id="game-plant-name">Cserjés gyalogakác hajtás</strong>
+                            <p class="text-stone-300 text-xs" id="game-plant-situation">Megjelent egy fiatal sűrű bokor a Rábapatona melletti ártéri tölgyes szélén.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap gap-3 pt-2" id="game-buttons">
+                        <button onclick="handleGuardianChoice('protect')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-4 rounded-xl transition-all">
+                            🛡️ Védjük és hagyjuk növekedni!
+                        </button>
+                        <button onclick="handleGuardianChoice('eradicate')" class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-xl transition-all">
+                            ✂️ Távolítsuk el (irtsuk ki kíméletesen)!
+                        </button>
+                    </div>
+
+                    <div id="game-feedback" class="hidden p-3 rounded-xl border font-medium text-xs"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- LÁBLÉC ÉS NYOMTATÁS GOMB -->
+    <footer class="bg-stone-100 border-t border-stone-200 py-6 mt-12 text-xs text-stone-500">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+                <p class="font-semibold text-stone-700">Észak-Dunántúl és a Rába-völgy természetismereti oktatóportál (4. osztály)</p>
+                <p>Természetvédelmi és helyismereti modul a környezettudatos neveléshez.</p>
+            </div>
+            <button onclick="window.print()" class="no-print bg-forest-600 hover:bg-forest-500 text-white font-bold py-2.5 px-4 rounded-xl shadow-sm transition-all flex items-center gap-2">
+                <span>🖨️</span>
+                <span>Órai Munkafüzet Nyomtatása (A4)</span>
+            </button>
+        </div>
+    </footer>
+
+    <!-- ========================================================================= -->
+    <!-- NYOMTATHATÓ FELADATLAP (CSAK NYOMTATÁSKOR LÁTHATÓ) -->
+    <!-- ========================================================================= -->
+    <div id="printable-protocol" class="hidden">
+        <div style="border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                <div>
+                    <h1 style="font-size: 18pt; font-weight: bold; margin: 0; text-transform: uppercase;">Természetbúvár Munkafüzet</h1>
+                    <p style="font-size: 11pt; margin: 4px 0 0 0;">Téma: Észak-Dunántúl és a Rába-menti erdők élővilága</p>
+                </div>
+                <div style="text-align: right; font-size: 10pt;">
+                    <p style="margin: 0;">Név: ___________________________</p>
+                    <p style="margin: 4px 0 0 0;">Osztály: 4. _____ &nbsp;|&nbsp; Dátum: __________</p>
+                </div>
+            </div>
+        </div>
+
+        <h3 style="font-size: 11pt; font-weight: bold; margin-top: 14px;">1. Tájegységek és erdőtípusok (Kösd össze a párokat!):</h3>
+        <table style="width: 100%; font-size: 10pt; margin-top: 6px; border-collapse: collapse;">
+            <tr>
+                <td style="width: 45%; padding: 4px;">A) Kőszegi-hegység és Magas-Bakony</td>
+                <td style="width: 10%; text-align: center;">•</td>
+                <td style="width: 45%; padding: 4px;">1) Puhafás ligeterdők (fűz, fekete nyár)</td>
+            </tr>
+            <tr>
+                <td style="width: 45%; padding: 4px;">B) Rába közvetlen hullámtere</td>
+                <td style="width: 10%; text-align: center;">•</td>
+                <td style="width: 45%; padding: 4px;">2) Hűvös bükkösök és fenyvesek</td>
+            </tr>
+            <tr>
+                <td style="width: 45%; padding: 4px;">C) Rábapatona és Győr magasabb ártéri szintje</td>
+                <td style="width: 10%; text-align: center;">•</td>
+                <td style="width: 45%; padding: 4px;">3) Keményfás ligeterdő (kocsányos tölgy, kőris)</td>
+            </tr>
+        </table>
+
+        <h3 style="font-size: 11pt; font-weight: bold; margin-top: 18px;">2. Ártéri túlélés:</h3>
+        <p style="font-size: 10pt; line-height: 1.4;">
+            Miért nem fulladnak meg a fehér fűzfák, ha hetekig áll rajtuk a Rába áradása?<br>
+            Válasz: ____________________________________________________________________________________<br>
+            ___________________________________________________________________________________________
+        </p>
+
+        <h3 style="font-size: 11pt; font-weight: bold; margin-top: 18px;">3. Fafajok és Kéregtípusok táblázata:</h3>
+        <table style="width: 100%; border: 1px solid #444; border-collapse: collapse; font-size: 10pt; text-align: center; margin-top: 6px;">
+            <tr style="background-color: #f3f3f3;">
+                <th style="border: 1px solid #444; padding: 6px;">Fafaj neve</th>
+                <th style="border: 1px solid #444; padding: 6px;">Kéreg jellege</th>
+                <th style="border: 1px solid #444; padding: 6px;">Levél formája</th>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #444; padding: 8px;">Közönséges nyírfa</td>
+                <td style="border: 1px solid #444; padding: 8px;">Fehér, papírszerűen foszló</td>
+                <td style="border: 1px solid #444; padding: 8px;">___________________</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #444; padding: 8px;">Kocsányos tölgy</td>
+                <td style="border: 1px solid #444; padding: 8px;">___________________</td>
+                <td style="border: 1px solid #444; padding: 8px;">Öblösen karéjos</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid #444; padding: 8px;">Közönséges bükk</td>
+                <td style="border: 1px solid #444; padding: 8px;">Sima, elefántszürke</td>
+                <td style="border: 1px solid #444; padding: 8px;">___________________</td>
+            </tr>
+        </table>
+
+        <h3 style="font-size: 11pt; font-weight: bold; margin-top: 18px;">4. Természetvédelem az ártéren:</h3>
+        <p style="font-size: 10pt; line-height: 1.5;">
+            Mit jelent az, hogy egy faj <strong>inváziós</strong>? Nevezz meg egyet a Rába partjáról, és írd le, miért veszélyes az őshonos fákra!<br>
+            Név: ___________________________<br>
+            Miért veszélyes? ___________________________________________________________________________<br>
+            ___________________________________________________________________________________________
+        </p>
+
+        <div style="margin-top: 25px; text-align: right; font-size: 10pt;">
+            <span>Értékelés: ⭐️ ⭐️ ⭐️ ⭐️ ⭐️ &nbsp;&nbsp;&nbsp;&nbsp; Tanári aláírás: _____________________</span>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIKA -->
+    <script>
+        // 1. FŐ LAPOK VÁLTÁSA
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+            const selectedPane = document.getElementById(tabId);
+            if (selectedPane) selectedPane.classList.remove('hidden');
+
+            const tabIds = ['tab-map', 'tab-flood', 'tab-catalog', 'tab-parks', 'tab-invasive'];
+            tabIds.forEach(id => {
+                const btn = document.getElementById(`btn-${id}`);
+                if (btn) {
+                    if (id === tabId) {
+                        btn.className = "tab-button px-3 py-2 rounded-xl transition-all flex items-center gap-1.5 bg-white text-stone-900 shadow-sm whitespace-nowrap font-bold";
+                    } else {
+                        btn.className = "tab-button px-3 py-2 rounded-xl transition-all flex items-center gap-1.5 text-stone-600 hover:text-stone-900 whitespace-nowrap font-semibold";
+                    }
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 2. TÉRKÉP ADATOK
+        const regionsData = {
+            raba: {
+                title: "Rába-vidék és a Kisalföld",
+                type: "Síkvidék & Ártéri zóna",
+                alt: "Tengerszint: 110–130 m",
+                rain: "550 – 620 mm",
+                forest: "Fűz-nyár liget & Tölgy-kőris-szil",
+                trees: "Fehér fűz, fekete nyár, kocsányos tölgy, magyar kőris",
+                desc: "Közvetlen szűkebb pátriánk! A Rába hordalékos, kanyargó völgye szeli át a tájat. Az évi csapadék kb. 550–600 mm. Az erdők zöme a vízjáráshoz kötődik: kanyargó puhafás fűz- és nyárligetek, kissé távolabb méltóságteljes kocsányos tölgyek és védett magyar kőrisek élnek itt.",
+                question: "„Ki sétált már a Rába partján Rábapatonán vagy Győrben? Milyen fákat láttatok a vízbe hajolni?”"
+            },
+            szigetkoz: {
+                title: "Szigetköz (Az Öreg-Duna birodalma)",
+                type: "Folyami szigetvilág & vizes élőhely",
+                alt: "Tengerszint: 115–125 m",
+                rain: "580 – 640 mm",
+                forest: "Duna menti kiterjedt puhafás ligeterdők",
+                trees: "Fehér fűz, enyves éger, fehér és fekete nyár",
+                desc: "Európa legnagyobb belföldi deltavidéke. A Duna ágrendszerei számtalan apró szigetet fognak közre. A fák állandó kapcsolatban állnak a talajvízzel, gazdag madárvilág fészkel rajtuk.",
+                question: "„Ki evezett már kenuval a Szigetközben? Milyen érzés a bedőlt fák és az ártéri dzsungel között siklani?”"
+            },
+            bakony: {
+                title: "Magas-Bakony és Déli hegyvidék",
+                type: "Hegyvidéki mészkő-fennsík",
+                alt: "Tengerszint: 300–704 m",
+                rain: "700 – 850 mm",
+                forest: "Hegyi bükkösök és gyertyános-tölgyesek",
+                trees: "Bükkfa, gyertyán, kocsánytalan tölgy, hegyi juhar",
+                desc: "Hűvös és csapadékos táj. A Bakony belső részein hatalmas, oszlopcsarnok-szerű bükkösök élnek. A bükkfa szereti a párás levegőt és a sok esőt, ezért a száraz síkságon nem találkozhatunk vele.",
+                question: "„Ki járt már a Cuha-patak völgyében vagy Cseszneken? Éreztétek, milyen hűvös a hegyi erdők levegője nyáron is?”"
+            },
+            koszeg: {
+                title: "Kőszegi- és Soproni-hegység",
+                type: "Alpokalja / Hegyvidék",
+                alt: "Tengerszint: 350–882 m",
+                rain: "750 – 900 mm (A legcsapadékosabb!)",
+                forest: "Szelídgesztenyések, bükkösök és fenyvesek",
+                trees: "Bükk, szelídgesztenye, jegenyefenyő, vörösfenyő",
+                desc: "Itt érjük el az Alpok lábát. Mivel a nyugati esőfelhők ide érkeznek először, ez a vidék kapja a legtöbb csapadékot Észak-Dunántúlon. Híres az ősi szelídgesztenyéseiről.",
+                question: "„Ettetek már sült szelídgesztenyét? Kőszeg és Sopron erdeiben évszázados gesztenyefák teremnek!”"
+            },
+            vertes: {
+                title: "Vértes-hegység",
+                type: "Karsztos dolomithegység",
+                alt: "Tengerszint: 250–480 m",
+                rain: "600 – 680 mm",
+                forest: "Karsztbokorerdők és cseres-tölgyesek",
+                trees: "Molyhos tölgy, csertölgy, virágos kőris",
+                desc: "A déli lejtők szárazak és sziklásak, ahol alacsony karsztbokorerdők élnek. Az északi hűvös völgyekben viszont szurdokerdők és bükkösök rejtőznek.",
+                question: "„Láttatok már sziklán megkapaszkodó göcsörtös fákat? Hogyan bírják ki a vizet a kövek között?”"
+            }
+        };
+
+        function showRegion(key) {
+            const data = regionsData[key];
+            if (!data) return;
+
+            document.querySelectorAll('.map-region').forEach(el => el.classList.remove('active-region'));
+            const activeReg = document.getElementById(`reg-${key}`);
+            if (activeReg) activeReg.classList.add('active-region');
+
+            document.getElementById('region-title').innerText = data.title;
+            document.getElementById('region-type').innerText = data.type;
+            document.getElementById('region-alt').innerText = data.alt;
+            document.getElementById('region-desc').innerText = data.desc;
+            document.getElementById('region-rain').innerText = data.rain;
+            document.getElementById('region-forest').innerText = data.forest;
+            document.getElementById('region-trees').innerText = data.trees;
+            document.getElementById('region-question').innerText = data.question;
+        }
+
+        // 3. ÁRTÉRI ZÓNA VÁLASZTÓ
+        const riverZones = {
+            river: {
+                badge: "Folyómeder és Kavicszátony",
+                level: "Állandó vízfolyás",
+                name: "A Rába nyílt vízfelülete és zátonyai",
+                info: "Itt a nagy sodrás miatt nem tudnak megmaradni a fák. Csak az alacsony vízálláskor szárazra kerülő kavicszátonyokon kelnek ki az apró fűzmagvak, amiket az újabb árhullám gyakran elsodor."
+            },
+            soft: {
+                badge: "Puhafás ligeterdő",
+                level: "Gyakori vízborítás: évi 30–80 nap!",
+                name: "Fűz-nyár ligeterdő (Közvetlen folyópart)",
+                info: "A víz közvetlen szomszédságában élnek. Fáik fája lágy, könnyű és rugalmas ('puhafa'). Az áradó Rába sodrása sem töri le őket, lehajlanak a hullámok alatt. Törzsükből az iszap alatt új pótgyökereket növesztenek!"
+            },
+            hard: {
+                badge: "Keményfás ligeterdő",
+                level: "Ritka elöntés: évi 5–15 nap",
+                name: "Tölgy-kőris-szil liget (Magasabb térszín)",
+                info: "A folyótól kissé távolabb helyezkedik el. A kocsányos tölgy fája kemény, nehéz és évszázadokig ellenáll a korhadásnak. A magyar kőris és vénic-szil társaságában a Rába legértékesebb védett ligetét alkotja."
+            }
+        };
+
+        function selectRiverZone(zoneKey) {
+            const data = riverZones[zoneKey];
+            if (!data) return;
+            document.getElementById('zone-badge').innerText = data.badge;
+            document.getElementById('zone-water-level').innerText = data.level;
+            document.getElementById('zone-name').innerText = data.name;
+            document.getElementById('zone-info').innerText = data.info;
+        }
+
+        // 4. DIGITÁLIS HATÁROZÓ ADATBÁZIS (25 FAJ - 4 KATEGÓRIÁBA RENDEZVE)
+        // KÉPEK BEILLESZTÉSE: az imgWhole, imgBark, imgLeaf mezőkbe írd be a kép fájlnevét!
+        const speciesList = [
+            // --- 1. PIONÍR FÁK (5) ---
+            {
+                id: 1,
+                cat: 'pionir',
+                catLabel: '1. Pionír fafaj',
+                catBadgeBg: 'bg-amber-100 text-amber-900 border-amber-300',
+                localTag: 'Tisztások, homokos peremek',
+                name: 'Közönséges nyírfa',
+                latin: 'Betula pendula',
+                imgWhole: '', imgBark: '', imgLeaf: '',
+                captionWhole: 'Kecses korona, lecsüngő ágakkal',
+                captionBark: 'Hófehér, papírszerűen lefoszló kéreg',
+                captionLeaf: 'Rombusz alakú fűrészes levelek',
+                bark: 'Hófehér törzséről bárki azonnal megismeri. Idős korára a tuskó közelében vastag, fekete, mélyen hasadozott kéregpikkelyeket növeszt.',
+                leaf: 'Levelei háromszög vagy deltoid alakúak, szélük kétszeresen fűrészes. Szélbeporzású barkavirágzatai tavasszal csüngenek.',
+                habitat: 'Fényimádó úttörő. Csupasz homokpadokon, kavicsbányákban és erdei irtásokon elsőként telepszik meg.',
+                funfact: 'A nyír kérge betulint tartalmaz, ami vízhatlanná teszi. Régen kenukat készítettek belőle, és papírként írtak rá!'
+            },
+            {
+                id: 2,
+                cat: 'pionir',
+                catLabel: '1. Pionír fafaj',
+                catBadgeBg: 'bg-amber-100 text-amber-900 border-amber-300',
+                localTag: 'Erdőszélek, domboldalak',
+                name: 'Rezgő nyár',
+                latin: 'Populus tremula',
+                imgWhole: '', imgBark: '', imgLeaf: '',
+                captionWhole: 'Kerekded, szellős lombozat',
+                captionBark: 'Fiatalon zöldesszürke, sima törzs',
+                captionLeaf: 'Lapított szárú kerek levélkék',
+                bark: 'Törzse fiatalon sima, ezüstös-zöldesszürke színű, rombusz alakú légzőnyílásokkal.',
+                leaf: 'Kerekded leveleinek nyele oldalról lapított, ezért a legkisebb szélfuvallatra is összekoccannak és susognak („Reszket, mint a nyárfalevél”).',
+                habitat: 'Gyorsan növekszik vágásokban, erdőszéleken. Gyökérsarjakkal villámgyorsan facsoportokat alkot.',
+                funfact: 'A népi szólás, miszerint „reszket, mint a nyárfalevél”, a különlegesen lapított levélnyelek miatt alakult ki!'
+            },
+            {
+                id: 3,
+                cat: 'pionir',
+                catLabel: '1. Pionír fafaj',
+                catBadgeBg: 'bg-amber-100 text-amber-900 border-amber-300',
+                localTag: 'Rába közvetlen partja!',
+                name: 'Fehér fűz',
+                latin: 'Salix alba',
+                imgWhole: '', imgBark: '', imgLeaf: '',
+                captionWhole: 'Hatalmas vízparti lombkorona',
+                captionBark: 'Mélyen repedezett, odvasodó kéreg',
+                captionLeaf: 'Lándzsás, ezüstös fonákú levelek',
+                bark: 'Vastag, szürkésbarna kérge mély árkokkal barázdált. Fája puha, az idős fák törzse odvasodik, baglyoknak adva szállást.',
+                leaf: 'Keskeny, lándzsás leveleinek fonáka selymes-ezüstös szőrzetű, így a lombkorona szélben csodásan ezüstösen hullámzik.',
+                habitat: 'A Rába hullámterének legfontosabb fája. Akár két hónapos árvízi elöntést is könnyen kibír.',
+                funfact: 'Kérgéből vonták ki először a szalicilsavat, a híres lázcsillapító aszpirin hatóanyagának előfutárát!'
+            },
+            {
+                id: 4,
+                cat: 'pionir',
+                catLabel: '1. Pionír fafaj',
+                catBadgeBg: 'bg-amber-100 text-amber-900 border-amber-300',
+                localTag: 'Vizes rétek, árkok széle',
+                name: 'Kecskefűz',
+                latin: 'Salix caprea',
+                imgWhole: '', imgBark: '', imgLeaf: '',
+                captionWhole: 'Kisebb fa vagy terebélyes bokor',
+                captionBark: 'Szürkésbarna, finoman repedezett',
+                captionLeaf: 'Széles tojásdad, hullámos levél',
+                bark: 'Kérge szürke, idősebb korában hálózatosan felrepedezik.',
+                leaf: 'Más füzektől eltérően levele nem keskeny, hanem széles tojásdad, a fonáka molyhosan szőrös.',
+                habitat: 'Árterek szélén, vágásokban, nedves réteken jelenik meg pionírként.',
+                funfact: 'Kora tavasszal a kecskefűz selymes barkavirágzatát gyűjtjük „húsvéti barkaként”! A méhek legelső tavaszi csemegéje.'
+            },
+            {
+                id: 5,
+                cat: 'pionir',
+                catLabel: '1. Pionír fafaj',
+                catBadgeBg: 'bg-amber-100 text-amber-900 border-amber-300',
+                localTag: 'Állandóan nedves vízpartok',
+                name: 'Enyves éger',
+                latin: 'Alnus glutinosa',
+                imgWhole: '', imgBark: '', imgLeaf: '',
+                captionWhole: 'Karcsú kúpos törzs a víz mellett',
+                captionBark: 'Sötétbarna, pikkelyesen bordázott',
+                captionLeaf: 'Kicsípett csúcsú kerek levél',
+                bark: 'Sötét, szürkésfekete kérge pikkelyekre tagolódik. Frissen vágott fája élénk narancsvörösre színeződik a levegőn!',
+                leaf: 'Különlegessége: a levél csúcsa nem hegyes, hanem befelé kanyarodik (kicsípett levélcsúcs). Fiatalon ragadós, enyves tapintású.',
+                habitat: 'Lápok, folyópartok őre. Gyökerei a víz alatt sem fulladnak meg a speciális szellőzőjáratok miatt.',
+                funfact: 'Mivel a víz alatt nem korhad el, hanem kőkeményre érik, Velence palotáinak alapjait égerfacölöpökre építették!'
+            },
+
+            // --- 2. CSERJÉK ÉS BOKROK (6) ---
+            {
+                id: 6,
+                cat: 'cserje',
+                catLabel: '2. Erdei cserje',
+                catBadgeBg: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+                localTag: 'Déli meleg erdőszélek',
+                name: 'Húsos som',
+                latin: 'Cornus mas',
+                imgWhole: '', imgBark: '', imgLeaf: '',
+                captionWhole: 'Terebélyes, sűrű ágú bokor',
+                captionBark: 'Pikkelyesen hámló sárgásbarna',
+                captionLeaf: 'Ívesen futó erezetű levél',
+                bark: 'Szürkésbarna kérge lemezekben válik le. Fája a legkeményebb fák egyike: olyan nehéz, hogy elsüllyed a vízben!',
+                leaf: 'Tojásdad leveleinek oldalerei ívben futnak a csúcs felé. Kora tavasszal a levelek előtt hozza sárga virágait.',
+                habitat: 'Tölgyesek alsó cserjeszintjében, domboldalakon (pl. Bakony és Sokoró lankáin) gyakori.',
+                funfact: 'Ősszel érő piros somterméséből kiváló vitaminbomba lekvár és finom szörp főzhető!'
+            },
+            {
+                id: 7,
+                cat: 'cserje',
+                catLabel: '2. Erdei cserje',
+                catBadgeBg: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+                localTag: 'Legelők, ártéri töltések',
+                name: 'Egybibés galagonya',
+                latin: 'Crataegus monogyna',
+                imgWhole: '', imgBark: '', imgLeaf: '',
+                captionWhole: 'Szúrós, sűrű cserje vagy kis fa',
+                captionBark: 'Barnásvörös, tövises ágakkal',
+                captionLeaf: 'Mélyen karéjos kis levélkék',
+                bark: 'Ágait éles ágtövisek védik a vadak rágásától. Idős korban kis fácskává cseperedik.',
+                leaf: 'Mélyen hasogatott kis levelek. Ősszel élénkpiros, bogyószerű almácskatermést hoz.',
+                habitat: 'Erdőszéleken és legelőkön szinte áthatolhatatlan sövényt képez. Énekesmadarak kedvenc fészkelőhelye.',
+                funfact: 'A galagonya virága és termése a legfontosabb természetes szív- és érrendszeri gyógynövényünk!'
+            },
+            {
+                id: 8,
+                cat: 'cserje',
+                catLabel: '2. Erdei cserje',
+                catBadgeBg: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+                localTag: 'Árterek nedves ligetei',
+                name: 'Fekete bodza',
+                latin: 'Sambucus nigra',
+                imgWhole: '', imgBark: '', imgLeaf: '',
+                captionWhole: 'Gyorsan növő, terebélyes bokor',
+                captionBark: 'Parás, szemölcsös világosszürke',
+                captionLeaf: 'Páratlanul szárnyalt levelek',
+                bark: 'Kérge szürke és parásan repedezett. Ágai belsejében puha, fehér szivacsszerű bél található.',
+                leaf: 'Összetett levelei 5–7 fogazott levélkéből állnak. Májusban hatalmas fehér tányérvirágzatot bont.',
+                habitat: 'Tápanyagban gazdag ártéri erdőkben és ligetekben nő szerte a Rába mentén.',
+                funfact: 'Virágából fenséges bodzaszörp készül, fekete bogyóiból pedig lekvár. Nyersen ne kóstold meg, mert hasfájást okozhat!'
+            },
+            {
+                id: 9,
+                cat: 'cserje',
+                catLabel: '2. Erdei cserje',
+                catBadgeBg: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+                localTag: 'Száraz erdőszélek, mezsgyék',
+                name: 'Kökény',
+                latin: 'Prunus spinosa',
+                imgWhole: '', imgBark: '', imgLeaf: '',
+                captionWhole: 'Mereven szúrós, sűrű cserje',
+                captionBark: 'Feketésbarna, hegyes ágtövisek',
+                captionLeaf: 'Apró, ovális fogazott levélkék',
+                bark: 'Hajtásai sötétek és éles, hegyes tövisekben végződnek.',
+                leaf: 'Apró levelek. Tavasszal lombfakadás előtt ragyogó fehér virágtakaróba öltözik.',
+                habitat: 'Erdőszéleken, szántóföldek mezsgyéin, domboldalakon alkot sűrű bozótot.',
+                funfact: 'Hamvas kék bogyója nyersen összehúzza az ember száját. Csak akkor édes, ha megcsípi az első őszi fagy!'
+            },
+            {
+                id: 10,
+                cat: 'cserje',
+                catLabel: '2. Erdei cserje',
+                catBadgeBg: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+                localTag: 'Nyirkos ligetek, patakpart',
+                name: 'Kányabangita',
+                latin: 'Viburnum opulus',
+                imgWhole: '', imgBark: '', imgLeaf: '',
+                captionWhole: 'Közepes méretű, laza bokor',
+                captionBark: 'Világosbarna, hosszanti csíkos',
+                captionLeaf: 'Juharszerűen 3-5 karéjos levél',
+                bark: 'Kérge világos szürkésbarna, kissé hasadozó.',
+                leaf: 'Levelei három- vagy ötkaréjosak. Lapos ernyővirágzatának külső virágai óriásiak, csalogatóul szolgálnak a rovaroknak.',
+                habitat: 'A Rába-menti ligetek és vizenyős erdők elegáns növénye.',
+                funfact: 'Ragyogó piros, áttetsző bogyói télen sem potyognak le, életmentő táplálékot nyújtva a telelő madaraknak.'
+            },
+            {
+                id: 11,
+                cat: 'cserje',
+                catLabel: '2. Erdei cserje',
+                catBadgeBg: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+                localTag: 'Ártéri tölgyesek alsó szintje',
+                name: 'Csíkos kecskerágó',
+                latin: 'Euonymus europaeus',
+                imgWhole: '', imgBark: '', imgLeaf: '',
+                captionWhole: 'Elegáns, finom ágú cserje',
+                captionBark: 'Zöld vesszők 4 parafaprofillal',
+                captionLeaf: 'Lándzsás, ősszel lángoló bíbor',
+                bark: 'Fiatal zöld ágain 4 hosszanti, világos parás léc fut végig – mintha szögletesre faragták volna!',
+                leaf: 'Elliptikus levelei ősszel az antociánoknak köszönhetően pompás bordó-rózsaszínre pirulnak.',
+                habitat: 'Folyóparti tölgy-kőris-szil ligeterdők díszes cserjéje.',
+                funfact: 'Termése olyan, mint egy négyszarvú rózsaszín püspöksüveg, amelyből narancssárga magvak bújnak elő!'
+            },
+
+            // --- 3. LOMBHULLATÓ ERDŐALKOTÓ FÁK (10) [Zárótársulások + Kísérő fák] ---
+            {
+                id: 12,
+                cat: 'erdoalkoto',
+                catLabel: '3. Erdőalkotó lombos fa',
+                catBadgeBg: 'bg-green-700 text-white border-green-800',
+                localTag: 'Rábaköz és Kisalföld királya!',
+                name: 'Kocsányos tölgy',
+                latin: 'Quercus robur',
+                imgWhole: '', imgBark: '', imgLeaf: '',
+                captionWhole: 'Hatalmas, zömök ágú erdőóriás',
+                captionBark: 'Mélyen hasadozott sötétbarna kéreg',
+                captionLeaf: 'Karéjos levél cimpás levélvállal',
+                bark: 'Mély barázdákkal szabdalt, vastag, sötétbarna kéregpáncél védi a hidegtől és a tűztől.',
+                leaf: 'Öblösen karéjos leveleinek tövénél két kis fülecske (cimpás levélváll) látható. Makkjai hosszú száron (kocsányon) csüngenek!',
+                habitat: 'Síkvidékek és folyópartok magasabb ártéri szintje. Évszázados védett matuzsálem példányai élnek a Rábaközben.',
+                funfact: 'Akár 800–1000 évig is él! Egyetlen idős tölgyfa több mint 400 élőlényfajnak (rovaroknak, mókusoknak, madaraknak) ad otthont.'
+            },
+            {
+                id: 13,
+                cat: 'erdoalkoto',
+                catLabel: '3. Erdőalkotó lombos fa',
+                catBadgeBg: 'bg-green-700 text-white border-green-800',
+                localTag: 'Bakony, Vértes, hegyvidékek',
+                name: 'Kocsánytalan tölgy',
+                latin: 'Quercus petraea',
+                imgWhole: '', imgBark: '', imgLeaf: '',
+                captionWhole: 'Egyenes törzsű hegyvidéki fa',
+                captionBark: 'Finomabban repedezett szürke kéreg',
+                captionLeaf: 'Hosszú nyelű, ék vállú levél',
+                bark: 'A kocsányos tölgynél finomabban, sekélyebben barázdált szürke kéreg.',
+                leaf: 'A kocsányos tölgy fordítottja: a levele hosszú nyélen ül, míg a makkjai ülők, nincsen kocsányuk!',
+                habitat: 'Domb- és hegyvidékek lejtőin él, a pangó vizet nem tűri.',
+                funfact: 'A boroshordók legnemesebb alapanyaga: a kocsánytalan tölgyből faragott hordókban érlelik a legkiválóbb magyar borokat!'
+            },
+            {
+                id: 14,
+                cat: 'erdoalkoto',
+                catLabel: '3. Erdőalkotó lombos fa',
+                catBadgeBg: 'bg-green-700 text-white border-green-800',
+                localTag: 'Magas-Bakony és Kőszegi-hegység',
+                name: 'Közönséges bükk',
+                latin: 'Fagus sylvatica',
+                imgWhole: '', imgBark: '', imgLeaf: '',
+                captionWhole: 'Oszlopcsarnokot képező sudár fa',
+                captionBark: 'Ezüstszürke, teljesen sima kéreg',
+                captionLeaf: 'Hullámos szélű, kemény fényes levél',
+                bark: 'Törzse még 100 éves korában is sima és hamuszürke, akár egy elefánt lába!',
+                leaf: 'Tojásdad, fénylő levelek. Termése a tüskés kupacsban rejtőző háromélű bükkmakk.',
+                habitat: 'Hűvös, párás, sok csapadékot kapó hegyoldalak uralkodó fája.',
+                funfact: 'A bükkerdők koronája nyáron annyira zárt és sötét, hogy a fák alatt alig nő más növény, csupasz avarszőnyeg borítja a talajt!'
+            },
+            {
+                id: 15,
+                cat: 'erdoalkoto',
+                catLabel: '3. Erdőalkotó lombos fa',
+                catBadgeBg: 'bg-green-700 text-white border-green-800',
+                localTag: 'Rába-völgy védett kincse',
+                name: 'Magyar kőris',
+                latin: 'Fraxinus angustifolia',
+                imgWhole: '', imgBark: '', imgLeaf: '',
+                captionWhole: 'Karcsú, elegáns keményfa',
+                captionBark: 'Aprón hálózatos, szürkésbarna',
+                captionLeaf: 'Páratlanul szárnyalt keskeny levelek',
+                bark: 'Kérge finoman hálózatos, rügyei sötétbarnák.',
+                leaf: 'Páratlanul szárnyalt összetett levél keskeny levélkékkel. Szárnyas termései csomókban csüngenek.',
+                habitat: 'Pannon bennszülött fafaj! A Rába keményfás ligeterdeiben a kocsányos tölggyel él együtt.',
+                funfact: 'Kifejezetten az észak-dunántúli folyóvölgyek időszakos tavaszi elöntéseihez alkalmazkodott ritka fafajta.'
+            },
+            {
+                id: 16,
+                cat: 'erdoalkoto',
+                catLabel: '3. Erdőalkotó lombos fa',
+                catBadgeBg: 'bg-green-700 text-white border-green-800',
+                localTag: 'Nedves ligetek ritka fája',
+                name: 'Vénic-szil',
+                latin: 'Ulmus laevis',
+                imgWhole: '', imgBark: '', imgLeaf: '',
+                captionWhole: 'Szétterülő, hatalmas korona',
+                captionBark: 'Pikkelyes kéreg, deszkagyökerekkel',
+                captionLeaf: 'Ferde, aszimmetrikus levélváll',
+                bark: 'Szürkésbarna kérge lemezekben hámlik. Idős korára bordaszerű támasztógyökereket („deszkagyökereket”) növeszt.',
+                leaf: 'Minden szilfalevél ferde: a levélalap egyik oldala lejjebb ér a szárra, mint a másik!',
+                habitat: 'Ártéri ligetekben él. A szilfavész gomba miatt megritkult, ezért minden példánya becses.',
+                funfact: 'Szőrös peremű lapos termése tavasszal a folyó vizén úszva jut el új területekre!'
+            },
+            {
+                id: 17,
+                cat: 'erdoalkoto',
+                catLabel: '3. Erdőalkotó lombos fa',
+                catBadgeBg: 'bg-green-700 text-white border-green-800',
+                localTag: 'Dombok és tölgyesek társa',
+                name: 'Közönséges gyertyán',
+                latin: 'Carpinus betulus',
+                imgWhole: '', imgBark: '', imgLeaf: '',
+                captionWhole: 'Sűrű ágrendszerű zárt lomb',
+                captionBark: 'Ezüstszürke, izomszerűen bordás',
+                captionLeaf: 'Szabályosan redőzött hegyes levél',
+                bark: 'Törzse nem hengeres, hanem izomszerűen hullámos, bordás mintázatú, sima szürke felülettel.',
+                leaf: 'Levelei finoman redőzöttek, az erek élesen kiemelkednek. Termése háromkaréjú lependék.',
+                habitat: 'A tölggyel közösen alkotja a híres gyertyános-tölgyes erdőtársulást.',
+                funfact: 'Fája elképesztően nehéz és szívós. Régen fogaskerekeket és mészárostőkéket faragtak belőle!'
+            },
+            {
+                id: 18,
+                cat: 'erdoalkoto',
+                catLabel: '3. Erdőalkotó lombos fa',
+                catBadgeBg: 'bg-green-700 text-white border-green-800',
+                localTag: 'Dombok, erdőszélek és ligetek',
+                name: 'Mezei juhar',
+                latin: 'Acer campestre',
+                imgWhole: '', imgBark: '', imgLeaf: '',
+                captionWhole: 'Gömbszerű, sűrű lombozat',
+                captionBark: 'Kockákra repedezett, parás kéreg',
+                captionLeaf: '3-5 tompa karéjú kis levél',
+                bark: 'Kérge szürkésbarna, apró négyzetekre hasadozik.',
+                leaf: '3 vagy 5 tompa karéjú levélke. A levélnyél letörve fehéres tejnedvet enged ki.',
+                habitat: 'A tölgyesek leggyakoribb kísérő fája, sövényekben és fasorokban is remekül érzi magát.',
+                funfact: 'Ikerlependék termése a híres forgó „helikopter”, amelynek szárnyai vízszintesen állnak szét!'
+            },
+            {
+                id: 19,
+                cat: 'erdoalkoto',
+                catLabel: '3. Erdőalkotó lombos fa',
+                catBadgeBg: 'bg-green-700 text-white border-green-800',
+                localTag: 'Hűvösebb erdők, parkok',
+                name: 'Korai juhar',
+                latin: 'Acer platanoides',
+                imgWhole: '', imgBark: '', imgLeaf: '',
+                captionWhole: 'Széles, terebélyes díszes korona',
+                captionBark: 'Finoman hosszanti bordás kéreg',
+                captionLeaf: 'Hegyes öblű nagy juharlevél',
+                bark: 'Kérge sosem válik le nagy lapokban: sötétszürke, sűrű hosszanti bordákkal borított.',
+                leaf: 'Hatalmas levelei éles hegyekben végződnek. Kora tavasszal lombfakadás előtt nyílnak zöldessárga virágai.',
+                habitat: 'Gyertyános-tölgyesekben és bükkösökben kísérő faj.',
+                funfact: 'Miért korai? Mert a juharok közül legelsőként, már április elején virágba borul, még a levelei előtt!'
+            },
+            {
+                id: 20,
+                cat: 'erdoalkoto',
+                catLabel: '3. Erdőalkotó lombos fa',
+                catBadgeBg: 'bg-green-700 text-white border-green-800',
+                localTag: 'Dombok, falvak, templomkertek',
+                name: 'Kislevelű hárs',
+                latin: 'Tilia cordata',
+                imgWhole: '', imgBark: '', imgLeaf: '',
+                captionWhole: 'Sűrű árnyékot adó magas korona',
+                captionBark: 'Sötétszürke, finoman barázdált',
+                captionLeaf: 'Szív alakú levél rozsdabarna szőrrel',
+                bark: 'Törzse egyenes, sötétszürke kérge hálózatosan repedezett.',
+                leaf: 'Szabályos szív alakú levelek. A fonák érzugaiban apró rozsdabarna szőrpamacsok bújnak meg!',
+                habitat: 'Tölgyesek és bükkösök értékes társa, falusi terek évszázados emlékfája.',
+                funfact: 'Illatos virágzatából készül a megfázás elleni legfinomabb gyógytea a téli időszakban!'
+            },
+            {
+                id: 21,
+                cat: 'erdoalkoto',
+                catLabel: '3. Erdőalkotó lombos fa',
+                catBadgeBg: 'bg-green-700 text-white border-green-800',
+                localTag: 'Természetes dombvidéki erdők',
+                name: 'Vadcseresznye',
+                latin: 'Prunus avium',
+                imgWhole: '', imgBark: '', imgLeaf: '',
+                captionWhole: 'Magas törzsű, terebélyes erdei fa',
+                captionBark: 'Vízszintes csíkokban hámló vörösesbarna',
+                captionLeaf: 'Tojásdad levél 2 vörös miriggyel',
+                bark: 'Különleges, fényes vörösesbarna kérge körkörös szalagokban hámlik le a törzsről.',
+                leaf: 'Fűrészes levél, a nyél tövénél két apró vöröses miriggyel, amely édes nedvet választ ki.',
+                habitat: 'Üde tölgyesek és bükkösök ritka, szép elegye.',
+                funfact: 'A nemes cseresznyefajták vadon élő őse! Kemény, vöröses fája miatt a bútorasztalosok kedvence.'
+            },
+
+            // --- 4. FENYŐK ÉS TŰLEVELŰEK (4) ---
+            {
+                id: 22,
+                cat: 'fenyo',
+                catLabel: '4. Fenyő / Tűlevelű',
+                catBadgeBg: 'bg-teal-700 text-white border-teal-800',
+                localTag: 'Fenyvesek, homoki rezervátumok',
+                name: 'Erdeifenyő',
+                latin: 'Pinus sylvestris',
+                imgWhole: '', imgBark: '', imgLeaf: '',
+                captionWhole: 'Görbe törzsű, szellős lapos korona',
+                captionBark: 'Fent élénk rókavörös, lent szürke kéreg',
+                captionLeaf: 'Kéttűs csomók, csavarodó tűkkel',
+                bark: 'Törzsének felső része világító élénk rókavörös színű, vékonyan hámló kéregpikkelyekkel.',
+                leaf: 'Kéttűs fenyő: a szürkészöld tűk kettesével állnak egy hüvelyben, és kissé csavarodnak.',
+                habitat: 'Fenyőfőnél (a Bakony lábánál) ősi jégkorszaki homoki erdeifenyves rezervátum maradt fenn belőle!',
+                funfact: 'Rendkívül igénytelen fa: csupasz sziklán és forró homokon is képes mélyre hatoló gyökeret verni.'
+            },
+            {
+                id: 23,
+                cat: 'fenyo',
+                catLabel: '4. Fenyő / Tűlevelű',
+                catBadgeBg: 'bg-teal-700 text-white border-teal-800',
+                localTag: 'Kopár dolomithegyek, parkok',
+                name: 'Feketefenyő',
+                latin: 'Pinus nigra',
+                imgWhole: '', imgBark: '', imgLeaf: '',
+                captionWhole: 'Sötét, ernyőszerű zárt korona',
+                captionBark: 'Mélyen lemezes, sötétszürke-fekete',
+                captionLeaf: 'Hosszú, merev, szúrós sötétzöld tűk',
+                bark: 'Törzse szinte koromfekete, vastag és mélyen hasadozott kéregpáncéllal.',
+                leaf: 'Tűlevelei kettesével állnak, de hosszúak (10–16 cm), merevek és szúrósak.',
+                habitat: 'Dél-Európából származik. A kopár dolomithegyek talajának megkötésére telepítették.',
+                funfact: 'Bőséges illatos gyantáját régen fáklyák és sebkezelő balzsamok készítésére csapolták le.'
+            },
+            {
+                id: 24,
+                cat: 'fenyo',
+                catLabel: '4. Fenyő / Tűlevelű',
+                catBadgeBg: 'bg-teal-700 text-white border-teal-800',
+                localTag: 'Hűvös hegyvidékek, kertek',
+                name: 'Közönséges lucfenyő',
+                latin: 'Picea abies',
+                imgWhole: '', imgBark: '', imgLeaf: '',
+                captionWhole: 'Szabályos gúla alakú karcsú korona',
+                captionBark: 'Vörösesbarna, pikkelyes kéreg',
+                captionLeaf: 'Négyélű tűk egyesével körben',
+                bark: 'Kérge barnásvörös, apró pikkelyekben válik le.',
+                leaf: 'Rövid, hegyes, négyélű tűi magánosan ülnek az ágakon. Tobozai lefelé csüngenek.',
+                habitat: 'Párás, csapadékos hegyvidékek fája (Kőszegi-hegység).',
+                funfact: 'A hagyományos karácsonyfa! Ha megdörzsölöd a tűit, azonnal eláraszt a meghitt ünnepi gyantaillat.'
+            },
+            {
+                id: 25,
+                cat: 'fenyo',
+                catLabel: '4. Fenyő / Tűlevelű',
+                catBadgeBg: 'bg-teal-700 text-white border-teal-800',
+                localTag: 'Alpokalja és arborétumok',
+                name: 'Európai vörösfenyő',
+                latin: 'Larix decidua',
+                imgWhole: '', imgBark: '', imgLeaf: '',
+                captionWhole: 'Világos, tollas, laza ágrendszer',
+                captionBark: 'Vastag, vörösesbarna, mélyen hasadt',
+                captionLeaf: 'Csomókban álló puha, hullató tűk',
+                bark: 'Vastag vörösesbarna kéreg.',
+                leaf: 'Egyetlen lombhullató fenyőnk! Tűi csomókban ülnek, puhák, nem szúrnak, és ősszel sárgára válva lehullanak!',
+                habitat: 'Hegyvidékek, Kőszegi-hegység, parkok.',
+                funfact: 'Fája elképesztően nehéz és tartós: víz alatti hidakat és hegyi faházakat építenek belőle!'
+            }
+        ];
+
+        // ÁLLAPOTOK
+        let currentFilter = 'all';
+        let searchQuery = '';
+        let filteredList = [...speciesList];
+        let currentIndex = 0;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            populateQuickSelect();
+            renderCard();
+            renderDots();
+            setupKeyboardNav();
+        });
+
+        function populateQuickSelect() {
+            const selectEl = document.getElementById('species-select');
+            selectEl.innerHTML = '';
+            speciesList.forEach((sp) => {
+                const opt = document.createElement('option');
+                opt.value = sp.id;
+                opt.textContent = `${sp.id}. ${sp.name}`;
+                selectEl.appendChild(opt);
+            });
+        }
+
+        function renderCard() {
+            if (filteredList.length === 0) {
+                document.getElementById('card-hungarian-name').innerText = "Nincs találat";
+                document.getElementById('card-latin-name').innerText = "Próbálj más keresőszót!";
+                return;
+            }
+
+            const item = filteredList[currentIndex];
+
+            document.getElementById('card-counter').innerText = `${currentIndex + 1} / ${filteredList.length}`;
+            document.getElementById('card-number-badge').innerText = `#${item.id}`;
+            document.getElementById('quick-cat-label').innerText = item.catLabel;
+
+            const badge = document.getElementById('card-badge');
+            badge.innerText = item.catLabel;
+            badge.className = `px-2.5 py-0.5 rounded-full text-[11px] font-extrabold uppercase tracking-wide border ${item.catBadgeBg}`;
+
+            document.getElementById('card-local-tag').innerText = item.localTag;
+            document.getElementById('card-hungarian-name').innerText = item.name;
+            document.getElementById('card-latin-name').innerText = item.latin;
+
+            setupImageSlot('whole', item.imgWhole, item.captionWhole);
+            setupImageSlot('bark', item.imgBark, item.captionBark);
+            setupImageSlot('leaf', item.imgLeaf, item.captionLeaf);
+
+            document.getElementById('desc-bark').innerText = item.bark;
+            document.getElementById('desc-leaf').innerText = item.leaf;
+            document.getElementById('desc-habitat').innerText = item.habitat;
+            document.getElementById('desc-funfact').innerText = item.funfact;
+
+            document.getElementById('species-select').value = item.id;
+            renderDots();
+        }
+
+        function setupImageSlot(type, imgUrl, captionText) {
+            const imgEl = document.getElementById(`img-${type}`);
+            const phEl = document.getElementById(`ph-${type}`);
+            const capEl = document.getElementById(`caption-${type}`);
+
+            capEl.innerText = captionText;
+
+            if (imgUrl && imgUrl.trim() !== '') {
+                imgEl.src = imgUrl;
+                imgEl.classList.remove('hidden');
+                phEl.classList.add('hidden');
+            } else {
+                imgEl.classList.add('hidden');
+                phEl.classList.remove('hidden');
+            }
+        }
+
+        function nextCard() {
+            if (filteredList.length === 0) return;
+            currentIndex = (currentIndex + 1) % filteredList.length;
+            renderCard();
+        }
+
+        function prevCard() {
+            if (filteredList.length === 0) return;
+            currentIndex = (currentIndex - 1 + filteredList.length) % filteredList.length;
+            renderCard();
+        }
+
+        function jumpToSpecies(id) {
+            const targetId = parseInt(id, 10);
+            const foundIdx = filteredList.findIndex(item => item.id === targetId);
+            if (foundIdx !== -1) {
+                currentIndex = foundIdx;
+                renderCard();
+            } else {
+                filterCategory('all');
+                currentIndex = speciesList.findIndex(item => item.id === targetId);
+                renderCard();
+            }
+        }
+
+        function renderDots() {
+            const container = document.getElementById('dot-container');
+            container.innerHTML = '';
+            filteredList.forEach((_, idx) => {
+                const dot = document.createElement('button');
+                dot.onclick = () => { currentIndex = idx; renderCard(); };
+                dot.className = `w-2.5 h-2.5 rounded-full transition-all flex-shrink-0 ${idx === currentIndex ? 'bg-emerald-700 w-5' : 'bg-stone-300 hover:bg-stone-400'}`;
+                container.appendChild(dot);
+            });
+        }
+
+        // 4 KATEGÓRIA SZŰRŐ KEZELÉSE
+        function filterCategory(catKey) {
+            currentFilter = catKey;
+            applyFilters();
+
+            document.querySelectorAll('.cat-filter-btn').forEach(b => {
+                b.className = "cat-filter-btn px-3 py-1.5 rounded-xl bg-stone-100 text-stone-700 hover:bg-stone-200 whitespace-nowrap";
+            });
+            const activeBtn = document.getElementById(`cat-${catKey}`);
+            if (activeBtn) {
+                activeBtn.className = "cat-filter-btn px-3 py-1.5 rounded-xl bg-stone-900 text-white shadow-sm whitespace-nowrap font-bold";
+            }
+        }
+
+        function handleSearch(val) {
+            searchQuery = val.toLowerCase().trim();
+            applyFilters();
+        }
+
+        function applyFilters() {
+            filteredList = speciesList.filter(item => {
+                const matchCat = (currentFilter === 'all') || (item.cat === currentFilter);
+                const matchSearch = (searchQuery === '') || 
+                                    item.name.toLowerCase().includes(searchQuery) ||
+                                    item.latin.toLowerCase().includes(searchQuery) ||
+                                    item.bark.toLowerCase().includes(searchQuery) ||
+                                    item.leaf.toLowerCase().includes(searchQuery);
+                return matchCat && matchSearch;
+            });
+            currentIndex = 0;
+            renderCard();
+        }
+
+        function setupKeyboardNav() {
+            window.addEventListener('keydown', (e) => {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+                if (e.key === 'ArrowRight') {
+                    nextCard();
+                } else if (e.key === 'ArrowLeft') {
+                    prevCard();
+                }
+            });
+        }
+
+        // 5. PARKFA SZŰRŐ
+        function filterParkTrees(filter) {
+            const cards = document.querySelectorAll('.park-tree-card');
+            cards.forEach(card => {
+                const origin = card.getAttribute('data-origin');
+                if (filter === 'all' || origin === filter) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            ['all', 'native', 'exotic'].forEach(f => {
+                const btn = document.getElementById(`filter-${f}`);
+                if (btn) {
+                    if (f === filter) {
+                        btn.className = "px-3 py-1.5 rounded-xl bg-stone-900 text-white font-bold";
+                    } else {
+                        btn.className = "px-3 py-1.5 rounded-xl bg-stone-200 text-stone-700 hover:bg-stone-300 font-semibold";
+                    }
+                }
+            });
+        }
+
+        // 6. ÁRTÉR ŐRE JÁTÉK
+        const scenarios = [
+            {
+                icon: "🌾",
+                name: "Cserjés gyalogakác hajtás",
+                situation: "Megjelent egy fiatal, virágzó gyalogakác bokor a Rába ártéri erdejének szélén.",
+                correct: "eradicate",
+                feedbackCorrect: "Nagyszerű döntés! ✂️ A gyalogakác veszélyes özöncserje, ha nem irtják ki időben, sűrű bozóttá válik, és egyetlen tölgy- vagy fűzcsemete sem tud mellette felnőni.",
+                feedbackWrong: "Vigyázat! ⚠️ Bár szép lila virága van, a gyalogakác agresszív inváziós növény. Ha megvédjük, elfojtja a folyóparti őshonos fáinkat!"
+            },
+            {
+                icon: "🌳",
+                name: "Fiatal kocsányos tölgy csemete",
+                situation: "Egy mókus elrejtett makkjából kicsírázott egy kis tölgyfa a parttól 100 méterre.",
+                correct: "protect",
+                feedbackCorrect: "Pontosan így van! 🛡️ A kocsányos tölgy a legértékesebb őshonos keményfánk. Évszázadokig óvni kell, hogy az ártér koronás óriása lehessen!",
+                feedbackWrong: "Hoppá! ❌ A tölgyfát semmiképp se irtsuk! Ő a magyar ligeterdők védendő fája!"
+            },
+            {
+                icon: "☠️",
+                name: "Mirigyes bálványfa sarjtelep",
+                situation: "Kellemetlen szagú, gyorsan növő bálványfa törzsek hajtottak ki a vasúti töltés mellett az erdő felé terjedve.",
+                correct: "eradicate",
+                feedbackCorrect: "Kitűnő környezetvédő vagy! ✂️ A bálványfa mérgezi a talajt más növények számára, és megállíthatatlanul terjed, ha nem lépünk közbe.",
+                feedbackWrong: "Sajnos rossz döntés! ⚠️ A bálványfa az egyik legveszélyesebb behurcolt özönfa Magyarországon. Irtani szükséges!"
+            }
+        ];
+
+        let currentScenarioIdx = 0;
+
+        function handleGuardianChoice(action) {
+            const sc = scenarios[currentScenarioIdx];
+            const feedbackEl = document.getElementById('game-feedback');
+            feedbackEl.classList.remove('hidden');
+
+            if (action === sc.correct) {
+                feedbackEl.className = "p-3 rounded-xl border bg-emerald-900/60 border-emerald-500 text-emerald-200 text-xs";
+                feedbackEl.innerHTML = sc.feedbackCorrect + " <br><button onclick='nextScenario()' class='mt-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1 rounded-lg'>Következő feladat ➔</button>";
+            } else {
+                feedbackEl.className = "p-3 rounded-xl border bg-red-900/60 border-red-500 text-red-200 text-xs";
+                feedbackEl.innerHTML = sc.feedbackWrong;
+            }
+        }
+
+        function nextScenario() {
+            currentScenarioIdx = (currentScenarioIdx + 1) % scenarios.length;
+            const sc = scenarios[currentScenarioIdx];
+            document.getElementById('game-plant-icon').innerText = sc.icon;
+            document.getElementById('game-plant-name').innerText = sc.name;
+            document.getElementById('game-plant-situation').innerText = sc.situation;
+            document.getElementById('game-feedback').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
