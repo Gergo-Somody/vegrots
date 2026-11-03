@@ -1846,15 +1846,18 @@ function addCropToSlot(slotType, cropId) {
   if (!crop) return;
   const box = document.querySelector(`.season-box[data-slot="${slotType}"]`);
   const mode = box.dataset.mode;
+  const currentItems = gameState.currentPlan[slotType];
 
   if (mode === 'crop') {
+    // Egyéni mód: 1 db főkultúra
     gameState.currentPlan[slotType] = [crop];
   } else {
-    if (!gameState.currentPlan[slotType].some(c => c.id === crop.id)) {
-      if (gameState.currentPlan[slotType].length < 4) {
+    // Társítás / Keverék mód: max 3-4 növény megengedett
+    if (!currentItems.some(c => c.id === crop.id)) {
+      if (currentItems.length < 3) {
         gameState.currentPlan[slotType].push(crop);
       } else {
-        alert('Ebben a keverékben már van 4 faj! Ez bőségesen elég egy profi keverékhez.');
+        alert('Egy parcellában legfeljebb 3 növényt tudtok egymás mellett társítani a helyszűke miatt!');
       }
     }
   }
@@ -1897,18 +1900,31 @@ function renderSlotItems(box, slotType) {
     });
   }
 
-  const footerStatus = box.querySelector('.slot-footer-info');
+const footerStatus = box.querySelector('.slot-footer-info');
+  const count = items.length;
+
   if (mode === 'crop') {
     const c = items[0];
     if (c) {
-      footerStatus.innerHTML = `<span>N költség: ${c.cost > 0 ? '-' + c.cost : '+' + Math.abs(c.cost)}</span><span>Várható: ${c.yield} kosár</span>`;
+      footerStatus.innerHTML = `<span>N igény: ${c.cost > 0 ? '-' + c.cost : '+' + Math.abs(c.cost)}</span><span>Várható: ${c.yield} kosár</span>`;
     } else {
       footerStatus.innerHTML = `<span>N igény: 0</span><span>Üres</span>`;
     }
   } else {
-    const count = items.length;
-    const bonus = count >= 3 ? '+25 pont (Szuper-keverék!)' : (count === 2 ? '+10 pont' : (count === 1 ? 'Alap' : '0'));
-    footerStatus.innerHTML = `<span>Keverék: ${count} faj</span><span style="color:var(--green); font-weight:700;">${bonus}</span>`;
+    // Társításos / Keverék mód összegzése
+    const totalCost = items.reduce((sum, c) => sum + (c.cost || 0), 0);
+    const cropCount = items.filter(c => c.type === 'crop').length;
+
+    // Arányos szorzó zöldségeknél: 1 db = 100%, 2 db = 60%, 3 db = 40%
+    const splitRatio = cropCount === 1 ? 1.0 : (cropCount === 2 ? 0.6 : (cropCount >= 3 ? 0.4 : 0));
+    const estimatedYield = Math.round(items.filter(c => c.type === 'crop').reduce((sum, c) => sum + (c.yield * splitRatio), 0));
+
+    if (cropCount > 0) {
+      footerStatus.innerHTML = `<span>Össz N igény: -${totalCost}</span><span>Társított hozam: ~${estimatedYield} kosár (${Math.round(splitRatio*100)}%/faj)</span>`;
+    } else {
+      const bonus = count >= 3 ? '+25 pont (Szuper-keverék)' : (count === 2 ? '+10 pont' : 'Alap');
+      footerStatus.innerHTML = `<span>Takaró: ${count} faj</span><span style="color:var(--green); font-weight:700;">${bonus}</span>`;
+    }
   }
   updateTimelineRibbons();
 }
@@ -1995,47 +2011,97 @@ btnCommit.addEventListener('click', () => {
     if (prevYear.summer && prevYear.summer.length > 0) prevSummerCrop = prevYear.summer[0];
   }
 
-  // 1. KORA TAVASZ
+// =========================================================================
+  // 1. KORA TAVASZ (TÁRSÍTÁS ÉS ARÁNYOS HOZAMOSZTÁS)
+  // =========================================================================
+  const earlyCrops = plan.early.filter(c => c.type === 'crop');
+  const earlyCropCount = earlyCrops.length;
+  // 1 növény: 100%, 2 növény: 60%, 3 növény: 40% hozam/fajta
+  const earlySplitFactor = earlyCropCount === 1 ? 1.0 : (earlyCropCount === 2 ? 0.6 : 0.4);
+
+  if (earlyCropCount > 1) {
+    logs.push({
+      type: 'info',
+      text: `🤝 TAVASZI TÁRSÍTÁS (${earlyCropCount} növény): A növények osztoznak az ágyáson, a hozam ${Math.round(earlySplitFactor * 100)}%/fajta!`
+    });
+  }
+
   plan.early.forEach(crop => {
+    // Takarónövény kezelése tavasszal
+    if (crop.type === 'cover') {
+      gameState.soilHealth += (crop.soilBonus || 10);
+      if (crop.family === 'fabaceae') gameState.nitrogen += 1;
+      return;
+    }
+
+    // Fagyérzékeny növény fagyhalála kora tavasszal
     if (!crop.frostProof || !crop.earlyOk) {
       gameState.soilHealth -= 25;
       logs.push({ type: 'danger', text: `🥶 KORA TAVASZI FAGYHALÁL! A melegigényes ${crop.name} elfagyott (-25 talajélet)!` });
     } else {
+      // Vetésforgó ütközés az előző évvel
       if (prevFamilies.includes(crop.family) && crop.family !== 'none') {
         gameState.soilHealth -= 30;
         const pest = FAMILY_PESTS[crop.family] || { icon: '🍄', name: 'Gyökérkártevő' };
         logs.push({ type: 'danger', text: `${pest.icon} KÁRTEVŐ FERTŐZÉS! A(z) ${crop.name} előtt rokon család volt: 0 termés (-30 pont)!` });
       } else {
-        const y = crop.yield || 0;
-        gameState.totalYield += y;
+        // Tápanyag és arányosított hozam
         gameState.nitrogen -= (crop.cost || 0);
+        const y = Math.round((crop.yield || 0) * earlySplitFactor);
+        gameState.totalYield += y;
         logs.push({ type: 'success', text: `🌱 Sikeres kora tavaszi idény: ${crop.name} beérett (+${y} kosár)!` });
       }
     }
   });
 
-  // 2. NYÁRI FŐKULTÚRA
+
+  // =========================================================================
+  // 2. NYÁRI FŐKULTÚRA (TÁRSÍTÁS, TÁPANYAGLEVONÁS ÉS ARÁNYOS HOZAMOSZTÁS)
+  // =========================================================================
+  const summerCrops = plan.summer.filter(c => c.type === 'crop');
+  const summerCropCount = summerCrops.length;
+  // 1 növény: 100%, 2 növény: 60%, 3 növény: 40% hozam/fajta
+  const yieldSplitFactor = summerCropCount === 1 ? 1.0 : (summerCropCount === 2 ? 0.6 : 0.4);
+
+  if (summerCropCount > 1) {
+    logs.push({ 
+      type: 'info', 
+      text: `🤝 NYÁRI TÁRSÍTÁS (${summerCropCount} zöldség): A parcellát megosztják, a hozam arányosan ${Math.round(yieldSplitFactor * 100)}%-ra módosul fajtánként!` 
+    });
+  }
+
   plan.summer.forEach(crop => {
-    if (crop.id === 'retek' || crop.id === 'spenot') {
-      gameState.soilHealth -= 10;
-      logs.push({ type: 'danger', text: `☀️ HŐSOKK & FELMAGZÁS! A kánikulában a(z) ${crop.name} magba szökött: 0 kosár termés!` });
+    // Ha takarónövény van a nyári idényben:
+    if (crop.type === 'cover') {
+      gameState.soilHealth += (crop.soilBonus || 10);
+      if (crop.family === 'fabaceae') gameState.nitrogen += 1;
       return;
     }
 
-    let timePenalty = 1.0;
-    if (plan.early.some(c => c.days >= 90) && crop.days >= 110) {
-      timePenalty = 0.3;
-      logs.push({ type: 'warn', text: `⏳ TENYÉSZIDŐ CSÚSZÁS! A későn ültetett ${crop.name} nem tudott teljesen beérni (-70% termés)!` });
+    // Hidegkedvelő növény felmagzása kánikulában
+    if (crop.id === 'retek' || crop.id === 'spenot') {
+      gameState.soilHealth -= 10;
+      logs.push({ type: 'danger', text: `☀️ HŐSOKK: A nyári melegben a(z) ${crop.name} felmagzott: 0 kosár termés!` });
+      return;
     }
 
+    // Időbeli csúszás
+    let timePenalty = 1.0;
+    if (plan.early.some(c => c.days >= 90) && crop.days >= 110) {
+      timePenalty = 0.4;
+      logs.push({ type: 'warn', text: `⏳ CSÚSZÁS: A(z) ${crop.name} nem tudott teljesen beérni az őszi hidegek előtt (-60% hozam)!` });
+    }
+
+    // Kártevő-fertőzés rokon család után
     let pestMultiplier = 1.0;
     if (prevSummerCrop && prevSummerCrop.family === crop.family && crop.family !== 'none') {
       const pest = FAMILY_PESTS[crop.family] || { icon: '🐛', name: 'Talajkórokozó' };
-      gameState.soilHealth -= 35;
-      pestMultiplier = 0.25;
-      logs.push({ type: 'danger', text: `🚨 SÚLYOS KÁRTEVŐ-INVÁZIÓ: ${pest.icon} ${pest.name}! A kártevők felélték a termés javát (-35 talajpont)!` });
+      gameState.soilHealth -= 30;
+      pestMultiplier = 0.3;
+      logs.push({ type: 'danger', text: `🚨 SÚLYOS KÁRTEVŐ-INVÁZIÓ: ${pest.icon} ${pest.name}! A rokon elővetemény miatt a kártevők elvitték a termés zömét (-30 talajpont)!` });
     }
 
+    // Tavasz-nyár azonos család egy éven belül
     const earlyFamilies = plan.early.map(c => c.family);
     if (earlyFamilies.includes(crop.family) && crop.family !== 'none') {
       gameState.soilHealth -= 20;
@@ -2043,23 +2109,19 @@ btnCommit.addEventListener('click', () => {
       logs.push({ type: 'danger', text: `❌ CSALÁDI ISMÉTLÉS EGY ÉVBEN: Tavasz után nyáron is ${crop.family} volt a földben!` });
     }
 
-    if (crop.demand === 'heavy' && gameState.nitrogen <= 0) {
-      gameState.soilHealth -= 25;
-      logs.push({ type: 'danger', text: `🥀 TÁPANYAG-ÉHÍNSÉG! Elfogyott a nitrogén (0 N). A(z) ${crop.name} elsárgult: 0 kosár termés!` });
-    } else {
-      gameState.nitrogen -= (crop.cost || 0);
-      const rawYield = crop.yield || 0;
-      let finalYield = Math.round(rawYield * pestMultiplier * timePenalty);
+    // Tápanyag levonása: Minden társított növény kéri a saját nitrogénjét!
+    gameState.nitrogen -= (crop.cost || 0);
 
-      if (gameState.nitrogen < 0) {
-        gameState.soilHealth -= 15;
-        finalYield = Math.round(finalYield * 0.4);
-        gameState.totalYield += finalYield;
-        logs.push({ type: 'warn', text: `⚠️ FOGYÓBAN A TÁPANYAG! A(z) ${crop.name} kimerítette a talajt (+${finalYield} kosár, -15 talajpont).` });
-      } else {
-        gameState.totalYield += finalYield;
-        logs.push({ type: 'success', text: `🧺 BŐSÉGES ARATÁS: A(z) ${crop.name} beérett (+${finalYield} kosár)!` });
-      }
+    if (gameState.nitrogen < 0) {
+      // Ha a társítás felélte a teljes nitrogént:
+      gameState.soilHealth -= 15;
+      const reducedYield = Math.round((crop.yield || 0) * yieldSplitFactor * pestMultiplier * timePenalty * 0.3);
+      gameState.totalYield += reducedYield;
+      logs.push({ type: 'warn', text: `🥀 TÁPANYAGHIÁNY: A társítás felélte a nitrogént! A(z) ${crop.name} elsárgult (+${reducedYield} kosár, -15 talajpont).` });
+    } else {
+      const finalCropYield = Math.round((crop.yield || 0) * yieldSplitFactor * pestMultiplier * timePenalty);
+      gameState.totalYield += finalCropYield;
+      logs.push({ type: 'success', text: `🧺 Betakarítva: ${crop.name} (+${finalCropYield} kosár).` });
     }
   });
 
