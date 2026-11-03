@@ -487,7 +487,13 @@ async function fetchData() {
     syncTag.textContent = '❌ Kapcsolati hiba';
   }
 }
-
+function getActiveTeamNames() {
+  const allNames = new Set([
+    ...Object.keys(latestPerTeam),
+    ...Object.keys(cachedTeamsObj || {})
+  ]);
+  return Array.from(allNames);
+}
 function processData(teamsObj) {
   cachedTeamsObj = teamsObj || {};
   latestPerTeam = {};
@@ -544,14 +550,17 @@ function normalizeCropName(str) {
 
 // 1. DIAGRAMOK ÉPÍTÉSE
 function renderCharts() {
-  const teams = Array.from(new Set([...OFFICIAL_TEAMS, ...Object.keys(latestPerTeam)]));
+  const teams = getActiveTeamNames();
   const teamLabels = [];
   const soilData = [];
   const yieldData = [];
 
   teams.forEach(tName => {
     const data = latestPerTeam[tName];
-    teamLabels.push(tName.replace('3. Ágyás ', '').replace('2. Ágyás ', '').replace('1. Ágyás – ', ''));
+    // Levágjuk a felesleges előtagokat, hogy szép legyen a címke
+    const cleanLabel = tName.replace(/^(\d+\.\s*Ágyás(\s*Felül|\s*Alul|\s*Közép)?\s*[–-]?\s*|Kis Négyzet\s*[–-]?\s*)/i, '');
+    teamLabels.push(cleanLabel || tName);
+
     if (data) {
       soilData.push(data.latest.soil);
       yieldData.push(data.latest.yield);
@@ -648,6 +657,15 @@ function renderCharts() {
   // Pedagógiai értékelés
   const badgeEl = document.getElementById('pantryGradeBadge');
   const textEl = document.getElementById('pantryPedagogyText');
+  const totalCrops = Object.values(pantry).reduce((a, b) => a + b, 0);
+
+  if (totalCrops === 0) {
+    badgeEl.textContent = '⏳ Várakozás adatokra';
+    badgeEl.style.color = 'var(--text-muted)';
+    textEl.textContent = 'Még nem érkezett befejezett év az aktív csapatoktól.';
+    return;
+  }
+
   const zeros = Object.values(pantry).filter(v => v === 0).length;
 
   if (zeros === 0 && pantry.legume >= 4 && pantry.root >= 4) {
@@ -665,19 +683,27 @@ function renderCharts() {
   }
 }
 
+
 // 2. KÁRTEVŐ & SZOMSZÉDSÁGI MÁTRIX TÁBLÁZAT
 function renderMatrixTable() {
   const tbody = document.getElementById('gardenMatrixBody');
   tbody.innerHTML = '';
   let conflictCount = 0;
 
-  OFFICIAL_TEAMS.forEach(teamName => {
+  const teams = getActiveTeamNames();
+
+  if (teams.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:24px; color:var(--text-muted); font-style:italic;">Még nem regisztrált egyetlen csapat sem a táblázatban.</td></tr>`;
+    document.getElementById('statPestConflicts').textContent = '0 db riasztás';
+    return;
+  }
+
+  teams.forEach(teamName => {
     const data = latestPerTeam[teamName];
     const profile = (cachedTeamsObj[teamName] && cachedTeamsObj[teamName].profile) ? cachedTeamsObj[teamName].profile : null;
     const preCropName = profile && profile.preCrop ? profile.preCrop : 'Alap keverék';
     const preCropNotice = profile && profile.pestRisk ? profile.pestRisk : '';
 
-    // Évek kinyerése
     let yearsText = '';
     const plantedFamilies = [];
 
@@ -686,16 +712,15 @@ function renderMatrixTable() {
         const yRow = data.allYears[y];
         const sKey = normalizeCropName(yRow.summer);
         if (sKey && CROPS_META[sKey]) plantedFamilies.push({ year: y, family: CROPS_META[sKey].family, name: CROPS_META[sKey].name });
-        yearsText += `<div style="margin-bottom:3px;"><strong style="color:var(--blue);">${y}. Év:</strong> 🌱 ${yRow.early} | ☀️ ${yRow.summer} | ❄️ ${yRow.winter}</div>`;
+        yearsText += `<div style="margin-bottom:3px;"><strong style="color:var(--blue);">${y}. Év:</strong> 🌱 ${yRow.early} | ☀️ <strong>${yRow.summer}</strong> | ❄️ ${yRow.winter}</div>`;
       } else {
         yearsText += `<div style="color:var(--text-muted);">${y}. Év: — Nincs adat —</div>`;
       }
     });
 
-    // Kockázatok megállapítása
     const risks = [];
 
-    // 1. Mustár/retek elővetemény tilalom
+    // 1. Mustár/retek elővetemény miatti keresztes tilalom
     if (preCropNotice.includes('🚨') || preCropNotice.toLowerCase().includes('tilos')) {
       const hasCabbage = plantedFamilies.some(f => f.family === 'brassicaceae');
       if (hasCabbage) {
@@ -706,7 +731,7 @@ function renderMatrixTable() {
       }
     }
 
-    // 2. Saját parcellán belüli családi ismétlés
+    // 2. Saját parcellán belüli családi monokultúra
     for (let i = 0; i < plantedFamilies.length - 1; i++) {
       if (plantedFamilies[i].family === plantedFamilies[i+1].family) {
         risks.push(`<span class="tag-risk-strong">🚨 Monokultúra: ${plantedFamilies[i].name} ➔ ${plantedFamilies[i+1].name} egymás után!</span>`);
@@ -714,7 +739,7 @@ function renderMatrixTable() {
       }
     }
 
-    // 3. Szomszédos parcellákkal való ütközés
+    // 3. Szomszédos fertőzés (ha van definiált szomszéd)
     const neighbors = BED_NEIGHBORS[teamName] || [];
     neighbors.forEach(nName => {
       const nData = latestPerTeam[nName];
@@ -754,7 +779,12 @@ function renderLatestCards() {
   const container = document.getElementById('viewLatest');
   container.innerHTML = '';
 
-  const allTeams = Array.from(new Set([...OFFICIAL_TEAMS, ...Object.keys(latestPerTeam)]));
+  const allTeams = getActiveTeamNames();
+
+  if (allTeams.length === 0) {
+    container.innerHTML = `<div class="loading-spinner">Még nem regisztrált csapat a táblázatba.</div>`;
+    return;
+  }
 
   allTeams.forEach(teamName => {
     const data = latestPerTeam[teamName];
@@ -775,13 +805,13 @@ function renderLatestCards() {
           <div style="flex:1;">
             <div class="team-title">${teamName}</div>
             ${mottoHtml}
-            <span style="font-size:0.75rem; color:var(--text-muted);">Még nincs beküldött év</span>
+            <span style="font-size:0.75rem; color:var(--text-muted);">Csapat regisztrálva, év még nincs lezárva</span>
           </div>
-          <span style="font-size:0.72rem; color:var(--text-muted); background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:6px;">Inaktív</span>
+          <span style="font-size:0.72rem; color:var(--text-muted); background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:6px;">Regisztrált</span>
         </div>
         <div class="team-badge-pre">🌱 <strong>Induló elővetemény:</strong> ${preCropName}</div>
         <div style="padding:16px 0; text-align:center; color:var(--text-muted); font-size:0.8rem; font-style:italic;">
-          Várakozás a diákok vetéstervének beküldésére...
+          Várakozás a diákok első évének beküldésére...
         </div>
       `;
       container.appendChild(card);
@@ -896,9 +926,14 @@ function renderHistoryList() {
 
 function updateTeacherSummary() {
   const activeCount = Object.keys(latestPerTeam).length;
-  document.getElementById('statActiveBeds').textContent = `${activeCount} / ${OFFICIAL_TEAMS.length}`;
+  const totalRegistered = getActiveTeamNames().length;
+  document.getElementById('statActiveBeds').textContent = `${activeCount} / ${totalRegistered}`;
 
-  if (activeCount === 0) return;
+  if (activeCount === 0) {
+    document.getElementById('statAvgSoil').textContent = '—';
+    document.getElementById('statTotalYield').textContent = '0 kosár';
+    return;
+  }
 
   let totalSoil = 0;
   let totalYield = 0;
