@@ -1295,7 +1295,12 @@ function loadLocalRegisteredTeams() {
         motto: item.motto,
         logoSvg: item.svgCode,
         symbol: item.symbol,
-        shape: item.shape
+        shape: item.shape,
+        preCrop: item.preCrop || item.preCropMix || "",
+        preCropKey: item.preCropKey || "",
+        initialSoilLife: item.initialSoilLife,
+        initialNitrogen: item.initialNitrogen,
+        pestRisk: item.pestRisk || item.preCropNotice || ""
       });
     });
   } catch (e) {
@@ -1633,16 +1638,14 @@ function calculateClassPantry(teams) {
 function updateTeamBaseline() {
   const team = teamSelector.value;
   const base = getTeamBaseline(team);
-  baseCoverName.textContent = base.name;
-  baseTags.innerHTML = '';
   
   const teamData = allTeamsGardenData[team];
   const profile = teamData ? teamData.profile : null;
 
-  // HA VAN A TÁBLÁZATBÓL VAGY REGISZTRÁCIÓBÓL ÉRKEZŐ EGYEDI ELŐVETEMÉNY:
+  // 1. Induló állapot és pontok beállítása
   if (profile && profile.preCrop) {
     baseCoverName.textContent = profile.preCrop;
-    gameState.soilHealth = profile.initialSoilLife !== undefined ? Number(profile.initialSoilLife) : base.soilHealth || 100;
+    gameState.soilHealth = profile.initialSoilLife !== undefined ? Number(profile.initialSoilLife) : 100;
     gameState.nitrogen = profile.initialNitrogen !== undefined ? Number(profile.initialNitrogen) : base.nitrogen;
   } else {
     baseCoverName.textContent = base.name;
@@ -1651,27 +1654,15 @@ function updateTeamBaseline() {
 
   baseTags.innerHTML = '';
 
-  // Jelvény / Címer megjelenítése a bannerben és a fejlécben
+  // 2. Címer, Mottó, Tagok és Iskola kitűzők
   const badgeWrap = document.getElementById('baselineTeamBadge');
   const previewBadge = document.getElementById('teamBadgePreview');
   if (profile && profile.logoSvg) {
-    if (badgeWrap) {
-      badgeWrap.innerHTML = profile.logoSvg;
-      badgeWrap.style.display = 'block';
-    }
-    if (previewBadge) {
-      previewBadge.innerHTML = profile.logoSvg;
-      previewBadge.style.display = 'block';
-    }
+    if (badgeWrap) { badgeWrap.innerHTML = profile.logoSvg; badgeWrap.style.display = 'block'; }
+    if (previewBadge) { previewBadge.innerHTML = profile.logoSvg; previewBadge.style.display = 'block'; }
   } else {
-    if (badgeWrap) {
-      badgeWrap.innerHTML = '';
-      badgeWrap.style.display = 'none';
-    }
-    if (previewBadge) {
-      previewBadge.innerHTML = '';
-      previewBadge.style.display = 'none';
-    }
+    if (badgeWrap) { badgeWrap.innerHTML = ''; badgeWrap.style.display = 'none'; }
+    if (previewBadge) { previewBadge.innerHTML = ''; previewBadge.style.display = 'none'; }
   }
 
   if (profile) {
@@ -1697,23 +1688,34 @@ function updateTeamBaseline() {
       p.textContent = `🏫 ${profile.school}`;
       baseTags.appendChild(p);
     }
+
+    // ITT A JAVÍTÁS: Ha a profil hozott pestRisk megjegyzést a spreadsheetből:
+    if (profile.pestRisk) {
+      const p = document.createElement('span');
+      const isWarn = profile.pestRisk.includes('🚨') || profile.pestRisk.toLowerCase().includes('tilos');
+      p.className = isWarn ? 'restriction-pill' : 'bonus-pill';
+      p.textContent = profile.pestRisk;
+      baseTags.appendChild(p);
+    }
   }
 
-  base.restrictions.forEach(r => {
-    const p = document.createElement('span');
-    p.className = 'restriction-pill';
-    p.textContent = `⛔ ${r}`;
-    baseTags.appendChild(p);
-  });
+  // Ha nem volt egyedi pestRisk, a régi base szabályokat írja ki:
+  if (!profile || !profile.pestRisk) {
+    base.restrictions.forEach(r => {
+      const p = document.createElement('span');
+      p.className = 'restriction-pill';
+      p.textContent = `⛔ ${r}`;
+      baseTags.appendChild(p);
+    });
 
-  base.bonuses.forEach(b => {
-    const p = document.createElement('span');
-    p.className = 'bonus-pill';
-    p.textContent = `⭐ ${b}`;
-    baseTags.appendChild(p);
-  });
+    base.bonuses.forEach(b => {
+      const p = document.createElement('span');
+      p.className = 'bonus-pill';
+      p.textContent = `⭐ ${b}`;
+      baseTags.appendChild(p);
+    });
+  }
 
-  gameState.nitrogen = base.nitrogen;
   updateDashboard();
 }
 
@@ -2237,8 +2239,14 @@ function showGameOver(isBankrupt = false) {
 
   fetchAndAnalyzeGardenNetwork();
 
-  const historyList = document.getElementById('modalHistoryList');
+const historyList = document.getElementById('modalHistoryList');
   historyList.innerHTML = '';
+
+  // Meghatározzuk a tényleges elővetemény nevét (profilból vagy alapértelmezettből):
+  const teamData = allTeamsGardenData[team];
+  const activeCoverName = (teamData && teamData.profile && teamData.profile.preCrop) 
+                          ? teamData.profile.preCrop 
+                          : base.name;
 
   const row0 = document.createElement('div');
   row0.className = 'history-year-row';
@@ -2246,7 +2254,7 @@ function showGameOver(isBankrupt = false) {
     <div class="year-tag" style="background:rgba(56,189,248,0.15); color:var(--blue);">0. Év (2026)</div>
     <div class="seasons-summary-flow">
       <span style="color:var(--text-muted); font-size:0.75rem;">Induló vetés:</span>
-      <span class="flow-badge flow-winter">🌾 ${base.name}</span>
+      <span class="flow-badge flow-winter">🌾 ${activeCoverName}</span>
     </div>
   `;
   historyList.appendChild(row0);
