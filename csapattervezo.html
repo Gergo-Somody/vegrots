@@ -45,7 +45,7 @@
             Vetésforgó Bajnokság
             <span class="text-xs bg-yellow-400 text-emerald-950 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Csapattervező</span>
           </h1>
-          <p class="text-xs sm:text-sm text-green-100 font-normal">Készítsétek el a csapatotok profilját és egyedi kerti logóját!</p>
+          <p class="text-xs sm:text-sm text-green-100 font-normal">Készítsétek el a csapatotok profilját, előveteményét és egyedi kerti logóját!</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
@@ -79,18 +79,18 @@
       <!-- BAL OLDAL: Csapat adatok & Beállítások (7 oszlop) -->
       <section class="lg:col-span-7 space-y-6">
 
-        <!-- 1. Kártya: Csapat Alapadatok -->
+        <!-- 1. Kártya: Csapat Alapadatok & Elővetemény -->
         <div class="bg-white/90 backdrop-blur rounded-3xl p-6 shadow-md border-2 border-green-200">
           <h2 class="text-lg font-bold text-emerald-800 flex items-center gap-2 mb-4">
             <span class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm font-bold">1</span>
-            Csapat Alapadatok
+            Csapat Alapadatok & Induló Ágyásállapot
           </h2>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="sm:col-span-2">
               <label for="teamName" class="block text-xs font-bold uppercase text-emerald-900 mb-1">Csapat Neve *</label>
               <div class="relative">
-                <input type="text" id="teamName" value="Káposzta Bajnokok" placeholder="Pl. Zöldborsó Zsenik"
+                <input type="text" id="teamName" value="Káposzta Bajnokok" placeholder="Pl. Mag páncélosok / Peti"
                   class="w-full pl-10 pr-4 py-2.5 rounded-xl border-2 border-green-200 focus:border-emerald-500 focus:outline-none text-base font-semibold text-slate-800 transition"
                   oninput="updateLogo()">
                 <i class="fa-solid fa-users text-emerald-500 absolute left-3.5 top-3.5 text-sm"></i>
@@ -99,7 +99,7 @@
 
             <div>
               <label for="schoolName" class="block text-xs font-bold uppercase text-emerald-900 mb-1">Iskola / Osztály</label>
-              <input type="text" id="schoolName" value="Napraforgó Általános Iskola, 4.b" placeholder="Pl. Petőfi Sándor Ált. Isk. 3.a"
+              <input type="text" id="schoolName" value="Napraforgó Általános Iskola, 4.b" placeholder="Pl. Rábapatona Ált. Isk. 4.a"
                 class="w-full px-3.5 py-2 rounded-xl border-2 border-green-200 focus:border-emerald-500 focus:outline-none text-sm font-medium">
             </div>
 
@@ -107,6 +107,42 @@
               <label for="mascotPlant" class="block text-xs font-bold uppercase text-emerald-900 mb-1">Kabala Növény / Mottó</label>
               <input type="text" id="mascotPlant" value="Mindig a nap felé fordulunk!" placeholder="Pl. A hüvelyesek ereje"
                 class="w-full px-3.5 py-2 rounded-xl border-2 border-green-200 focus:border-emerald-500 focus:outline-none text-sm font-medium">
+            </div>
+          </div>
+
+          <!-- ÚJ: ELŐVETEMÉNY / ZÖLDTRÁGYA VÁLASZTÓ -->
+          <div class="mt-5 pt-4 border-t border-green-100">
+            <label class="block text-xs font-bold uppercase text-emerald-900 mb-2 flex items-center gap-1.5">
+              <i class="fa-solid fa-seedling text-emerald-600"></i> Induló Elővetemény / Őszi Takarónövény (2026. október)
+            </label>
+            <select id="preCropSelect" onchange="updatePreCrop()" class="w-full px-3.5 py-2.5 rounded-xl border-2 border-green-200 focus:border-emerald-500 focus:outline-none text-sm font-semibold text-emerald-950 bg-emerald-50/50">
+              <option value="regenerativ_mix">🌱 Dús rozs + lóbab + borsó + lucerna (Regeneratív Szuper-Mix)</option>
+              <option value="okozold">🌾 Homoki zab + tavaszi bükköny + here (Öko Zöld Keverék)</option>
+              <option value="mustar_olajretek">⚠️ Fehér mustár + olajretek (Gyors gyomelnyomó - Káposzta elé tilos!)</option>
+              <option value="facelia_here">🌸 Facélia + Alexandriai here (Morzsalékos talajképző)</option>
+              <option value="ures_talaj">🍂 Kezeletlen / Üres szántás (Gyenge indulás)</option>
+              <option value="custom">✏️ Egyéni keverék beírása...</option>
+            </select>
+
+            <div id="customPreCropBox" class="mt-2 hidden">
+              <input type="text" id="customPreCropInput" placeholder="Add meg az egyedi zöldtrágya összetevőket..."
+                class="w-full px-3.5 py-2 rounded-xl border border-green-300 text-sm focus:outline-none">
+            </div>
+
+            <!-- Dinamikus Elővetemény Hatás Kijelző -->
+            <div id="preCropImpact" class="mt-3 p-3 bg-emerald-100/60 rounded-xl border border-emerald-300 text-xs flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <span class="text-slate-500 block text-[10px] uppercase font-bold">Kezdő Talajélet</span>
+                <strong id="impactSoil" class="text-emerald-800 text-sm font-bold">100 pont</strong>
+              </div>
+              <div>
+                <span class="text-slate-500 block text-[10px] uppercase font-bold">Kezdő Nitrogén</span>
+                <strong id="impactN" class="text-blue-700 text-sm font-bold">+3 N (Gazdag)</strong>
+              </div>
+              <div>
+                <span class="text-slate-500 block text-[10px] uppercase font-bold">Kockázat / Kártevő</span>
+                <strong id="impactPest" class="text-emerald-700 text-sm font-bold">Nincs (Tiszta)</strong>
+              </div>
             </div>
           </div>
 
@@ -165,34 +201,28 @@
 
           <!-- Növénytani Ikon Választó -->
           <div class="mb-5">
-            <label class="block text-xs font-bold uppercase text-emerald-900 mb-2">Fő Növénytani Szimbólum (Vetésforgó Szakaszok)</label>
+            <label class="block text-xs font-bold uppercase text-emerald-900 mb-2">Fő Növénytani Szimbólum</label>
             <div class="grid grid-cols-3 sm:grid-cols-6 gap-2" id="iconSelector">
-              <!-- Búza / Gabonafélék -->
               <button type="button" onclick="setIcon('wheat')" data-icon="wheat" class="icon-btn p-2 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-800 flex flex-col items-center text-center">
                 <span class="text-2xl">🌾</span>
                 <span class="text-[10px] font-bold mt-1">Gabona</span>
               </button>
-              <!-- Hüvelyes / Borsó -->
               <button type="button" onclick="setIcon('pea')" data-icon="pea" class="icon-btn p-2 rounded-xl border-2 border-green-200 bg-white text-slate-700 flex flex-col items-center text-center hover:bg-emerald-50">
                 <span class="text-2xl">🫛</span>
                 <span class="text-[10px] font-bold mt-1">Hüvelyes</span>
               </button>
-              <!-- Gyökérzöldség -->
               <button type="button" onclick="setIcon('carrot')" data-icon="carrot" class="icon-btn p-2 rounded-xl border-2 border-green-200 bg-white text-slate-700 flex flex-col items-center text-center hover:bg-emerald-50">
                 <span class="text-2xl">🥕</span>
-                <span class="text-[10px] font-bold mt-1">Gyökérzöldség</span>
+                <span class="text-[10px] font-bold mt-1">Gyökér</span>
               </button>
-              <!-- Leveles zöldség -->
               <button type="button" onclick="setIcon('cabbage')" data-icon="cabbage" class="icon-btn p-2 rounded-xl border-2 border-green-200 bg-white text-slate-700 flex flex-col items-center text-center hover:bg-emerald-50">
                 <span class="text-2xl">🥬</span>
                 <span class="text-[10px] font-bold mt-1">Leveles</span>
               </button>
-              <!-- Csíra / Palánta -->
               <button type="button" onclick="setIcon('sprout')" data-icon="sprout" class="icon-btn p-2 rounded-xl border-2 border-green-200 bg-white text-slate-700 flex flex-col items-center text-center hover:bg-emerald-50">
                 <span class="text-2xl">🌱</span>
                 <span class="text-[10px] font-bold mt-1">Palánta</span>
               </button>
-              <!-- Természet & Eszköz -->
               <button type="button" onclick="setIcon('sun')" data-icon="sun" class="icon-btn p-2 rounded-xl border-2 border-green-200 bg-white text-slate-700 flex flex-col items-center text-center hover:bg-emerald-50">
                 <span class="text-2xl">☀️</span>
                 <span class="text-[10px] font-bold mt-1">Napfény</span>
@@ -256,8 +286,6 @@
           </div>
         </div>
 
-        <!-- 3. Kártya: Google Apps Script Webhook Beállítás -->
-
       </section>
 
       <!-- JOBB OLDAL: Élő Előnézet, Letöltés, Beküldés (5 oszlop) -->
@@ -287,6 +315,9 @@
             </div>
             <p class="text-slate-600 truncate" id="previewSchool">Napraforgó Általános Iskola, 4.b</p>
             <p class="text-emerald-700 font-semibold italic" id="previewMotto">"Mindig a nap felé fordulunk!"</p>
+            <p class="text-emerald-900 font-bold pt-1 border-t border-emerald-200 flex items-center gap-1">
+              🌱 Elővetemény: <span id="previewPreCrop" class="font-normal text-slate-700 truncate">Dús rozs + lóbab + borsó + lucerna</span>
+            </p>
           </div>
 
           <!-- Akció gombok: Letöltések -->
@@ -316,7 +347,7 @@
         <div class="bg-amber-50 rounded-2xl p-4 border border-amber-200 flex items-start gap-3">
           <span class="text-2xl">💡</span>
           <div class="text-xs text-amber-900 leading-relaxed">
-            <strong class="font-bold">Vetésforgó Tipp:</strong> A jó vetésforgóban a tápanyagigényes növényeket (káposzta, kukorica) nitrogénkötő hüvelyesek (borsó, bab), majd mélygyökerű fajok követik, hogy a talaj mindig egészséges és termékeny maradjon!
+            <strong class="font-bold">Zöldtrágya Tanulság:</strong> A hüvelyeseket (borsó, lóbab, here) tartalmazó téli keverék megköti a levegő nitrogénjét, a mélygyökerű rozs pedig feltárja a talajéletet, így a tavaszi zöldségek rögtön gazdag talajban kezdhetnek!
           </div>
         </div>
 
@@ -338,7 +369,7 @@
       </div>
       <h3 class="text-xl font-bold text-emerald-950 mb-2">Csapat Sikeresen Nevezve!</h3>
       <p class="text-slate-600 text-sm mb-4">
-        A(z) <strong id="successTeamName" class="text-emerald-700"></strong> bekerült a felhőbeli táblázatba és elérhető a bajnokságban!
+        A(z) <strong id="successTeamName" class="text-emerald-700"></strong> bekerült a rendszerbe az induló zöldtrágya tervvel!
       </p>
       <div id="successBadgePreview" class="w-28 h-28 mx-auto mb-5 drop-shadow-md"></div>
       <div class="space-y-2">
@@ -356,29 +387,76 @@
 
   <!-- JavaScript Logika -->
   <script>
+    // Előre definiált zöldtrágya profilok paraméterei
+    const PRE_CROP_PRESETS = {
+      regenerativ_mix: {
+        name: "Dús rozs + lóbab + borsó + lucerna",
+        soilBio: 100,
+        nitrogen: "+3 N (Gazdag)",
+        nitrogenNum: 3,
+        pestRisk: "Nincs (Tiszta)"
+      },
+      okozold: {
+        name: "Homoki zab + tavaszi bükköny + alexandriai here",
+        soilBio: 95,
+        nitrogen: "+2 N (Közepes)",
+        nitrogenNum: 2,
+        pestRisk: "Nincs (Tiszta)"
+      },
+      mustar_olajretek: {
+        name: "Fehér mustár + olajretek",
+        soilBio: 80,
+        nitrogen: "+1 N (Alacsony)",
+        nitrogenNum: 1,
+        pestRisk: "Káposzta-félékre veszélyes (földibolha)!"
+      },
+      facelia_here: {
+        name: "Facélia + Alexandriai here",
+        soilBio: 90,
+        nitrogen: "+2 N (Közepes)",
+        nitrogenNum: 2,
+        pestRisk: "Nincs (Kiváló morzsalékos talaj)"
+      },
+      ures_talaj: {
+        name: "Kezeletlen, üres parlagi talaj",
+        soilBio: 50,
+        nitrogen: "0 N (Kimerült)",
+        nitrogenNum: 0,
+        pestRisk: "Fokozott gyomosodás kockázat"
+      },
+      custom: {
+        name: "Egyéni keverék",
+        soilBio: 85,
+        nitrogen: "+2 N (Közepes)",
+        nitrogenNum: 2,
+        pestRisk: "Egyéni elbírálás"
+      }
+    };
+
     // Állapot kezelés
     const state = {
       teamName: "Káposzta Bajnokok",
       school: "Napraforgó Általános Iskola, 4.b",
       motto: "Mindig a nap felé fordulunk!",
       members: ["Nagy Bence", "Kovács Lilla", "Tóth Áron"],
-      shape: "circle",      // circle, shield, leaf, hexagon, pot
-      icon: "wheat",        // wheat, pea, carrot, cabbage, sprout, sun
+      shape: "circle",
+      icon: "wheat",
       bgColor: "#15803d",
       borderColor: "#fef08a",
       wreath: "leaves",
       scale: 100,
       rotate: 0,
+      preCropKey: "regenerativ_mix",
+      preCropName: PRE_CROP_PRESETS.regenerativ_mix.name,
+      preCropData: PRE_CROP_PRESETS.regenerativ_mix,
       scriptUrl: "https://script.google.com/macros/s/AKfycby6nNEj7Spkrm8aH2hvXvT2mhRGOLWx8qZqrRPfGKJwIRfIlSsYkVwLBO8fMzCUtjsSAw/exec"
     };
 
-    // SVG Ikon grafikai definíciók (Child-friendly, tiszta vektoros rajzok)
+    // SVG Ikon grafikai definíciók
     const SVG_ICONS = {
       wheat: `
         <g id="icon-wheat">
-          <!-- Búzakalász szárak és szemek -->
           <path d="M 0 50 Q 5 10 0 -50" stroke="#fef08a" stroke-width="4" fill="none" stroke-linecap="round"/>
-          <!-- Magvak -->
           <ellipse cx="-12" cy="-25" rx="7" ry="14" transform="rotate(-30 -12 -25)" fill="#facc15" stroke="#ca8a04" stroke-width="2"/>
           <ellipse cx="12" cy="-25" rx="7" ry="14" transform="rotate(30 12 -25)" fill="#fde047" stroke="#ca8a04" stroke-width="2"/>
           <ellipse cx="-14" cy="-5" rx="7" ry="14" transform="rotate(-35 -14 -5)" fill="#facc15" stroke="#ca8a04" stroke-width="2"/>
@@ -386,20 +464,16 @@
           <ellipse cx="-12" cy="15" rx="7" ry="14" transform="rotate(-40 -12 15)" fill="#facc15" stroke="#ca8a04" stroke-width="2"/>
           <ellipse cx="12" cy="15" rx="7" ry="14" transform="rotate(40 12 15)" fill="#fde047" stroke="#ca8a04" stroke-width="2"/>
           <ellipse cx="0" cy="-45" rx="6" ry="12" fill="#fef08a" stroke="#ca8a04" stroke-width="2"/>
-          <!-- Búzaszálkák -->
           <path d="M -12 -35 L -26 -52 M 12 -35 L 26 -52 M 0 -55 L 0 -72" stroke="#ca8a04" stroke-width="2" stroke-linecap="round"/>
         </g>
       `,
       pea: `
         <g id="icon-pea">
-          <!-- Borsóhüvely hajlított forma -->
           <path d="M -45 10 C -25 45 35 40 50 -10 C 25 15 -20 15 -45 10 Z" fill="#22c55e" stroke="#15803d" stroke-width="3"/>
           <path d="M -45 10 C -15 -25 40 -20 50 -10 C 35 -5 -15 -10 -45 10 Z" fill="#4ade80" stroke="#15803d" stroke-width="3"/>
-          <!-- 3 kövér zöldborsó szem mosollyal -->
           <circle cx="-16" cy="1" r="11" fill="#86efac" stroke="#16a34a" stroke-width="2.5"/>
           <circle cx="6" cy="1" r="11" fill="#a7f3d0" stroke="#16a34a" stroke-width="2.5"/>
           <circle cx="28" cy="-1" r="9.5" fill="#86efac" stroke="#16a34a" stroke-width="2.5"/>
-          <!-- Csillogás a borsókon -->
           <circle cx="-19" cy="-3" r="2.5" fill="#ffffff"/>
           <circle cx="3" cy="-3" r="2.5" fill="#ffffff"/>
           <circle cx="25" cy="-4" r="2" fill="#ffffff"/>
@@ -407,44 +481,33 @@
       `,
       carrot: `
         <g id="icon-carrot">
-          <!-- Zöld répatollak -->
           <path d="M 0 -15 C -20 -45 -15 -55 0 -35 C 15 -55 20 -45 0 -15" fill="#22c55e" stroke="#15803d" stroke-width="2"/>
           <path d="M -5 -20 C -30 -35 -25 -50 -10 -30" fill="#4ade80" stroke="#16a34a" stroke-width="2"/>
           <path d="M 5 -20 C 30 -35 25 -50 10 -30" fill="#4ade80" stroke="#16a34a" stroke-width="2"/>
-          <!-- Sárgarépa test kúpos -->
           <path d="M -22 -15 Q 0 -18 22 -15 Q 12 25 0 52 Q -12 25 -22 -15 Z" fill="#f97316" stroke="#c2410c" stroke-width="3.5"/>
-          <!-- Barázdák -->
           <path d="M -10 -2 Q 0 0 8 -4 M -12 14 Q -3 16 6 12 M -6 30 Q 0 32 4 29" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round"/>
         </g>
       `,
       cabbage: `
         <g id="icon-cabbage">
-          <!-- Káposzta / Fejes saláta kunkorodó levelekkel -->
           <circle cx="0" cy="5" r="38" fill="#15803d" stroke="#14532d" stroke-width="3"/>
           <circle cx="0" cy="5" r="30" fill="#22c55e" stroke="#166534" stroke-width="2.5"/>
           <path d="M -25 -10 Q 0 20 25 -10 Q 30 25 0 32 Q -30 25 -25 -10 Z" fill="#4ade80" stroke="#15803d" stroke-width="2"/>
           <circle cx="0" cy="6" r="16" fill="#86efac" stroke="#16a34a" stroke-width="2"/>
-          <!-- Levélerek -->
           <path d="M 0 -10 L 0 25 M -12 5 Q 0 10 12 5 M -8 18 Q 0 22 8 18" stroke="#bbf7d0" stroke-width="2.5" stroke-linecap="round"/>
         </g>
       `,
       sprout: `
         <g id="icon-sprout">
-          <!-- Földdombocska -->
           <path d="M -35 40 Q 0 28 35 40 Z" fill="#78350f" stroke="#451a03" stroke-width="2"/>
-          <!-- Hajtás szára -->
           <path d="M 0 32 Q -5 10 0 -10" stroke="#4ade80" stroke-width="5" stroke-linecap="round" fill="none"/>
-          <!-- Bal levélke -->
           <path d="M -2 -8 C -30 -22 -35 5 -2 5 Z" fill="#22c55e" stroke="#15803d" stroke-width="2.5"/>
-          <!-- Jobb levélke -->
           <path d="M 0 -10 C 30 -28 36 -2 0 3 Z" fill="#86efac" stroke="#16a34a" stroke-width="2.5"/>
-          <!-- Harmatcsepp -->
           <circle cx="16" cy="-12" r="3" fill="#38bdf8"/>
         </g>
       `,
       sun: `
         <g id="icon-sun">
-          <!-- Sugarak -->
           <g stroke="#f59e0b" stroke-width="4" stroke-linecap="round">
             <line x1="0" y1="-44" x2="0" y2="-55" />
             <line x1="0" y1="44" x2="0" y2="55" />
@@ -455,22 +518,18 @@
             <line x1="-31" y1="31" x2="-39" y2="39" />
             <line x1="31" y1="31" x2="39" y2="39" />
           </g>
-          <!-- Napocska teste mosollyal -->
           <circle cx="0" cy="0" r="34" fill="#fbbf24" stroke="#d97706" stroke-width="3"/>
           <ellipse cx="-10" cy="-6" rx="3.5" ry="5" fill="#78350f"/>
           <ellipse cx="10" cy="-6" rx="3.5" ry="5" fill="#78350f"/>
           <circle cx="-9" cy="-8" r="1.5" fill="#ffffff"/>
           <circle cx="11" cy="-8" r="1.5" fill="#ffffff"/>
-          <!-- Piros orcák -->
           <circle cx="-16" cy="3" r="4" fill="#f87171" opacity="0.6"/>
           <circle cx="16" cy="3" r="4" fill="#f87171" opacity="0.6"/>
-          <!-- Mosoly -->
           <path d="M -10 8 Q 0 18 10 8" stroke="#78350f" stroke-width="3" stroke-linecap="round" fill="none"/>
         </g>
       `
     };
 
-    // Alapformák rajzolása SVG koordinátákkal (Középpont: 180, 160)
     function getShieldPath(shapeType) {
       switch(shapeType) {
         case 'shield':
@@ -487,10 +546,8 @@
       }
     }
 
-    // Díszítőelemek (Koszorú vagy csillagok)
     function getWreathMarkup(type, borderColor) {
       if (type === 'none') return '';
-      
       if (type === 'stars') {
         return `
           <g fill="${borderColor}" opacity="0.9">
@@ -504,17 +561,12 @@
           </g>
         `;
       }
-
-      // 'leaves' opció (koszorú ágacskák a szélén)
       return `
         <g stroke="${borderColor}" fill="${borderColor}" opacity="0.85">
-          <!-- Bal koszorú ív -->
           <path d="M 100 220 C 65 160 75 100 115 65" fill="none" stroke-width="2.5" stroke-linecap="round"/>
           <ellipse cx="86" cy="180" rx="4" ry="9" transform="rotate(-30 86 180)"/>
           <ellipse cx="78" cy="140" rx="4" ry="9" transform="rotate(-15 78 140)"/>
           <ellipse cx="86" cy="100" rx="4" ry="9" transform="rotate(15 86 100)"/>
-          
-          <!-- Jobb koszorú ív -->
           <path d="M 260 220 C 295 160 285 100 245 65" fill="none" stroke-width="2.5" stroke-linecap="round"/>
           <ellipse cx="274" cy="180" rx="4" ry="9" transform="rotate(30 274 180)"/>
           <ellipse cx="282" cy="140" rx="4" ry="9" transform="rotate(15 282 140)"/>
@@ -523,80 +575,82 @@
       `;
     }
 
-    // Teljes SVG összeállító függvény
     function generateFullSVG() {
       const shieldPath = getShieldPath(state.shape);
       const iconMarkup = SVG_ICONS[state.icon] || SVG_ICONS.wheat;
       const wreathMarkup = getWreathMarkup(state.wreath, state.borderColor);
       const scaleFactor = state.scale / 100;
-      
-      // Íves szöveg vagy alsó szalag
       const safeTeamName = escapeHtml(state.teamName.trim() || "Vetésforgó Csapat");
 
       return `
 <svg id="teamBadgeSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 360" width="100%" height="100%">
   <defs>
-    <!-- Színátmenet háttérhez -->
     <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" stop-color="${state.bgColor}" stop-opacity="0.9" />
       <stop offset="100%" stop-color="${state.bgColor}" stop-opacity="1" />
     </linearGradient>
 
-    <!-- Szalag arany átmenet -->
     <linearGradient id="ribbonGrad" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#ca8a04" />
       <stop offset="50%" stop-color="#fef08a" />
       <stop offset="100%" stop-color="#ca8a04" />
     </linearGradient>
-
-    <!-- Felső hajlított pálya az íves szövegnek -->
-    <path id="textArcTop" d="M 70 170 A 110 110 0 0 1 290 170" fill="none" />
   </defs>
 
-  <!-- Fő forma és keret -->
   <path d="${shieldPath}" fill="url(#badgeGrad)" stroke="${state.borderColor}" stroke-width="8" stroke-linejoin="round" />
-  
-  <!-- Belső vékony díszcsík -->
   <path d="${shieldPath}" fill="none" stroke="${state.borderColor}" stroke-width="1.8" stroke-dasharray="6,4" opacity="0.6" transform="scale(0.92) translate(15.6, 13)" />
 
-  <!-- Díszítő koszorú/csillag elemek -->
   ${wreathMarkup}
 
-  <!-- Központi növénytani ikon csoport skálázással és forgatással -->
   <g transform="translate(180, 145) scale(${scaleFactor}) rotate(${state.rotate})">
     ${iconMarkup}
   </g>
 
-  <!-- Alsó dekoratív szalag a csapatnévnek -->
   <g id="ribbonGroup" transform="translate(0, 4)">
-    <!-- Szalag végek -->
     <path d="M 40 305 L 75 285 L 75 325 Z" fill="#a16207" />
     <path d="M 320 305 L 285 285 L 285 325 Z" fill="#a16207" />
-    
-    <!-- Szalag fő teste -->
     <rect x="58" y="285" width="244" height="38" rx="10" fill="url(#ribbonGrad)" stroke="#a16207" stroke-width="2" />
-    
-    <!-- Csapatnév a szalagon -->
     <text x="180" y="310" text-anchor="middle" font-family="'Fredoka', 'Arial Rounded MT Bold', sans-serif" font-weight="700" font-size="16" fill="#451a03" letter-spacing="0.5">
       ${safeTeamName.toUpperCase()}
     </text>
   </g>
 
-  <!-- Finom fénypont a logón -->
   <circle cx="120" cy="70" r="16" fill="#ffffff" opacity="0.12"/>
 </svg>
       `.trim();
     }
 
-    // HTML segédfüggvény
     function escapeHtml(text) {
       const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
       return text.replace(/[&<>"']/g, function(m) { return map[m]; });
     }
 
+    // ÚJ: Elővetemény módosítás és számítások kezelése
+    function updatePreCrop() {
+      const key = document.getElementById('preCropSelect').value;
+      state.preCropKey = key;
+      const customBox = document.getElementById('customPreCropBox');
+
+      if (key === 'custom') {
+        customBox.classList.remove('hidden');
+        const customName = document.getElementById('customPreCropInput').value.trim() || "Egyéni keverék";
+        state.preCropName = customName;
+        state.preCropData = PRE_CROP_PRESETS.custom;
+      } else {
+        customBox.classList.add('hidden');
+        state.preCropData = PRE_CROP_PRESETS[key];
+        state.preCropName = PRE_CROP_PRESETS[key].name;
+      }
+
+      // Kijelzők frissítése
+      document.getElementById('impactSoil').innerText = `${state.preCropData.soilBio} pont`;
+      document.getElementById('impactN').innerText = state.preCropData.nitrogen;
+      document.getElementById('impactPest').innerText = state.preCropData.pestRisk;
+      document.getElementById('previewPreCrop').innerText = state.preCropName;
+    }
+
     // Előnézet és UI frissítése
     function updateLogo() {
-      // Értékek szinkronizálása a state objektumba
       state.teamName = document.getElementById('teamName').value || "Káposzta Bajnokok";
       state.school = document.getElementById('schoolName').value;
       state.motto = document.getElementById('mascotPlant').value;
@@ -609,18 +663,16 @@
       document.getElementById('iconScaleVal').innerText = state.scale + '%';
       document.getElementById('iconRotateVal').innerText = state.rotate + '°';
 
-      // SVG generálás és beillesztés
       const svgMarkup = generateFullSVG();
       document.getElementById('svgContainer').innerHTML = svgMarkup;
 
-      // Összegző kártya frissítése
       document.getElementById('previewTeamTitle').innerText = state.teamName;
       document.getElementById('previewSchool').innerText = state.school || "Iskola nincs megadva";
       document.getElementById('previewMotto').innerText = state.motto ? `"${state.motto}"` : "";
       document.getElementById('previewMemberCount').innerText = `${state.members.length} csapattag`;
+      document.getElementById('previewPreCrop').innerText = state.preCropName;
     }
 
-    // Pajzsforma választó
     function setShield(shape) {
       state.shape = shape;
       document.querySelectorAll('.shape-btn').forEach(btn => {
@@ -633,7 +685,6 @@
       updateLogo();
     }
 
-    // Ikon választó
     function setIcon(iconKey) {
       state.icon = iconKey;
       document.querySelectorAll('.icon-btn').forEach(btn => {
@@ -646,13 +697,11 @@
       updateLogo();
     }
 
-    // Gyors színbeállító gombok
     function setQuickColor(inputId, colorHex) {
       document.getElementById(inputId).value = colorHex;
       updateLogo();
     }
 
-    // Csapattagok dinamikus kezelése
     function renderMembers() {
       const container = document.getElementById('membersContainer');
       container.innerHTML = '';
@@ -708,7 +757,6 @@
       updateLogo();
     }
 
-    // Véletlenszerű / Meglepetés logó és csapatnév generáló
     function randomizeAll() {
       const funnyNames = [
         "Vetésforgó Varázslók", "Katicabogár Kommandó", "Gyorscsírázók",
@@ -725,26 +773,22 @@
       const icons = ['wheat', 'pea', 'carrot', 'cabbage', 'sprout', 'sun'];
       const bgColors = ['#15803d', '#166534', '#0f766e', '#854d0e', '#ca8a04', '#1e3a8a'];
       const borderColors = ['#fef08a', '#ffffff', '#fdba74', '#86efac'];
+      const preCropKeys = ['regenerativ_mix', 'okozold', 'facelia_here'];
 
-      // Randomizáció
-      const randomName = funnyNames[Math.floor(Math.random() * funnyNames.length)];
-      const randomMotto = mottos[Math.floor(Math.random() * mottos.length)];
-      const randomShape = shapes[Math.floor(Math.random() * shapes.length)];
-      const randomIcon = icons[Math.floor(Math.random() * icons.length)];
-      const randomBg = bgColors[Math.floor(Math.random() * bgColors.length)];
-      const randomBorder = borderColors[Math.floor(Math.random() * borderColors.length)];
-
-      document.getElementById('teamName').value = randomName;
-      document.getElementById('mascotPlant').value = randomMotto;
-      document.getElementById('badgeBgColor').value = randomBg;
-      document.getElementById('badgeBorderColor').value = randomBorder;
+      document.getElementById('teamName').value = funnyNames[Math.floor(Math.random() * funnyNames.length)];
+      document.getElementById('mascotPlant').value = mottos[Math.floor(Math.random() * mottos.length)];
+      document.getElementById('badgeBgColor').value = bgColors[Math.floor(Math.random() * bgColors.length)];
+      document.getElementById('badgeBorderColor').value = borderColors[Math.floor(Math.random() * borderColors.length)];
       
-      setShield(randomShape);
-      setIcon(randomIcon);
-      showToast("Új meglepetés logó elkészítve! 🎲");
+      const randPre = preCropKeys[Math.floor(Math.random() * preCropKeys.length)];
+      document.getElementById('preCropSelect').value = randPre;
+      updatePreCrop();
+
+      setShield(shapes[Math.floor(Math.random() * shapes.length)]);
+      setIcon(icons[Math.floor(Math.random() * icons.length)]);
+      showToast("Új meglepetés profil elkészítve! 🎲");
     }
 
-    // Letöltés SVG formátumban
     function downloadSVG() {
       const svgData = generateFullSVG();
       const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
@@ -760,7 +804,6 @@
       showToast("SVG logó sikeresen letöltve! 📁");
     }
 
-    // Letöltés PNG formátumban (Canvas segítségével szép felbontásban)
     function downloadPNG() {
       const svgString = generateFullSVG();
       const svgBlob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
@@ -770,7 +813,6 @@
       const image = new Image();
       image.onload = function() {
         const canvas = document.createElement("canvas");
-        // Nagyobb felbontású 720x720 PNG
         canvas.width = 720;
         canvas.height = 720;
         const context = canvas.getContext("2d");
@@ -795,13 +837,12 @@
       const scriptUrl = state.scriptUrl || "https://script.google.com/macros/s/AKfycby6nNEj7Spkrm8aH2hvXvT2mhRGOLWx8qZqrRPfGKJwIRfIlSsYkVwLBO8fMzCUtjsSAw/exec";
       const submitBtn = document.getElementById('submitBtn');
 
-      // Alap validálás
       if (!state.teamName.trim()) {
         showToast("Kérlek adj meg egy csapatnevet!", true);
         return;
       }
 
-      // Payload összeállítása
+      // Készítjük a kiterjesztett payloadot az előveteménnyel és pontokkal
       const payload = {
         type: "team_register",
         teamName: state.teamName.trim(),
@@ -810,26 +851,29 @@
         members: state.members.filter(m => m.trim().length > 0),
         symbol: state.icon,
         shape: state.shape,
+        preCrop: state.preCropName,
+        preCropKey: state.preCropKey,
+        initialSoilLife: state.preCropData.soilBio,
+        initialNitrogen: state.preCropData.nitrogenNum,
+        pestRisk: state.preCropData.pestRisk,
         svgCode: generateFullSVG(),
         timestamp: new Date().toISOString()
       };
 
-      // Mentés azonnal helyi tárolóba is (offline használathoz és azonnali bajnokság-eléréshez)
+      // Mentés helyi tárolóba is (offline használatra és a bajnokság oldal azonnali átvételéhez)
       try {
         const stored = JSON.parse(localStorage.getItem('vegrots_registered_teams') || '{}');
         stored[payload.teamName] = payload;
         localStorage.setItem('vegrots_registered_teams', JSON.stringify(stored));
         localStorage.setItem('vegrots_current_team', payload.teamName);
       } catch (e) {
-        console.warn("Helyi mentési figyelmeztetés:", e);
+        console.warn("Helyi mentési hiba:", e);
       }
 
-      // Gomb állapot frissítés
       submitBtn.disabled = true;
       submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Beküldés folyamatban...</span>`;
 
       try {
-        // Google Apps Script no-cors módban fogadja el a hívást böngészőből
         await fetch(scriptUrl, {
           method: 'POST',
           mode: 'no-cors',
@@ -839,22 +883,22 @@
           body: JSON.stringify(payload)
         });
 
-        showToast("🎉 Csapat és logó sikeresen elküldve a Google Táblázatba!");
-        openSuccessModal(payload.teamName, payload.svgCode);
+        showToast("🎉 Csapat és elővetemény sikeresen elküldve a Google Táblázatba!");
+        openSuccessModal(payload.teamName, payload.svgCode, payload.preCropKey);
       } catch (err) {
         console.error("Beküldési hiba:", err);
-        showToast("Figyelmeztetés a felhő beküldéskor, de a csapat helyben mentve!", true);
-        openSuccessModal(payload.teamName, payload.svgCode);
+        showToast("Mentve helyben! (Felhő szinkron később)", true);
+        openSuccessModal(payload.teamName, payload.svgCode, payload.preCropKey);
       } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> <span>Csapat Nevezése a Bajnokságba!</span>`;
       }
     }
 
-    function openSuccessModal(teamName, svgCode) {
+    function openSuccessModal(teamName, svgCode, preCropKey) {
       document.getElementById('successTeamName').textContent = teamName;
       document.getElementById('successBadgePreview').innerHTML = svgCode;
-      document.getElementById('btnGoToChampionship').href = `bajnoksag.html?team=${encodeURIComponent(teamName)}`;
+      document.getElementById('btnGoToChampionship').href = `bajnoksag.html?team=${encodeURIComponent(teamName)}&precrop=${encodeURIComponent(preCropKey)}`;
       document.getElementById('successModal').classList.remove('hidden');
     }
 
@@ -862,15 +906,6 @@
       document.getElementById('successModal').classList.add('hidden');
     }
 
-    // Webhook URL mentése localStorage-ba
-    function saveWebhookUrl() {
-      const url = document.getElementById('scriptUrl').value.trim();
-      state.scriptUrl = url;
-      localStorage.setItem('vetesforgo_script_url', url);
-      showToast("Apps Script Web App URL elmentve!");
-    }
-
-    // Értesítés (Toast) buborék megjelenítője
     function showToast(msg, isError = false) {
       const toast = document.getElementById('statusToast');
       const text = document.getElementById('toastMessage');
@@ -888,36 +923,12 @@
       toast.classList.remove('hidden');
       setTimeout(() => {
         toast.classList.add('hidden');
-      }, 4200);
-    }
-
-    // Apps Script Modal nyitás/zárás
-    function openScriptModal() {
-      document.getElementById('scriptModal').classList.remove('hidden');
-    }
-
-    function closeScriptModal() {
-      document.getElementById('scriptModal').classList.add('hidden');
-    }
-
-    function copyAppsScriptCode() {
-      const code = document.getElementById('appsScriptCode').innerText;
-      const tempTextArea = document.createElement("textarea");
-      tempTextArea.value = code;
-      document.body.appendChild(tempTextArea);
-      tempTextArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(tempTextArea);
-      showToast("Apps Script kód vágólapra másolva!");
+      }, 4000);
     }
 
     // Kezdőállapot betöltése
     window.onload = function() {
-      const savedUrl = localStorage.getItem('vetesforgo_script_url');
-      if (savedUrl) {
-        state.scriptUrl = savedUrl;
-        document.getElementById('scriptUrl').value = savedUrl;
-      }
+      updatePreCrop();
       renderMembers();
       updateLogo();
     };
