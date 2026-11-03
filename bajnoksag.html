@@ -2477,10 +2477,49 @@ function updateTimelineRibbons() {
   }
 }
 
-refreshTeamSelector();
-renderPalette();
-fetchAndAnalyzeGardenNetwork();
-setInterval(fetchAndAnalyzeGardenNetwork, 15000);
+window.addEventListener('load', () => {
+  // 1. Paraméterek kiolvasása az URL-ből és a helyi tárolóból
+  const urlParams = new URLSearchParams(window.location.search);
+  const targetTeam = urlParams.get('team') || localStorage.getItem('vegrots_current_team');
+  const targetPreCrop = urlParams.get('precrop');
+
+  // 2. Csapatválasztó felépítése a regisztrált adatokkal
+  loadLocalRegisteredTeams();
+  refreshTeamSelector(targetTeam);
+
+  // 3. Ha érkezett egyedi elővetemény adat (pl. a csapattervezőből), felülírjuk az induló állapotot
+  const storedTeams = JSON.parse(localStorage.getItem('vegrots_registered_teams') || '{}');
+  const activeTeamName = teamSelector.value;
+  const teamRegData = storedTeams[activeTeamName];
+
+  if (teamRegData && teamRegData.initialSoilLife !== undefined) {
+    gameState.soilHealth = Number(teamRegData.initialSoilLife);
+    gameState.nitrogen = Number(teamRegData.initialNitrogen);
+
+    if (teamRegData.preCrop) {
+      baseCoverName.textContent = teamRegData.preCrop;
+      const precoverInfoEl = document.getElementById('precoverInfo');
+      if (precoverInfoEl) {
+        precoverInfoEl.innerHTML = `Elővetemény: <strong>${teamRegData.preCrop}</strong>`;
+      }
+    }
+  }
+
+  // 4. Felület, paletta és hálózati adatok frissítése
+  renderPalette();
+  updateDashboard();
+  updateTimelineRibbons();
+  fetchAndAnalyzeGardenNetwork();
+  setInterval(fetchAndAnalyzeGardenNetwork, 15000);
+
+  // 5. Tájékoztató bejegyzés a krónikába
+  if (targetTeam) {
+    const entry = document.createElement('div');
+    entry.className = 'log-entry log-purple';
+    entry.innerHTML = `🚀 Betöltve a csapattervezőből: <strong>${activeTeamName}</strong> (Induló talajélet: ${gameState.soilHealth} pont, Nitrogén: +${gameState.nitrogen} N)`;
+    chronicleLog.prepend(entry);
+  }
+});
 </script>
 
 </body>
