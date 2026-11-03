@@ -798,11 +798,11 @@
 
     // EREDETI VÉLETLEN CSAPATNÉV, MOTTÓ ÉS LOGÓ GENERÁTOR (KIEGÉSZÍTVE A 7 VALÓS KEVERÉKKEL)
     function randomizeAll() {
-      //const funnyNames = [
-        //"Vetésforgó Varázslók", "Katicabogár Kommandó", "Gyorscsírázók",
-        //"BioBorsó Bajnokok", "Napfény Kertészei", "Magvető Mókusok",
-        //"Humusz Hősök", "Aranykalász Akadémia", "Sárgarépa Szövetség"
-      //];
+      const funnyNames = [
+        "Vetésforgó Varázslók", "Katicabogár Kommandó", "Gyorscsírázók",
+        "BioBorsó Bajnokok", "Napfény Kertészei", "Magvető Mókusok",
+        "Humusz Hősök", "Aranykalász Akadémia", "Sárgarépa Szövetség"
+      ];
       const mottos = [
         "Egészséges talaj, egészséges élet!",
         "Körbe-körbe forog a vetemény!",
@@ -813,15 +813,15 @@
       const icons = ['wheat', 'pea', 'carrot', 'cabbage', 'sprout', 'sun'];
       const bgColors = ['#15803d', '#166534', '#0f766e', '#854d0e', '#ca8a04', '#1e3a8a'];
       const borderColors = ['#fef08a', '#ffffff', '#fdba74', '#86efac'];
-      //const preCropKeys = ['vitorlazo', 'magpancelosok', 'hangyataxik', 'gemorr', 'zoldlandzsasok', 'magagyusok', 'kemenymagok'];
+      const preCropKeys = ['vitorlazo', 'magpancelosok', 'hangyataxik', 'gemorr', 'zoldlandzsasok', 'magagyusok', 'kemenymagok'];
 
-      document.getElementById('teamName').value = funnyNames[Math.floor(Math.random() * funnyNames.length)];
+      //document.getElementById('teamName').value = funnyNames[Math.floor(Math.random() * funnyNames.length)];
       document.getElementById('mascotPlant').value = mottos[Math.floor(Math.random() * mottos.length)];
       document.getElementById('badgeBgColor').value = bgColors[Math.floor(Math.random() * bgColors.length)];
       document.getElementById('badgeBorderColor').value = borderColors[Math.floor(Math.random() * borderColors.length)];
       
       const randPre = preCropKeys[Math.floor(Math.random() * preCropKeys.length)];
-      document.getElementById('preCropSelect').value = randPre;
+      //document.getElementById('preCropSelect').value = randPre;
       updatePreCrop();
 
       setShield(shapes[Math.floor(Math.random() * shapes.length)]);
