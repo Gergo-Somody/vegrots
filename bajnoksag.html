@@ -1423,6 +1423,9 @@ async function fetchAndAnalyzeGardenNetwork() {
       Object.keys(result.teams).forEach(tName => {
         const remoteTeam = result.teams[tName];
         ensureTeamData(tName, remoteTeam.profile);
+        if (remoteTeam.profile) {
+          allTeamsGardenData[tName].profile = remoteTeam.profile;
+        }
         const remoteYears = remoteTeam.years || {};
 
         // Beemeljük az 1., 2. és 3. évet a táblázatból
@@ -1632,9 +1635,21 @@ function updateTeamBaseline() {
   const base = getTeamBaseline(team);
   baseCoverName.textContent = base.name;
   baseTags.innerHTML = '';
-
+  
   const teamData = allTeamsGardenData[team];
   const profile = teamData ? teamData.profile : null;
+
+  // HA VAN A TÁBLÁZATBÓL VAGY REGISZTRÁCIÓBÓL ÉRKEZŐ EGYEDI ELŐVETEMÉNY:
+  if (profile && profile.preCrop) {
+    baseCoverName.textContent = profile.preCrop;
+    gameState.soilHealth = profile.initialSoilLife !== undefined ? Number(profile.initialSoilLife) : base.soilHealth || 100;
+    gameState.nitrogen = profile.initialNitrogen !== undefined ? Number(profile.initialNitrogen) : base.nitrogen;
+  } else {
+    baseCoverName.textContent = base.name;
+    gameState.nitrogen = base.nitrogen;
+  }
+
+  baseTags.innerHTML = '';
 
   // Jelvény / Címer megjelenítése a bannerben és a fejlécben
   const badgeWrap = document.getElementById('baselineTeamBadge');
