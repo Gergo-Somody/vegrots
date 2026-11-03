@@ -2126,8 +2126,16 @@ btnCommit.addEventListener('click', () => {
   });
 
   // 3. ŐSZ ÉS TÉL
+ // =========================================================================
+  // 3. ŐSZ & TÉL (TAKARÓ KEVERÉK VAGY KÉSŐI ZÖLDSÉG / TÁRSÍTÁS)
+  // =========================================================================
+// =========================================================================
+  // 3. ŐSZ & TÉL (TAKARÓ KEVERÉK VAGY KÉSŐI ZÖLDSÉG / TÁRSÍTÁS)
+  // =========================================================================
   const isWinterCover = document.querySelector('.season-box[data-slot="winter"]').dataset.mode === 'cover';
+
   if (isWinterCover) {
+    // --- A) TAKARÓNÖVÉNY KEVERÉK ÁG ---
     const count = plan.winter.length;
     let coverSoilBonus = 0;
     let coverNBonus = 0;
@@ -2136,7 +2144,7 @@ btnCommit.addEventListener('click', () => {
 
     plan.winter.forEach(c => {
       if (c.id === 'pohanka') {
-        logs.push({ type: 'warn', text: `🍂 HIDEGSORK: A pohánka az őszi fagyokban elfagyott, nem védte a téli talajt!` });
+        logs.push({ type: 'warn', text: `🍂 HIDEGSOKK: A pohánka az őszi fagyokban elfagyott, nem védte a téli talajt!` });
       } else {
         coverSoilBonus += (c.soilBonus || 15);
         if (c.family === 'fabaceae') coverNBonus += 2;
@@ -2145,7 +2153,7 @@ btnCommit.addEventListener('click', () => {
 
     if (hasMustard || hasFacelia) {
       coverSoilBonus += 15;
-      logs.push({ type: 'info', text: `🛡️ BIOREMÉDIÁCIÓ: A mustár és a facélia elpusztította a káros talajfonalférgeket (+15 talajpont)!` });
+      logs.push({ type: 'info', text: `🛡️ BIOREMÉDIÁCIÓ: A mustár és a facélia tisztította a talajt (+15 talajpont)!` });
     }
 
     if (count >= 3) {
@@ -2161,16 +2169,58 @@ btnCommit.addEventListener('click', () => {
 
     gameState.soilHealth += coverSoilBonus;
     gameState.nitrogen += coverNBonus;
+
   } else {
+    // --- B) KÉSŐI ZÖLDSÉG / FŐNÖVÉNY ÁG (TÁRSÍTÁS ÉS ARÁNYOSÍTÁS) ---
+    const winterCrops = plan.winter.filter(c => c.type === 'crop');
+    const winterCropCount = winterCrops.length;
+    // 1 növény: 100%, 2 növény: 60%, 3 növény: 40% hozam/fajta
+    const winterSplitFactor = winterCropCount === 1 ? 1.0 : (winterCropCount === 2 ? 0.6 : 0.4);
+
+    if (winterCropCount > 1) {
+      logs.push({
+        type: 'info',
+        text: `🤝 ŐSZI TÁRSÍTÁS (${winterCropCount} zöldség): A megosztott ágyás miatt a termés ${Math.round(winterSplitFactor * 100)}%/fajta!`
+      });
+    }
+
     plan.winter.forEach(crop => {
+      // Ha véletlenül takaró került be a zöldség módba:
+      if (crop.type === 'cover') {
+        gameState.soilHealth += (crop.soilBonus || 10);
+        return;
+      }
+
+      // Fagyérzékenység vizsgálata késő ősszel / télen
       if (!crop.frostProof) {
         gameState.soilHealth -= 30;
-        logs.push({ type: 'danger', text: `🥶 TÉLI FAGYHALÁL! A(z) ${crop.name} novemberben elfagyott és elrohadt (-30 pont)!` });
+        logs.push({ type: 'danger', text: `🥶 TÉLI FAGYHALÁL! A melegigényes ${crop.name} novemberben elfagyott és elrohadt (-30 talajpont, 0 hozam)!` });
+        return;
+      }
+
+      // Tápanyagigény levonása
+      gameState.nitrogen -= (crop.cost || 0);
+
+      // Késői zöldség szüretelése: a csupasz téli talaj miatt alapból van egy talajvesztés (-20 pont)
+      gameState.soilHealth -= 20;
+
+      if (gameState.nitrogen < 0) {
+        // Tápanyaghiány esetén
+        gameState.soilHealth -= 15;
+        const reducedYield = Math.round((crop.yield || 0) * 0.5 * winterSplitFactor * 0.3);
+        gameState.totalYield += reducedYield;
+        logs.push({
+          type: 'warn',
+          text: `🥀 TÉLI KÖLTSÉG & TÁPANYAGHIÁNY: A(z) ${crop.name} kimerítette a talajt (+${reducedYield} kosár, -35 talajpont)!`
+        });
       } else {
-        const partialYield = Math.round((crop.yield || 0) * 0.5);
+        // Sikeres téli szüret (pl. őszi káposzta)
+        const partialYield = Math.round((crop.yield || 0) * 0.5 * winterSplitFactor);
         gameState.totalYield += partialYield;
-        gameState.soilHealth -= 20;
-        logs.push({ type: 'warn', text: `❄️ Téli szüret: ${crop.name} (+${partialYield} kosár), de a csupasz talaj kimerült (-20 pont)!` });
+        logs.push({
+          type: 'warn',
+          text: `❄️ Téli szüret: ${crop.name} beérett (+${partialYield} kosár), de a télen csupaszon hagyott talaj kimerült (-20 talajpont)!`
+        });
       }
     });
   }
