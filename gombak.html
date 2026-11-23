@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Gombák Titokzatos Világa – 4. osztályos felfedező portál</title>
+    <style>
+        :root {
+            --primary: #7c2d12;
+            --primary-light: #ffedd5;
+            --secondary: #065f46;
+            --secondary-light: #d1fae5;
+            --danger: #991b1b;
+            --danger-light: #fee2e2;
+            --bg: #f5f5f4;
+            --card-bg: #ffffff;
+            --text: #1c1917;
+            --text-muted: #57534e;
+            --border: #e7e5e4;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px 16px 60px 16px;
+        }
+
+        /* FEJLÉC ÉS LAPOZÓ NAVIGÁCIÓ */
+        header {
+            background: linear-gradient(135deg, #431407 0%, #7c2d12 100%);
+            color: white;
+            padding: 28px 24px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px rgba(124, 45, 18, 0.2);
+        }
+
+        header h1 {
+            margin: 0 0 6px 0;
+            font-size: 1.9rem;
+        }
+
+        header p {
+            margin: 0;
+            color: #fed7aa;
+            font-size: 1rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: white;
+            padding: 10px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+            border: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            flex: 1 1 auto;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 10px;
+            background: #f5f5f4;
+            color: #44403c;
+            font-weight: 700;
+            font-size: 0.92rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .tab-btn:hover {
+            background: #e7e5e4;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 10px rgba(124, 45, 18, 0.25);
+        }
+
+        .tab-btn.quiz-tab.active {
+            background: var(--secondary);
+            box-shadow: 0 4px 10px rgba(6, 95, 70, 0.25);
+        }
+
+        /* OLDALAK (DIÁK) */
+        .page-slide {
+            display: none;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page-slide.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* KÉPHELY STÍLUS (Könnyű beillesztéshez) */
+        .img-slot {
+            width: 100%;
+            min-height: 190px;
+            background: #fafaf9;
+            border: 2px dashed #a8a29e;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 16px;
+            margin-bottom: 14px;
+            color: #78716c;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .img-slot img {
+            width: 100%;
+            height: 100%;
+            max-height: 360px;
+            object-fit: cover;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .img-slot.has-image {
+            border: none;
+            padding: 0;
+            background: transparent;
+        }
+
+        .img-slot.has-image img {
+            display: block;
+        }
+
+        .img-slot.has-image .placeholder-text {
+            display: none;
+        }
+
+        .placeholder-text span {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .placeholder-text strong {
+            display: block;
+            color: #44403c;
+            font-size: 0.95rem;
+        }
+
+        .placeholder-text small {
+            font-size: 0.8rem;
+            color: #78716c;
+        }
+
+        /* BADGE & CÍMEK */
+        .badge {
+            display: inline-block;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.8rem;
+            padding: 4px 12px;
+            border-radius: 999px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .badge-green { background: var(--secondary-light); color: var(--secondary); }
+        .badge-red { background: var(--danger-light); color: var(--danger); }
+
+        h2 {
+            color: var(--primary);
+            font-size: 1.75rem;
+            margin: 0 0 14px 0;
+        }
+
+        /* RÁCSOK */
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-top: 20px;
+        }
+
+        .card-box {
+            background: #f5f5f4;
+            padding: 20px;
+            border-radius: 14px;
+            border-top: 5px solid #78716c;
+        }
+
+        .card-box.highlight {
+            background: #fff7ed;
+            border-top-color: #ea580c;
+        }
+
+        .species-card {
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 18px;
+            background: #fcfaf8;
+        }
+
+        .species-card ul {
+            padding-left: 18px;
+            margin: 8px 0 0 0;
+            font-size: 0.93rem;
+        }
+
+        .species-card li {
+            margin-bottom: 4px;
+        }
+
+        .species-tag {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .tag-edible { background: #dcfce7; color: #166534; }
+        .tag-toxic { background: #fee2e2; color: #991b1b; }
+        .tag-wood { background: #fef3c7; color: #92400e; }
+
+        /* ALSÓ LAPOZÓ GOMBOK */
+        .slide-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 32px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn-nav {
+            background: #292524;
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-nav:hover:not(:disabled) {
+            background: var(--primary);
+        }
+
+        .btn-nav:disabled {
+            background: #d6d3d1;
+            cursor: not-allowed;
+        }
+
+        /* EGYESÉVEL MEGJELENŐ KVÍZ STÍLUSOK */
+        .quiz-card {
+            max-width: 720px;
+            margin: 10px auto;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 28px;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 999px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--secondary);
+            width: 5%;
+            transition: width 0.3s ease;
+        }
+
+        .quiz-q-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0 0 20px 0;
+        }
+
+        .quiz-option-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 15px 18px;
+            margin-bottom: 12px;
+            background: white;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #1e293b;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .quiz-option-btn:hover:not(:disabled) {
+            border-color: #0284c7;
+            background: #f0f9ff;
+        }
+
+        .quiz-option-btn.correct {
+            background: #dcfce7;
+            border-color: #16a34a;
+            color: #14532d;
+        }
+
+        .quiz-option-btn.wrong {
+            background: #fee2e2;
+            border-color: #dc2626;
+            color: #7f1d1d;
+        }
+
+        .quiz-feedback {
+            margin-top: 16px;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: 700;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <header>
+        <h1>🍄 A Gombák Titokzatos Világa</h1>
+        <p>4. osztályos interaktív felfedező előadás és tudáspróba</p>
+    </header>
+
+    <!-- FELSŐ OLDALVÁLTÓ FÜLEK -->
+    <nav class="nav-tabs">
+        <button class="tab-btn active" onclick="goToPage(0)">1. Mi a gomba?</button>
+        <button class="tab-btn" onclick="goToPage(1)">2. A 10 legfontosabb faj</button>
+        <button class="tab-btn" onclick="goToPage(2)">3. Csiperke vagy Galóca?</button>
+        <button class="tab-btn" onclick="goToPage(3)">4. Lebontás, Hasznos & Erdő</button>
+       <button class="tab-btn quiz-tab" onclick="window.location.href='gomba_teszt.html'">
+  🧠 5. Kvíz (50 kérdés)
+</button>
+    </nav>
+
+    <!-- ===================================================================== -->
+    <!-- 1. OLDAL: MIÉRT NEM NÖVÉNYEK ÉS NEM ÁLLATOK?                          -->
+    <!-- ===================================================================== -->
+    <div class="page-slide active" id="page-0">
+        <span class="badge">1. Fejezet • Biológiai alapok</span>
+        <h2>Sem nem növények, sem nem állatok – akkor mik a gombák?</h2>
+        <p>
+            Régen azt hitték, hogy a gombák különös növények, hiszen a földből nőnek ki és nem szaladnak el. Ma már tudjuk, hogy a gombák egy <strong>teljesen önálló országot</strong> alkotnak az élővilágban!
+        </p>
+
+        <!-- KÉPHELY: Gomba felépítése (kalap, tönk, föld alatti micélium) -->
+        <div class="img-slot" style="min-height: 300px;">
+            <img src="gombak/gomba.png" alt="A gomba felépítése és a föld alatti fonalhálózat">
+            <div class="placeholder-text">
+                <span>🖼️</span>
+                <strong>KÉPHELY 1: A gomba felépítése (Kalap, tönk és a föld alatti gombafonalak)</strong>
+                <small>Illessz be ide egy ábrát vagy fotót a gomba részeiről! (Ajánlott: 900x350 px)</small>
+            </div>
+        </div>
+
+        <div class="grid-3">
+            <div class="card-box">
+                <h3>🌱 Miért NEM növények?</h3>
+                <ul>
+                    <li><strong>Nincs zöld színtestük (klorofill):</strong> Nem tudnak napfényből cukrot készíteni.</li>
+                    <li><strong>Sötétben is megélnek:</strong> Akár a pince mélyén vagy a föld alatt is növekednek.</li>
+                    <li><strong>Nincs gyökerük, száruk, levelük:</strong> Testüket vékony fonalak (<em>hifák</em>) alkotják.</li>
+                </ul>
+            </div>
+
+            <div class="card-box">
+                <h3>🦌 Miért NEM állatok?</h3>
+                <ul>
+                    <li><strong>Helyhez kötöttek:</strong> Nem tudnak helyet változtatni.</li>
+                    <li><strong>Spórákkal szaporodnak:</strong> Mikroszkopikus spórákat szórnak szét a széllel.</li>
+                    <li><strong>Külső emésztés:</strong> Emésztőnedvet bocsátanak ki, és úgy szívják fel a tápanyagot.</li>
+                </ul>
+            </div>
+
+            <div class="card-box highlight">
+                <h3>🍄 Mi teszi őket egyedivé?</h3>
+                <ul>
+                    <li><strong>Kitines sejtfal:</strong> Ugyanaz az anyag építi fel őket, mint a bogarak páncélját!</li>
+                    <li><strong>A gomba csak a „gyümölcs”:</strong> Amit leszedünk, az csak a <em>termőtest</em>. Az igazi gomba a föld alatti hatalmas fonalhálózat (<em>micélium</em>).</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="slide-footer">
+            <button class="btn-nav" disabled>⬅️ Előző oldal</button>
+            <span>1 / 5. oldal</span>
+            <button class="btn-nav" onclick="goToPage(1)">Következő: 10 fontos faj ➡️</button>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- 2. OLDAL: A 10 LEGFONTOSABB HAZAI FAJ (HOL ÉL, NÖVÉNY, SZEREP)         -->
+    <!-- ===================================================================== -->
+    <div class="page-slide" id="page-1">
+        <span class="badge badge-green">2. Fejezet • Terepi fajismeret és ökológia</span>
+        <h2>Gombák a természetben: Hol élnek és mi a feladatuk?</h2>
+        <p>
+            Az erdőkben találkozhatunk a talajon növő <strong>kalapos gombákkal</strong> és a fák törzsén élő kemény <strong>taplógombákkal</strong>. Minden fajnak megvan a maga lakóhelye, kedvenc növénypartnere és fontos feladata.
+        </p>
+
+        <div class="grid-2">
+            <!-- 1. Ízletes vargánya -->
+            <div class="species-card">
+                <div class="img-slot">
+                    <img src="gombak/varganya.jpg" alt="Ízletes vargánya">
+                    <div class="placeholder-text"><span>🍄</span><strong>KÉPHELY: Ízletes vargánya</strong><small>Fotó helye</small></div>
+                </div>
+                <span class="species-tag tag-edible">Kiváló ehető</span>
+                <h3>1. Ízletes vargánya</h3>
+                <ul>
+                    <li><strong>Hol él?</strong> Lomberdőkben és fenyvesekben, savanyúbb talajon.</li>
+                    <li><strong>Mely növénnyel?</strong> Bükkel, tölggyel, gyertyánnal és lucfenyővel.</li>
+                    <li><strong>Mi a szerepe?</strong> <em>Mikorrhiza partner</em> – vízzel és ásványi anyagokkal látja el a fákat.</li>
+                </ul>
+            </div>
+
+            <!-- 2. Mezei csiperke -->
+            <div class="species-card">
+                <div class="img-slot">
+                    <img src="gombak/mezei_csiperke2.jpg" alt="Mezei csiperke">
+                    <div class="placeholder-text"><span>🍄</span><strong>KÉPHELY: Mezei csiperke</strong><small>Fotó helye</small></div>
+                </div>
+                <span class="species-tag tag-edible">Ehető • Gyakori</span>
+                <h3>2. Mezei csiperke</h3>
+                <ul>
+                    <li><strong>Hol él?</strong> Nyílt réteken, legelőkön, parkokban (nem erdőben!).</li>
+                    <li><strong>Mely növénnyel?</strong> Réti fűfélékkel, lágyszárú növények között.</li>
+                    <li><strong>Mi a szerepe?</strong> <em>Talajlakó lebontó</em> – az elhalt fűszálakból és szerves anyagokból készít humuszt.</li>
+                </ul>
+            </div>
+
+            <!-- 3. Nagy őzlábgomba -->
+            <div class="species-card">
+                <div class="img-slot">
+                    <img src="gombak/ozlabgomba.jpg" alt="Nagy őzlábgomba">
+                    <div class="placeholder-text"><span>🍄</span><strong>KÉPHELY: Nagy őzlábgomba</strong><small>Fotó helye</small></div>
+                </div>
+                <span class="species-tag tag-edible">Kiváló ehető</span>
+                <h3>3. Nagy őzlábgomba</h3>
+                <ul>
+                    <li><strong>Hol él?</strong> Erdőszéleken, tisztásokon, ligeterdőkben.</li>
+                    <li><strong>Mely növénnyel?</strong> Tölgyesek, akácosok és fenyvesek szegélyében, fűfélék között.</li>
+                    <li><strong>Mi a szerepe?</strong> <em>Avarlebontó</em> – a lehullott leveleket és ágacskákat bontja vissza tápanyaggá.</li>
+                </ul>
+            </div>
+
+            <!-- 4. Sárga rókagomba -->
+            <div class="species-card">
+                <div class="img-slot">
+                    <img src="gombak/rokagomba.jpg" alt="Sárga rókagomba">
+                    <div class="placeholder-text"><span>🍄</span><strong>KÉPHELY: Sárga rókagomba</strong><small>Fotó helye</small></div>
+                </div>
+                <span class="species-tag tag-edible">Ehető • Illatos</span>
+                <h3>4. Sárga rókagomba</h3>
+                <ul>
+                    <li><strong>Hol él?</strong> Mohás, nyirkosabb lomb- és fenyőerdőkben.</li>
+                    <li><strong>Mely növénnyel?</strong> Bükkel, tölggyel, szelídgesztenyével és fenyőkkel.</li>
+                    <li><strong>Mi a szerepe?</strong> <em>Mikorrhiza partner</em> – segíti a fák gyökereinek tápanyagfelvételét.</li>
+                </ul>
+            </div>
+
+            <!-- 5. Késői laskagomba -->
+            <div class="species-card">
+                <div class="img-slot">
+                    <img src="gombak/laskagomba.jpg" alt="Késői laskagomba">
+                    <div class="placeholder-text"><span>🍄</span><strong>KÉPHELY: Késői laskagomba</strong><small>Fotó helye</small></div>
+                </div>
+                <span class="species-tag tag-edible">Ehető • Fa lakója</span>
+                <h3>5. Késői laskagomba</h3>
+                <ul>
+                    <li><strong>Hol él?</strong> Ártéri erdőkben, idős lombos fák törzsén (ősszel-télen).</li>
+                    <li><strong>Mely növénnyel?</strong> Nyárfával, fűzfával, bükkel és diófával.</li>
+                    <li><strong>Mi a szerepe?</strong> <em>Faanyag-lebontó</em> – az elhalt fatörzsek kemény faanyagát bontja le.</li>
+                </ul>
+            </div>
+
+            <!-- 6. Gyilkos galóca -->
+            <div class="species-card">
+                <div class="img-slot">
+                    <img src="gombak/gyilkos_galoca1.jpg" alt="Gyilkos galóca">
+                    <div class="placeholder-text"><span>☠️</span><strong>KÉPHELY: Gyilkos galóca</strong><small>Fotó helye</small></div>
+                </div>
+                <span class="species-tag tag-toxic">HALÁLOSAN MÉRGEZŐ!</span>
+                <h3>6. Gyilkos galóca</h3>
+                <ul>
+                    <li><strong>Hol él?</strong> Melegebb lomberdőkben, parkokban (nyártól őszig).</li>
+                    <li><strong>Mely növénnyel?</strong> Leggyakrabban tölggyel, gyertyánnal és bükkel.</li>
+                    <li><strong>Mi a szerepe?</strong> <em>Mikorrhiza partner</em> – a fáknak hasznos segítője, de az emberre halálos!</li>
+                </ul>
+            </div>
+
+            <!-- 7. Légyölő galóca -->
+            <div class="species-card">
+                <div class="img-slot">
+                    <img src="gombak/legyolo.jpg" alt="Légyölő galóca">
+                    <div class="placeholder-text"><span>⚠️</span><strong>KÉPHELY: Légyölő galóca</strong><small>Fotó helye</small></div>
+                </div>
+                <span class="species-tag tag-toxic">Mérgező • Mesebeli</span>
+                <h3>7. Légyölő galóca</h3>
+                <ul>
+                    <li><strong>Hol él?</strong> Hűvösebb, savanyú talajú erdőkben.</li>
+                    <li><strong>Mely növénnyel?</strong> Nyírfával és lucfenyővel alkot szoros párost.</li>
+                    <li><strong>Mi a szerepe?</strong> <em>Mikorrhiza partner</em> – táplálja a nyírfákat és fenyőket.</li>
+                </ul>
+            </div>
+
+            <!-- 8. Világító tölcsérgomba -->
+            <div class="species-card">
+                <div class="img-slot">
+                    <img src="gombak/tolcsergomba.jpg" alt="Világító tölcsérgomba">
+                    <div class="placeholder-text"><span>⚠️</span><strong>KÉPHELY: Világító tölcsérgomba</strong><small>Fotó helye</small></div>
+                </div>
+                <span class="species-tag tag-toxic">Mérgező • Trükkös</span>
+                <h3>8. Világító tölcsérgomba</h3>
+                <ul>
+                    <li><strong>Hol él?</strong> Meleg tölgyesekben, fák tövében csoportosan.</li>
+                    <li><strong>Mely növénnyel?</strong> Tölgyfák és szelídgesztenyék elhalt gyökerein, tuskóin.</li>
+                    <li><strong>Mi a szerepe?</strong> <em>Faanyag-lebontó</em> – az elöregedett gyökereket bontja vissza a talajba.</li>
+                </ul>
+            </div>
+
+            <!-- 9. Bükkfatapló -->
+            <div class="species-card">
+                <div class="img-slot">
+                    <img src="gombak/bukkfataplo.jpg" alt="Bükkfatapló">
+                    <div class="placeholder-text"><span>🪵</span><strong>KÉPHELY: Bükkfatapló</strong><small>Fotó helye</small></div>
+                </div>
+                <span class="species-tag tag-wood">Taplógomba • Nem ehető</span>
+                <h3>9. Bükkfatapló</h3>
+                <ul>
+                    <li><strong>Hol él?</strong> Idős hegyvidéki és dombvidéki erdőkben, magasan a törzseken.</li>
+                    <li><strong>Mely növénnyel?</strong> Leginkább meggyengült vagy elhalt bükkfákkal (néha nyírrel).</li>
+                    <li><strong>Mi a szerepe?</strong> <em>Kiváló faanyag-lebontó</em> – lebontja a kemény lignint, odút készítve a harkályoknak!</li>
+                </ul>
+            </div>
+
+            <!-- 10. Pecsétviaszgomba -->
+            <div class="species-card">
+                <div class="img-slot">
+                    <img src="gombak/pecsetviaszgomba.jpg" alt="Pecsétviaszgomba">
+                    <div class="placeholder-text"><span>🪵</span><strong>KÉPHELY: Pecsétviaszgomba</strong><small>Fotó helye</small></div>
+                </div>
+                <span class="species-tag tag-wood">Taplógomba • Gyógyhatású</span>
+                <h3>10. Pecsétviaszgomba</h3>
+                <ul>
+                    <li><strong>Hol él?</strong> Meleg lomberdőkben, tuskók tövében.</li>
+                    <li><strong>Mely növénnyel?</strong> Tölgyfák és más keményfák elhalt gyökerein.</li>
+                    <li><strong>Mi a szerepe?</strong> <em>Faanyag-lebontó</em> – eltünteti az elhalt fatuskókat az erdőből.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="slide-footer">
+            <button class="btn-nav" onclick="goToPage(0)">⬅️ Előző oldal</button>
+            <span>2 / 5. oldal</span>
+            <button class="btn-nav" onclick="goToPage(2)">Következő: Csiperke vs. Galóca ➡️</button>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- 3. OLDAL: VESZÉLYES TÉVESZTÉS – CSIPERKE ÉS GYILKOS GALÓCA            -->
+    <!-- ===================================================================== -->
+    <div class="page-slide" id="page-2">
+        <span class="badge badge-red">3. Fejezet • Életmentő tudás</span>
+        <h2>⚠️ Vigyázat! Csiperke vagy Gyilkos galóca?</h2>
+        <p>
+            A legtöbb halálos gombamérgezés azért történik, mert a fiatal, fehér kalapú <strong>gyilkos galócát</strong> összetévesztik az ehető <strong>csiperkével</strong>. Nézd meg egymás mellett a kettőt!
+        </p>
+
+        <div class="grid-2">
+            <!-- CSIPERKE KÁRTYA + KÉP -->
+            <div style="background: #f0fdf4; border: 2px solid #86efac; border-radius: 16px; padding: 20px;">
+                <div class="img-slot" style="min-height: 230px; border-color: #4ade80;">
+                    <img src="gombak/mezei_csiperke.jpg" alt="Ehető csiperke részletfotó">
+                    <div class="placeholder-text">
+                        <span>✅</span>
+                        <strong>KÉPHELY: Ehető Csiperke (lemezei és tönkje alja)</strong>
+                        <small>Illessz be ide csiperke fotót!</small>
+                    </div>
+                </div>
+                <h3 style="color: #166534; font-size: 1.35rem;">✅ Ehető Csiperke (Champignon)</h3>
+                <ul>
+                    <li><strong>Lemezei:</strong> Fiatalon rózsaszínűek, később sötét csokoládébarnák.</li>
+                    <li><strong>Tönkje alja:</strong> Sima, gumós – <strong>NINCS bocskora!</strong></li>
+                    <li><strong>Illata:</strong> Kellemes, enyhén ánizsos vagy gombaillatú.</li>
+                </ul>
+            </div>
+
+            <!-- GYILKOS GALÓCA KÁRTYA + KÉP -->
+            <div style="background: #fef2f2; border: 2px solid #f87171; border-radius: 16px; padding: 20px;">
+                <div class="img-slot" style="min-height: 230px; border-color: #f87171;">
+                    <img src="gombak/gyilkos_galoca1.jpg" alt="Gyilkos galóca bocskorral és fehér lemezekkel">
+                    <div class="placeholder-text">
+                        <span>☠️</span>
+                        <strong>KÉPHELY: Gyilkos galóca (fehér lemezek és bocskor!)</strong>
+                        <small>Illessz be ide gyilkos galóca fotót!</small>
+                    </div>
+                </div>
+                <h3 style="color: #991b1b; font-size: 1.35rem;">☠️ Gyilkos galóca</h3>
+                <ul>
+                    <li><strong>Lemezei:</strong> Mindig <strong>hófehérek</strong> maradnak (idős korában is!).</li>
+                    <li><strong>Tönkje alja:</strong> A földben egy bőrszerű zsákban, <strong>BOCSKORBAN</strong> ül!</li>
+                    <li><strong>Gallér:</strong> Lógó szoknyácska van a tönkjén.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div style="margin-top: 24px; background: #fee2e2; border: 2px solid #dc2626; padding: 18px; border-radius: 14px; text-align: center; color: #7f1d1d; font-weight: 800; font-size: 1.1rem;">
+            🛑 ARANYSZABÁLY: Soha ne edd meg a leszedett vadon termő gombát addig, amíg hivatalos gombaszakellenőr (piacon, ingyenesen) meg nem vizsgálta!
+        </div>
+
+        <div class="slide-footer">
+            <button class="btn-nav" onclick="goToPage(1)">⬅️ Előző oldal</button>
+            <span>3 / 5. oldal</span>
+            <button class="btn-nav" onclick="goToPage(3)">Következő: Lebontás, Hasznos & Erdő ➡️</button>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- 4. OLDAL: LEBONTÁS (LIGNIN), GOMBÁK ÉS MI + MIKORRHIZA                -->
+    <!-- ===================================================================== -->
+    <div class="page-slide" id="page-3">
+        <span class="badge">4. Fejezet • Mindennapok és ökológia</span>
+        <h2>A Föld takarítói, segítőink és az erdő titkos internetje</h2>
+
+        <!-- KIEMELT BLOKK: AZ ERDŐ TAKARÍTÓI ÉS A LIGNIN LEBONTÁSA -->
+        <div style="background: #fffbeb; border: 2px solid #f59e0b; border-radius: 16px; padding: 24px; margin-bottom: 24px;">
+            <span class="badge" style="background: #fef3c7; color: #92400e;">Evolúciós szupererő</span>
+            <h3 style="color: #78350f; font-size: 1.4rem; margin-top: 4px;">♻️ A Föld legnagyobb takarítói: Hogyan mentették meg a gombák a bolygót?</h3>
+            <p style="margin-bottom: 10px;">
+                A gombák az élővilág legfontosabb <strong>lebontói</strong>. Nélkülük az erdők néhány év alatt méteres magasságban belefulladnának a lehullott falevelekbe és kidőlt fatörzsekbe!
+            </p>
+            <ul style="margin: 0; color: #451a03;">
+                <li><strong>A kemény fa titka (a Lignin):</strong> A fák törzsét egy kőkemény, ellenálló anyag, a <strong>lignin</strong> teszi szilárddá. Ezt az anyagot szinte egyetlen állat vagy baktérium sem tudja megemészteni.</li>
+                <li><strong>Evolúciós fordulópont:</strong> Évmilliókkal ezelőtt (a karbon korban) a kidőlt ősfák nem tudtak elkorhadni – belőlük keletkezett a mai <em>feketeszén</em>! Később azonban a gombák kifejlesztették azokat a különleges enzimeket, amelyekkel <strong>képesek lebontani a lignint</strong>.</li>
+                <li><strong>Újrahasznosítás az erdőben:</strong> A taplógombák és korhasztó gombák ma szétbontják a kemény fát, és visszaadják a talajnak az értékes tápanyagokat, hogy új csemeték nőhessenek belőle.</li>
+            </ul>
+        </div>
+
+        <div class="grid-2">
+            <!-- KÁROS GOMBÁK + KÉP -->
+            <div style="background: #fef2f2; border-left: 5px solid #ef4444; padding: 20px; border-radius: 14px;">
+                <div class="img-slot" style="min-height: 200px;">
+                    <img src="gombak/lisztharmat.jpg" alt="Káros gombák: penész és növénybetegségek">
+                    <div class="placeholder-text">
+                        <span>🦠</span>
+                        <strong>KÉPHELY: Káros gombák (pl. kenyérpenész, lisztharmat)</strong>
+                        <small>Illessz be ide képet!</small>
+                    </div>
+                </div>
+                <h3 style="color: #991b1b;">🦠 Káros gombák (Betegségek és romlás)</h3>
+                <ul>
+                    <li><strong>Élelmiszer-penész:</strong> A kenyéren, gyümölcsön megjelenő penész mérgező – az ilyen ételt ki kell dobni!</li>
+                    <li><strong>Növénybetegségek:</strong> A lisztharmat és a rozsdagomba megtámadja a búzát, szőlőt, gyümölcsfákat.</li>
+                    <li><strong>Emberi és állati betegségek:</strong> A bőr- és körömgomba fertőzést okoz (pl. uszodában papucs nélkül).</li>
+                </ul>
+            </div>
+
+            <!-- HASZNOS GOMBÁK + KÉP -->
+            <div style="background: #ecfdf5; border-left: 5px solid #10b981; padding: 20px; border-radius: 14px;">
+                <div class="img-slot" style="min-height: 200px;">
+                    <img src="gombak/keksajt.jpg" alt="Hasznos gombák: élesztő, nemespenészes sajt, penicillin">
+                    <div class="placeholder-text">
+                        <span>🍞</span>
+                        <strong>KÉPHELY: Hasznos gombák (élesztős kenyér, nemespenészes sajt)</strong>
+                        <small>Illessz be ide képet!</small>
+                    </div>
+                </div>
+                <h3 style="color: #065f46;">🍞 Hasznos gombák (Konyha, gyógyszer, mezőgazdaság)</h3>
+                <ul>
+                    <li><strong>Élesztőgombák:</strong> Nélkülük nem kelne meg a kenyér, a kalács és a pizza tésztája!</li>
+                    <li><strong>Nemespenészek:</strong> Finom sajtok (pl. camembert, márványsajt) és szalámik érleléséhez használják őket.</li>
+                    <li><strong>Gyógyszerek:</strong> Az ecsetpenészből készült <em>penicillin</em> életmentő antibiotikum.</li>
+                    <li><strong>Modern mezőgazdaság:</strong> Hasznos gombákkal védik a növényeket a kártevőktől vegyszerek helyett.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ZÁRÁS: MIKORRHIZA + 2 KÉPHELY (ERDŐ ALJA + GOMBA ÉS NÖVÉNY EGYÜTT) -->
+        <div style="background: linear-gradient(to right, #f0fdf4, #ecfeff); border: 1px solid #a7f3d0; border-radius: 16px; padding: 24px; margin-top: 28px;">
+            <h3 style="color: #065f46; font-size: 1.4rem; margin-top: 0;">🤝 Az erdő titkos internetje: A mikorrhiza (gombagyökér)</h3>
+            <p>
+                Az erdei fák és a kalapos gombák legjobb barátok. Ezt a szoros együttélést nevezzük <strong>mikorrhizának</strong>.
+            </p>
+
+            <div class="grid-2" style="margin-bottom: 16px;">
+                <!-- KÉPHELY: ERDŐ ALJA -->
+                <div class="img-slot" style="min-height: 210px; background: white;">
+                    <img src="gombak/gomba_fa.gif" alt="Az erdő talaja alatti gombafonalak">
+                    <div class="placeholder-text">
+                        <span>🌲</span>
+                        <strong>KÉPHELY: Az erdő alja (Föld alatti gombafonal-hálózat)</strong>
+                        <small>Illessz be ide képet az erdő alatti gombahálózatról!</small>
+                    </div>
+                </div>
+
+                <!-- KÉPHELY: GOMBA + NÖVÉNY EGYÜTT -->
+                <div class="img-slot" style="min-height: 210px; background: white;">
+                    <img src="gombak/gomba_noveny.gif" alt="Gomba és növény gyökere együttélése">
+                    <div class="placeholder-text">
+                        <span>🌱🤝🍄</span>
+                        <strong>KÉPHELY: Gomba + Növény együtt (Mikorrhiza kapcsolat)</strong>
+                        <small>Illessz be ide képet a gomba és a növény gyökerének kapcsolatáról!</small>
+                    </div>
+                </div>
+            </div>
+
+            <ul>
+                <li><strong>Mit ad a gomba a fának?</strong> A gomba fonalai behálózzák a fa gyökerét, és messziről is felszívják neki a vizet és az ásványi sókat.</li>
+                <li><strong>Mit ad a fa a gombának?</strong> A fa a leveleiben napfényből készített édes cukorral fizet a gombának.</li>
+                <li><strong>Erdői üzenőfal:</strong> A gombafonalakon keresztül az idős fák tápanyagot és figyelmeztető jeleket is küldenek a csemetéknek!</li>
+            </ul>
+        </div>
+
+        <div class="slide-footer">
+            <button class="btn-nav" onclick="goToPage(2)">⬅️ Előző oldal</button>
+            <span>4 / 5. oldal</span>
+            <button class="btn-nav" onclick="window.location.href='gomba_teszt.html'">
+  🧠 5. Kvíz (50 kérdés)
+</button>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- 5. OLDAL: EGYESÉVEL MEGJELENŐ 20 KÉRDÉSES KVÍZ                        -->
+    <!-- ===================================================================== -->
+    <div class="page-slide" id="page-4">
+        <span class="badge badge-green">5. Fejezet • Tudáspróba</span>
+        <h2>🧠 Gombász Kvíz – Kérdésről kérdésre!</h2>
+        <p>Válaszolj a kérdésekre egyesével! Azonnal kiderül, eltaláltad-e.</p>
+
+        <div class="quiz-card" id="quiz-box">
+            <div style="display: flex; justify-content: space-between; font-weight: 700; color: #475569; margin-bottom: 6px;">
+                <span id="q-counter">1 / 20. kérdés</span>
+                <span id="q-score">Pontszám: 0</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+
+            <div id="quiz-content">
+                <h3 class="quiz-q-title" id="question-text">Kérdés betöltése...</h3>
+                <div id="options-area"></div>
+                <div class="quiz-feedback" id="feedback-box"></div>
+                <div style="text-align: right; margin-top: 18px;">
+                    <button class="btn-nav" id="next-q-btn" style="display: none; background: #065f46;" onclick="nextQuestion()">Következő kérdés ➡️</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-footer">
+            <button class="btn-nav" onclick="goToPage(3)">⬅️ Vissza a tananyaghoz</button>
+            <span>5 / 5. oldal</span>
+            <button class="btn-nav" onclick="restartQuiz()">🔄 Kvíz újrakezdése</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // AUTOMATIKUS KÉPMEGJELENÍTÉS, HA BEÍRTÁL EGY SRC-T
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll('.img-slot img').forEach(img => {
+            if (img.getAttribute('src') && img.getAttribute('src').trim() !== "") {
+                img.parentElement.classList.add('has-image');
+            }
+        });
+        loadQuestion();
+    });
+
+    // OLDALAK KÖZÖTTI LAPOZÁS
+    function goToPage(pageIndex) {
+        const slides = document.querySelectorAll('.page-slide');
+        const tabs = document.querySelectorAll('.tab-btn');
+
+        slides.forEach((slide, idx) => {
+            slide.classList.toggle('active', idx === pageIndex);
+        });
+
+        tabs.forEach((tab, idx) => {
+            tab.classList.toggle('active', idx === pageIndex);
+        });
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // 20 KVÍZKÉRDÉS NEGYEDIKESEKNEK
+    const quizData = [
+        { q: "1. Miért NEM tartoznak a gombák a növények országába?", options: ["Mert tudnak szaladni", "Mert nincs zöld színtestük (klorofilljuk)", "Mert van csontvázuk"], correct: 1 },
+        { q: "2. Milyen anyagból épül fel a gombák sejtfala?", options: ["Fából", "Kitinből (mint a bogarak páncélja)", "Mészkőből"], correct: 1 },
+        { q: "3. Hogyan szaporodnak a gombák?", options: ["Magokkal", "Spórákkal", "Tojásokkal"], correct: 1 },
+        { q: "4. Mi található az erdő talaja alatt, ami a gomba valódi teste?", options: ["A gyökérzet", "A gombafonalak szövedéke (micélium)", "A makk"], correct: 1 },
+        { q: "5. Mi segíti a kenyértészta megkelését a konyhában?", options: ["A taplógomba", "Az élesztőgomba", "A légyölő galóca"], correct: 1 },
+        { q: "6. Melyik gombafajt használják különleges sajtok (pl. camembert) érlelésére?", options: ["Nemespenészt", "Gyilkos galócát", "Lisztharmatot"], correct: 0 },
+        { q: "7. Milyen színűek a halálosan mérgező gyilkos galóca lemezei?", options: ["Csokoládébarnák", "Mindig hófehérek", "Élénkpirosak"], correct: 1 },
+        { q: "8. Mi rejtőzik a gyilkos galóca tönkjének alján a földben?", options: ["Bocskor", "Répa", "Hagyma"], correct: 0 },
+        { q: "9. Milyen színűek az ehető csiperke lemezei idős korában?", options: ["Hófehérek", "Sötét csokoládébarnák", "Kékek"], correct: 1 },
+        { q: "10. Mi a teendő, ha az erdőben szedtél egy kosár gombát?", options: ["Azonnal megfőzzük", "Megmutatjuk hivatalos gombaszakellenőrnek", "Megkóstoljuk nyersen"], correct: 1 },
+        { q: "11. Melyik fafajjal él együtt leggyakrabban a légyölő galóca?", options: ["Nyírfával és lucfenyővel", "Kaktusszal", "Náddal"], correct: 0 },
+        { q: "12. Melyik híres gyógyszert fedezték fel az ecsetpenész segítségével?", options: ["A C-vitamint", "A penicillint (antibiotikumot)", "Az aszpirint"], correct: 1 },
+        { q: "13. Mit kell tenni a penészes kenyérrel?", options: ["Levágjuk a szélét és megesszük", "Az egészet ki kell dobni", "Megpirítjuk"], correct: 1 },
+        { q: "14. Mi a mikorrhiza?", options: ["Egy mérgező bogár", "A fák gyökere és a gombafonalak hasznos együttélése", "Egy konyhai edény"], correct: 1 },
+        { q: "15. Mit ad a gomba a fának a mikorrhiza kapcsolatban?", options: ["Vizet és ásványi sókat", "Napfényt", "Leveleket"], correct: 0 },
+        { q: "16. Mit ad a fa a gombának cserébe?", options: ["Cukrot (tápanyagot)", "Vizet", "Spórákat"], correct: 0 },
+        { q: "17. Melyik gomba okozhat növénybetegséget a kertben vagy a szántóföldön?", options: ["A lisztharmat", "A vargánya", "Az őzlábgomba"], correct: 0 },
+        { q: "18. Hogyan védekezhetünk az uszodában a lábgomba ellen?", options: ["Papucs viselésével", "Kesztyű viselésével", "Sapkával"], correct: 0 },
+        { q: "19. Mi az a kemény anyag a fák törzsében, amit csak a gombák tudnak igazán lebontani?", options: ["A lignin", "A cukor", "A mészkő"], correct: 0 },
+        { q: "20. Mi történt a kidőlt ősfákkal évmilliókkal ezelőtt, mielőtt a gombák megtanulták lebontani a lignint?", options: ["Elrepültek", "Feketeszén keletkezett belőlük", "Homokká váltak"], correct: 1 }
+    ];
+
+    let currentQ = 0;
+    let score = 0;
+    let answeredCurrent = false;
+
+    function loadQuestion() {
+        answeredCurrent = false;
+        const data = quizData[currentQ];
+
+        document.getElementById('q-counter').innerText = `${currentQ + 1} / ${quizData.length}. kérdés`;
+        document.getElementById('q-score').innerText = `Pontszám: ${score}`;
+        document.getElementById('progress-fill').style.width = `${((currentQ + 1) / quizData.length) * 100}%`;
+        document.getElementById('question-text').innerText = data.q;
+
+        const optionsArea = document.getElementById('options-area');
+        optionsArea.innerHTML = '';
+
+        data.options.forEach((optText, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'quiz-option-btn';
+            btn.innerText = optText;
+            btn.onclick = () => selectAnswer(idx, btn);
+            optionsArea.appendChild(btn);
+        });
+
+        const fb = document.getElementById('feedback-box');
+        fb.style.display = 'none';
+        document.getElementById('next-q-btn').style.display = 'none';
+    }
+
+    function selectAnswer(selectedIdx, clickedBtn) {
+        if (answeredCurrent) return;
+        answeredCurrent = true;
+
+        const data = quizData[currentQ];
+        const allBtns = document.querySelectorAll('.quiz-option-btn');
+        const fb = document.getElementById('feedback-box');
+
+        allBtns.forEach((btn, idx) => {
+            btn.disabled = true;
+            if (idx === data.correct) {
+                btn.classList.add('correct');
+            }
+        });
+
+        if (selectedIdx === data.correct) {
+            score++;
+            document.getElementById('q-score').innerText = `Pontszám: ${score}`;
+            fb.style.background = '#dcfce7';
+            fb.style.color = '#14532d';
+            fb.innerText = '✅ Szuper! Helyes válasz!';
+        } else {
+            clickedBtn.classList.add('wrong');
+            fb.style.background = '#fee2e2';
+            fb.style.color = '#7f1d1d';
+            fb.innerText = '❌ Sajnos nem ez a jó válasz. Nézd meg a zölddel jelöltet!';
+        }
+
+        fb.style.display = 'block';
+        const nextBtn = document.getElementById('next-q-btn');
+        nextBtn.style.display = 'inline-block';
+        nextBtn.innerText = (currentQ < quizData.length - 1) ? 'Következő kérdés ➡️' : 'Eredmény megtekintése 🏆';
+    }
+
+    function nextQuestion() {
+        currentQ++;
+        if (currentQ < quizData.length) {
+            loadQuestion();
+        } else {
+            showFinalResult();
+        }
+    }
+
+    function showFinalResult() {
+        const content = document.getElementById('quiz-content');
+        let badgeMsg = '';
+
+        if (score >= 17) {
+            badgeMsg = '🏆 Gratulálok! Igazi Erdőjáró Gombaszakértő lettél!';
+        } else if (score >= 12) {
+            badgeMsg = '👍 Szép munka! Ügyesen ismered a gombák világát!';
+        } else {
+            badgeMsg = '🍄 Jó kezdet! Lapozz vissza, nézd át még egyszer a képeket, és próbáld újra!';
+        }
+
+        content.innerHTML = `
+            <div style="text-align: center; padding: 20px 10px;">
+                <div style="font-size: 3.5rem; margin-bottom: 10px;">🎉</div>
+                <h3 style="font-size: 1.6rem; color: #065f46; margin-bottom: 10px;">${badgeMsg}</h3>
+                <p style="font-size: 1.3rem; font-weight: 800; color: #1e293b;">Végső pontszámod: ${score} / ${quizData.length}</p>
+                <button class="btn-nav" style="background: #065f46; margin-top: 16px;" onclick="restartQuiz()">🔄 Kvíz újraindítása</button>
+            </div>
+        `;
+    }
+
+    function restartQuiz() {
+        currentQ = 0;
+        score = 0;
+        const content = document.getElementById('quiz-content');
+        content.innerHTML = `
+            <h3 class="quiz-q-title" id="question-text"></h3>
+            <div id="options-area"></div>
+            <div class="quiz-feedback" id="feedback-box"></div>
+            <div style="text-align: right; margin-top: 18px;">
+                <button class="btn-nav" id="next-q-btn" style="display: none; background: #065f46;" onclick="nextQuestion()">Következő kérdés ➡️</button>
+            </div>
+        `;
+        loadQuestion();
+    }
+</script>
+
+</body>
+</html>
